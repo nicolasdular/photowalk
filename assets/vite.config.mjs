@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import { phoenixVitePlugin } from 'phoenix_vite'
 import tailwindcss from "@tailwindcss/vite";
+import preact from '@preact/preset-vite';
 
 export default defineConfig({
   server: {
@@ -15,7 +16,7 @@ export default defineConfig({
   build: {
     manifest: true,
     rollupOptions: {
-      input: ["js/app.js", "css/app.css"],
+      input: ["js/app.tsx", "css/app.css"],
     },
     outDir: "../priv/static",
     emptyOutDir: true,
@@ -29,6 +30,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    preact(),
     tailwindcss(),
     phoenixVitePlugin({
       pattern: /\.(ex|heex)$/
