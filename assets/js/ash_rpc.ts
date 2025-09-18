@@ -3,13 +3,13 @@
 
 
 
-export type UUID = string;
+
 
 // ThexstackSchemaTodo Schema
 export type ThexstackSchemaTodoResourceSchema = {
   __type: "Resource";
   __primitiveFields: "id" | "title" | "completed";
-  id: UUID;
+  id: number;
   title: string;
   completed: boolean | null;
 };
@@ -28,9 +28,13 @@ export type ThexstackSchemaTodoFilterInput = {
   not?: Array<ThexstackSchemaTodoFilterInput>;
 
   id?: {
-    eq?: UUID;
-    notEq?: UUID;
-    in?: Array<UUID>;
+    eq?: number;
+    notEq?: number;
+    greaterThan?: number;
+    greaterThanOrEqual?: number;
+    lessThan?: number;
+    lessThanOrEqual?: number;
+    in?: Array<number>;
   };
 
   title?: {
@@ -511,7 +515,7 @@ export type UpdateTodoResult<Fields extends UpdateTodoFields> = | { success: tru
 
 export async function updateTodo<Fields extends UpdateTodoFields>(
   config: {
-  primaryKey: UUID;
+  primaryKey: number;
   input: UpdateTodoInput;
   fields: Fields;
   headers?: Record<string, string>;

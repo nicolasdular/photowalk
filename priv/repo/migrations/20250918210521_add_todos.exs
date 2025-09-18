@@ -9,13 +9,13 @@ defmodule Thexstack.Repo.Migrations.AddTodos do
 
   def up do
     create table(:todos, primary_key: false) do
-      add(:id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true)
-      add(:title, :text, null: false)
-      add(:completed, :boolean, default: false)
+      add :id, :bigserial, null: false, primary_key: true
+      add :title, :text, null: false
+      add :completed, :boolean, default: false
     end
   end
 
   def down do
-    drop(table(:todos))
+    drop table(:todos)
   end
 end

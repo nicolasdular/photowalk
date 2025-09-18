@@ -19,7 +19,7 @@ defmodule Thexstack.Schema.Todo do
   end
 
   attributes do
-    uuid_primary_key :id
+    integer_primary_key :id
 
     attribute :title, :string do
       allow_nil? false
