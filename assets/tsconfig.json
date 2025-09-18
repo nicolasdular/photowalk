@@ -28,7 +28,8 @@
     "allowJs": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "preact"
+    "jsxImportSource": "preact",
+    "strictNullChecks": true
   },
   "include": ["js/**/*"]
 }

@@ -483,3 +483,129 @@ export async function validateCreateTodo(
 }
 
 
+export type UpdateTodoInput = {
+  completed?: boolean | null;
+};
+
+export type UpdateTodoValidationErrors = {
+  completed?: string[];
+};
+
+export type UpdateTodoFields = UnifiedFieldSelection<ThexstackSchemaTodoResourceSchema>[];
+
+type InferUpdateTodoResult<
+  Fields extends UpdateTodoFields,
+> = InferResult<ThexstackSchemaTodoResourceSchema, Fields>;
+
+export type UpdateTodoResult<Fields extends UpdateTodoFields> = | { success: true; data: InferUpdateTodoResult<Fields> }
+| {
+    success: false;
+    errors: Array<{
+      type: string;
+      message: string;
+      fieldPath?: string;
+      details: Record<string, string>;
+    }>;
+  }
+;
+
+export async function updateTodo<Fields extends UpdateTodoFields>(
+  config: {
+  primaryKey: UUID;
+  input: UpdateTodoInput;
+  fields: Fields;
+  headers?: Record<string, string>;
+  fetchOptions?: RequestInit;
+  customFetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+}
+): Promise<UpdateTodoResult<Fields>> {
+  const payload = {
+    action: "update_todo",
+    primaryKey: config.primaryKey,
+    input: config.input,
+    fields: config.fields
+  };
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...config.headers,
+  };
+
+  const fetchFunction = config.customFetch || fetch;
+  const fetchOptions: RequestInit = {
+    ...config.fetchOptions,
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload),
+  };
+
+  const response = await fetchFunction("/rpc/run", fetchOptions);
+
+  if (!response.ok) {
+    return {
+      success: false,
+      errors: [{ type: "network", message: response.statusText, details: {} }],
+    };
+  }
+
+  const result = await response.json();
+  return result as UpdateTodoResult<Fields>;
+}
+
+
+export type ValidateUpdateTodoResult =
+  | { success: true }
+  | {
+      success: false;
+      errors: Array<{
+        type: string;
+        message: string;
+        field?: string;
+        fieldPath?: string;
+        details?: Record<string, any>;
+      }>;
+    };
+
+
+export async function validateUpdateTodo(
+  config: {
+  primaryKey: string;
+  input: UpdateTodoInput;
+  headers?: Record<string, string>;
+  fetchOptions?: RequestInit;
+  customFetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+}
+): Promise<ValidateUpdateTodoResult> {
+  const payload = {
+    action: "update_todo",
+    primaryKey: config.primaryKey,
+    input: config.input
+  };
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...config.headers,
+  };
+
+  const fetchFunction = config.customFetch || fetch;
+  const fetchOptions: RequestInit = {
+    ...config.fetchOptions,
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload),
+  };
+
+  const response = await fetchFunction("/rpc/validate", fetchOptions);
+
+  if (!response.ok) {
+    return {
+      success: false,
+      errors: [{ type: "network", message: response.statusText }],
+    };
+  }
+
+  const result = await response.json();
+  return result as ValidateUpdateTodoResult;
+}
+
+
