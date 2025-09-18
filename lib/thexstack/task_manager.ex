@@ -5,6 +5,7 @@ defmodule Thexstack.TaskManager do
     resource Thexstack.Schema.Todo do
       rpc_action(:list_todos, :read)
       rpc_action(:create_todo, :create)
+      rpc_action(:update_todo, :update)
     end
   end
 
