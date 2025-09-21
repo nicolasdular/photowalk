@@ -23,6 +23,8 @@ config :spark,
     remove_parens?: true,
     "Ash.Resource": [
       section_order: [
+        :authentication,
+        :tokens,
         :postgres,
         :resource,
         :code_interface,
@@ -43,7 +45,7 @@ config :spark,
     "Ash.Domain": [section_order: [:resources, :policies, :authorization, :domain, :execution]]
   ]
 
-config :thexstack, :ash_domains, [Thexstack.TaskManager]
+config :thexstack, :ash_domains, [Thexstack.Accounts, Thexstack.TaskManager]
 
 config :bun,
   version: "1.2.16",

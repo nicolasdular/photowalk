@@ -5,6 +5,16 @@
 
 
 
+// ThexstackAccountsUser Schema
+export type ThexstackAccountsUserResourceSchema = {
+  __type: "Resource";
+  __primitiveFields: "id" | "email";
+  id: number;
+  email: string;
+};
+
+
+
 // ThexstackSchemaTodo Schema
 export type ThexstackSchemaTodoResourceSchema = {
   __type: "Resource";
@@ -22,6 +32,30 @@ export type ThexstackSchemaTodoResourceSchema = {
 
 
 
+export type ThexstackAccountsUserFilterInput = {
+  and?: Array<ThexstackAccountsUserFilterInput>;
+  or?: Array<ThexstackAccountsUserFilterInput>;
+  not?: Array<ThexstackAccountsUserFilterInput>;
+
+  id?: {
+    eq?: number;
+    notEq?: number;
+    greaterThan?: number;
+    greaterThanOrEqual?: number;
+    lessThan?: number;
+    lessThanOrEqual?: number;
+    in?: Array<number>;
+  };
+
+  email?: {
+    eq?: string;
+    notEq?: string;
+    in?: Array<string>;
+  };
+
+
+
+};
 export type ThexstackSchemaTodoFilterInput = {
   and?: Array<ThexstackSchemaTodoFilterInput>;
   or?: Array<ThexstackSchemaTodoFilterInput>;
@@ -218,6 +252,132 @@ export function buildCSRFHeaders(headers: Record<string, string> = {}): Record<s
 
 
 
+
+
+export type RegisterWithPasswordInput = {
+  email: string;
+  password: string;
+  passwordConfirmation: string;
+};
+
+export type RegisterWithPasswordValidationErrors = {
+  email?: string[];
+  password?: string[];
+  passwordConfirmation?: string[];
+};
+
+export type RegisterWithPasswordFields = UnifiedFieldSelection<ThexstackAccountsUserResourceSchema>[];
+
+type InferRegisterWithPasswordResult<
+  Fields extends RegisterWithPasswordFields,
+> = InferResult<ThexstackAccountsUserResourceSchema, Fields>;
+
+export type RegisterWithPasswordResult<Fields extends RegisterWithPasswordFields> = | { success: true; data: InferRegisterWithPasswordResult<Fields> }
+| {
+    success: false;
+    errors: Array<{
+      type: string;
+      message: string;
+      fieldPath?: string;
+      details: Record<string, string>;
+    }>;
+  }
+;
+
+export async function registerWithPassword<Fields extends RegisterWithPasswordFields>(
+  config: {
+  input: RegisterWithPasswordInput;
+  fields: Fields;
+  headers?: Record<string, string>;
+  fetchOptions?: RequestInit;
+  customFetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+}
+): Promise<RegisterWithPasswordResult<Fields>> {
+  const payload = {
+    action: "register_with_password",
+    input: config.input,
+    fields: config.fields
+  };
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...config.headers,
+  };
+
+  const fetchFunction = config.customFetch || fetch;
+  const fetchOptions: RequestInit = {
+    ...config.fetchOptions,
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload),
+  };
+
+  const response = await fetchFunction("/rpc/run", fetchOptions);
+
+  if (!response.ok) {
+    return {
+      success: false,
+      errors: [{ type: "network", message: response.statusText, details: {} }],
+    };
+  }
+
+  const result = await response.json();
+  return result as RegisterWithPasswordResult<Fields>;
+}
+
+
+export type ValidateRegisterWithPasswordResult =
+  | { success: true }
+  | {
+      success: false;
+      errors: Array<{
+        type: string;
+        message: string;
+        field?: string;
+        fieldPath?: string;
+        details?: Record<string, any>;
+      }>;
+    };
+
+
+export async function validateRegisterWithPassword(
+  config: {
+  input: RegisterWithPasswordInput;
+  headers?: Record<string, string>;
+  fetchOptions?: RequestInit;
+  customFetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+}
+): Promise<ValidateRegisterWithPasswordResult> {
+  const payload = {
+    action: "register_with_password",
+    input: config.input
+  };
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...config.headers,
+  };
+
+  const fetchFunction = config.customFetch || fetch;
+  const fetchOptions: RequestInit = {
+    ...config.fetchOptions,
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload),
+  };
+
+  const response = await fetchFunction("/rpc/validate", fetchOptions);
+
+  if (!response.ok) {
+    return {
+      success: false,
+      errors: [{ type: "network", message: response.statusText }],
+    };
+  }
+
+  const result = await response.json();
+  return result as ValidateRegisterWithPasswordResult;
+}
 
 
 export type ListTodosFields = UnifiedFieldSelection<ThexstackSchemaTodoResourceSchema>[];

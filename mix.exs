@@ -41,6 +41,9 @@ defmodule Thexstack.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bcrypt_elixir, "~> 3.0"},
+      {:picosat_elixir, "~> 0.2"},
+      {:ash_authentication_phoenix, "~> 2.0"},
       {:ash_postgres, "~> 2.0"},
       {:ash_phoenix, "~> 2.0"},
       {:ash_typescript, "~> 0.2.0"},

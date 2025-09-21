@@ -62,7 +62,7 @@ config :thexstack, ThexstackWeb.Endpoint,
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :thexstack, dev_routes: true
+config :thexstack, dev_routes: true, token_signing_secret: "FQ+jqBygVaZZ+GjqGaDKKhEa/mB5GLnM"
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :default_formatter, format: "[$level] $message\n"

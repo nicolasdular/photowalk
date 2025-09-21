@@ -1,4 +1,6 @@
 import Config
+config :thexstack, token_signing_secret: "HP3xPX0gZCCXB8CJnWq/IAtW8saC6euC"
+config :bcrypt_elixir, log_rounds: 1
 config :ash, policies: [show_policy_breakdowns?: true], disable_async?: true
 
 # Configure your database
