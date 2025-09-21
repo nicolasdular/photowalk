@@ -1,7 +1,7 @@
-import { StrictMode } from "preact/compat";
-import "vite/modulepreload-polyfill";
-import { render } from "preact";
-import { Todos } from "./pages/Todos";
+import { StrictMode } from 'preact/compat';
+import 'vite/modulepreload-polyfill';
+import { render } from 'preact';
+import { Todos } from './pages/Todos';
 import {
   Outlet,
   RouterProvider,
@@ -9,9 +9,9 @@ import {
   createRouter,
   createRoute,
   createRootRoute,
-} from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+} from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -33,13 +33,13 @@ const rootRoute = createRootRoute({
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/",
+  path: '/',
   component: Todos,
 });
 
 const aboutRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/about",
+  path: '/about',
   component: () => <div className="p-2">About</div>,
 });
 
@@ -47,14 +47,14 @@ const routeTree = rootRoute.addChildren([indexRoute, aboutRoute]);
 
 const router = createRouter({ routeTree });
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;
   }
 }
 
 const queryClient = new QueryClient();
-const preactContainer = document.getElementById("preact-app");
+const preactContainer = document.getElementById('preact-app');
 
 if (preactContainer) {
   render(
