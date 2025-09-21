@@ -1,5 +1,5 @@
-defmodule Thexstack.Schema.Todo do
-  use Ash.Resource, domain: Thexstack.TaskManager, data_layer: AshPostgres.DataLayer
+defmodule Thexstack.Tasks.Todo do
+  use Ash.Resource, domain: Thexstack.Tasks, data_layer: AshPostgres.DataLayer
 
   postgres do
     table "todos"

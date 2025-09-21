@@ -15,8 +15,8 @@ export type ThexstackAccountsUserResourceSchema = {
 
 
 
-// ThexstackSchemaTodo Schema
-export type ThexstackSchemaTodoResourceSchema = {
+// ThexstackTasksTodo Schema
+export type ThexstackTasksTodoResourceSchema = {
   __type: "Resource";
   __primitiveFields: "id" | "title" | "completed";
   id: number;
@@ -56,10 +56,10 @@ export type ThexstackAccountsUserFilterInput = {
 
 
 };
-export type ThexstackSchemaTodoFilterInput = {
-  and?: Array<ThexstackSchemaTodoFilterInput>;
-  or?: Array<ThexstackSchemaTodoFilterInput>;
-  not?: Array<ThexstackSchemaTodoFilterInput>;
+export type ThexstackTasksTodoFilterInput = {
+  and?: Array<ThexstackTasksTodoFilterInput>;
+  or?: Array<ThexstackTasksTodoFilterInput>;
+  not?: Array<ThexstackTasksTodoFilterInput>;
 
   id?: {
     eq?: number;
@@ -380,19 +380,19 @@ export async function validateRegisterWithPassword(
 }
 
 
-export type ListTodosFields = UnifiedFieldSelection<ThexstackSchemaTodoResourceSchema>[];
+export type ListTodosFields = UnifiedFieldSelection<ThexstackTasksTodoResourceSchema>[];
 
 type InferListTodosResult<
   Fields extends ListTodosFields,
 > = {
-  results: Array<InferResult<ThexstackSchemaTodoResourceSchema, Fields>>;
+  results: Array<InferResult<ThexstackTasksTodoResourceSchema, Fields>>;
   hasMore: boolean;
   limit: number;
   offset: number;
   count?: number | null;
   type: "offset";
 } | {
-  results: Array<InferResult<ThexstackSchemaTodoResourceSchema, Fields>>;
+  results: Array<InferResult<ThexstackTasksTodoResourceSchema, Fields>>;
   hasMore: boolean;
   limit: number;
   after: string | null;
@@ -418,7 +418,7 @@ export type ListTodosResult<Fields extends ListTodosFields> = | { success: true;
 export async function listTodos<Fields extends ListTodosFields>(
   config: {
   fields: Fields;
-  filter?: ThexstackSchemaTodoFilterInput;
+  filter?: ThexstackTasksTodoFilterInput;
   sort?: string;
   page?: (
     {
@@ -533,11 +533,11 @@ export type CreateTodoValidationErrors = {
   completed?: string[];
 };
 
-export type CreateTodoFields = UnifiedFieldSelection<ThexstackSchemaTodoResourceSchema>[];
+export type CreateTodoFields = UnifiedFieldSelection<ThexstackTasksTodoResourceSchema>[];
 
 type InferCreateTodoResult<
   Fields extends CreateTodoFields,
-> = InferResult<ThexstackSchemaTodoResourceSchema, Fields>;
+> = InferResult<ThexstackTasksTodoResourceSchema, Fields>;
 
 export type CreateTodoResult<Fields extends CreateTodoFields> = | { success: true; data: InferCreateTodoResult<Fields> }
 | {
@@ -655,11 +655,11 @@ export type UpdateTodoValidationErrors = {
   completed?: string[];
 };
 
-export type UpdateTodoFields = UnifiedFieldSelection<ThexstackSchemaTodoResourceSchema>[];
+export type UpdateTodoFields = UnifiedFieldSelection<ThexstackTasksTodoResourceSchema>[];
 
 type InferUpdateTodoResult<
   Fields extends UpdateTodoFields,
-> = InferResult<ThexstackSchemaTodoResourceSchema, Fields>;
+> = InferResult<ThexstackTasksTodoResourceSchema, Fields>;
 
 export type UpdateTodoResult<Fields extends UpdateTodoFields> = | { success: true; data: InferUpdateTodoResult<Fields> }
 | {

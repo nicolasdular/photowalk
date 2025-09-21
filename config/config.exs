@@ -45,7 +45,7 @@ config :spark,
     "Ash.Domain": [section_order: [:resources, :policies, :authorization, :domain, :execution]]
   ]
 
-config :thexstack, :ash_domains, [Thexstack.Accounts, Thexstack.TaskManager]
+config :thexstack, :ash_domains, [Thexstack.Accounts, Thexstack.Tasks]
 
 config :bun,
   version: "1.2.16",
