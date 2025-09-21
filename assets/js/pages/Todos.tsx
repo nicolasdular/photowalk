@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { listTodos, createTodo, updateTodo } from "../ash_rpc";
 import { useState } from "preact/hooks";
-import type { TargetedEvent } from "preact";
 
 function TodoItem({ todo }: { todo: any }) {
   const [checked, setChecking] = useState(todo.completed);
@@ -36,7 +35,11 @@ export function Todos() {
   const query = useQuery({
     queryKey: ["todos"],
     queryFn: () =>
-      listTodos({ fields: ["id", "title", "completed"], sort: "+id" }),
+      listTodos({
+        fields: ["id", "title", "completed"],
+        sort: "+id",
+        page: { limit: 100 },
+      }),
   });
 
   const mutation = useMutation({
@@ -52,8 +55,6 @@ export function Todos() {
     },
   });
 
-  console.log(query.data?.data?.results);
-
   return (
     <div className="flex justify-center">
       <div className="w-128">
@@ -63,29 +64,29 @@ export function Todos() {
         {query.data?.success ? (
           <div>
             <ul className="mt-10">
-              {query.data.data.map((todo, index) => {
+              {query.data.data.results.map((todo, index) => {
                 return <TodoItem key={index} todo={todo} />;
               })}
             </ul>
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                if (e.target && e.target["todo"]) {
-                  mutation.mutate(e.target["todo"].value);
-                }
-              }}
-            >
-              <input
-                autoFocus
-                value={name}
-                className="mt-2 w-full border border-gray-500/20"
-                onChange={(e) => setName(e.currentTarget.value)}
-                type="text"
-                name="todo"
-              />
-            </form>
           </div>
         ) : null}
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (e.target && e.target["todo"]) {
+              mutation.mutate(e.target["todo"].value);
+            }
+          }}
+        >
+          <input
+            autoFocus
+            value={name}
+            className="mt-2 w-full border border-gray-500/20"
+            onChange={(e) => setName(e.currentTarget.value)}
+            type="text"
+            name="todo"
+          />
+        </form>
       </div>
     </div>
   );

@@ -45,7 +45,24 @@ config :spark,
     "Ash.Domain": [section_order: [:resources, :policies, :authorization, :domain, :execution]]
   ]
 
-config :ash_typescript, input_field_formatter: :camel_case, output_field_formatter: :camel_case
+config :ash_typescript,
+  # Core configuration
+  output_file: "assets/js/ash_rpc.ts",
+  run_endpoint: "/rpc/run",
+  validate_endpoint: "/rpc/validate",
+  input_field_formatter: :camel_case,
+  output_field_formatter: :camel_case,
+
+  # Feature toggles
+  require_tenant_parameters: false,
+  generate_zod_schemas: false,
+  generate_phx_channel_rpc_actions: false,
+  generate_validation_functions: true,
+
+  # Import paths and naming
+  zod_import_path: "zod",
+  zod_schema_suffix: "ZodSchema",
+  phoenix_import_path: "phoenix"
 
 config :thexstack, :ash_domains, [Thexstack.Accounts, Thexstack.Tasks]
 

@@ -9,6 +9,14 @@ defmodule Thexstack.Tasks.Todo do
   actions do
     defaults [:read]
 
+    read :list do
+      pagination do
+        required? true
+        keyset? true
+        max_page_size 100
+      end
+    end
+
     create :create do
       accept [:title, :completed]
     end

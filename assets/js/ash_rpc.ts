@@ -388,19 +388,10 @@ type InferListTodosResult<
   results: Array<InferResult<ThexstackTasksTodoResourceSchema, Fields>>;
   hasMore: boolean;
   limit: number;
-  offset: number;
-  count?: number | null;
-  type: "offset";
-} | {
-  results: Array<InferResult<ThexstackTasksTodoResourceSchema, Fields>>;
-  hasMore: boolean;
-  limit: number;
   after: string | null;
   before: string | null;
   previousPage: string;
   nextPage: string;
-  count?: number | null;
-  type: "keyset";
 };
 
 export type ListTodosResult<Fields extends ListTodosFields> = | { success: true; data: InferListTodosResult<Fields> }
@@ -420,17 +411,11 @@ export async function listTodos<Fields extends ListTodosFields>(
   fields: Fields;
   filter?: ThexstackTasksTodoFilterInput;
   sort?: string;
-  page?: (
-    {
-      limit?: number;
-      offset?: number;
-      count?: boolean;
-    } | {
-      limit?: number;
-      after?: string;
-      before?: string;
-    }
-  );
+  page: {
+    limit?: number;
+    after?: string;
+    before?: string;
+  };
   headers?: Record<string, string>;
   fetchOptions?: RequestInit;
   customFetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
