@@ -43,7 +43,7 @@ export function Todos() {
   });
 
   const mutation = useMutation({
-    mutationFn: (title) =>
+    mutationFn: (title: string) =>
       createTodo({
         input: { title },
         fields: ["id", "title", "completed"],
