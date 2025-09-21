@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { listTodos, createTodo, updateTodo } from "../ash_rpc";
 import { useState } from "preact/hooks";
+import type { TargetedEvent } from "preact";
 
 function TodoItem({ todo }: { todo: any }) {
-  console.log(todo.completed);
   const [checked, setChecking] = useState(todo.completed);
 
   return (
@@ -15,10 +15,10 @@ function TodoItem({ todo }: { todo: any }) {
         name={`todo-${todo.id}`}
         type="checkbox"
         onChange={async (e) => {
-          setChecking(e.target.checked);
+          setChecking(e.currentTarget.checked);
           await updateTodo({
             primaryKey: todo.id,
-            input: { completed: e.target.checked },
+            input: { completed: e.currentTarget.checked },
             fields: ["id", "completed"],
           });
         }}
@@ -52,6 +52,8 @@ export function Todos() {
     },
   });
 
+  console.log(query.data?.data?.results);
+
   return (
     <div className="flex justify-center">
       <div className="w-128">
@@ -68,15 +70,18 @@ export function Todos() {
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
-                mutation.mutate(e.target[0].value);
+                if (e.target && e.target["todo"]) {
+                  mutation.mutate(e.target["todo"].value);
+                }
               }}
             >
               <input
                 autoFocus
                 value={name}
                 className="mt-2 w-full border border-gray-500/20"
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setName(e.currentTarget.value)}
                 type="text"
+                name="todo"
               />
             </form>
           </div>
