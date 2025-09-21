@@ -45,6 +45,8 @@ config :spark,
     "Ash.Domain": [section_order: [:resources, :policies, :authorization, :domain, :execution]]
   ]
 
+config :ash_typescript, input_field_formatter: :camel_case, output_field_formatter: :camel_case
+
 config :thexstack, :ash_domains, [Thexstack.Accounts, Thexstack.Tasks]
 
 config :bun,

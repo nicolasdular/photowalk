@@ -46,7 +46,7 @@ defmodule Thexstack.MixProject do
       {:ash_authentication_phoenix, "~> 2.0"},
       {:ash_postgres, "~> 2.0"},
       {:ash_phoenix, "~> 2.0"},
-      {:ash_typescript, "~> 0.2.0"},
+      {:ash_typescript, "~> 0.3.0"},
       {:sourceror, "~> 1.8", only: [:dev, :test]},
       {:ash, "~> 3.0"},
       {:phoenix_vite, "~> 0.3"},
