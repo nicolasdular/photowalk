@@ -17,7 +17,8 @@ defmodule ThexstackWeb.Router do
 
   pipeline :api do
     plug(:accepts, ["json"])
-    plug :load_from_bearer
+    plug(:fetch_session)
+    plug :load_from_session
     plug :set_actor, :user
   end
 
@@ -28,47 +29,6 @@ defmodule ThexstackWeb.Router do
     post("/run", RpcController, :run)
     post("/validate", RpcController, :validate)
   end
-
-  scope "/", ThexstackWeb do
-    pipe_through(:browser)
-
-    get("/", PageController, :home)
-    auth_routes AuthController, Thexstack.Accounts.User, path: "/auth"
-    sign_out_route AuthController
-
-    # Remove these if you'd like to use your own authentication views
-    sign_in_route register_path: "/register",
-                  reset_path: "/reset",
-                  auth_routes_prefix: "/auth",
-                  on_mount: [{ThexstackWeb.LiveUserAuth, :live_no_user}],
-                  overrides: [
-                    ThexstackWeb.AuthOverrides,
-                    AshAuthentication.Phoenix.Overrides.Default
-                  ]
-
-    # Remove this if you do not want to use the reset password feature
-    reset_route auth_routes_prefix: "/auth",
-                overrides: [
-                  ThexstackWeb.AuthOverrides,
-                  AshAuthentication.Phoenix.Overrides.Default
-                ]
-
-    # Remove this if you do not use the confirmation strategy
-    confirm_route Thexstack.Accounts.User, :confirm_new_user,
-      auth_routes_prefix: "/auth",
-      overrides: [ThexstackWeb.AuthOverrides, AshAuthentication.Phoenix.Overrides.Default]
-
-    # Remove this if you do not use the magic link strategy.
-    magic_sign_in_route(Thexstack.Accounts.User, :magic_link,
-      auth_routes_prefix: "/auth",
-      overrides: [ThexstackWeb.AuthOverrides, AshAuthentication.Phoenix.Overrides.Default]
-    )
-  end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", ThexstackWeb do
-  #   pipe_through :api
-  # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:thexstack, :dev_routes) do
@@ -86,4 +46,47 @@ defmodule ThexstackWeb.Router do
       forward("/mailbox", Plug.Swoosh.MailboxPreview)
     end
   end
+
+  scope "/", ThexstackWeb do
+    pipe_through(:browser)
+
+    get("/auth/:token", MagicLinkController, :magic_link)
+    # magic_sign_in_route(Thexstack.Accounts.User, :magic_link,
+    #   auth_routes_prefix: "/auth",
+    #   overrides: [AshAuthentication.Phoenix.Overrides.Default]
+    # )
+
+    get("/*path", PageController, :home)
+    # auth_routes AuthController, Thexstack.Accounts.User, path: "/auth"
+    # sign_out_route AuthController
+
+    # # Remove these if you'd like to use your own authentication views
+    # sign_in_route register_path: "/register",
+    #               reset_path: "/reset",
+    #               auth_routes_prefix: "/auth",
+    #               on_mount: [{ThexstackWeb.LiveUserAuth, :live_no_user}],
+    #               overrides: [
+    #                 ThexstackWeb.AuthOverrides,
+    #                 AshAuthentication.Phoenix.Overrides.Default
+    #               ]
+
+    # # Remove this if you do not want to use the reset password feature
+    # reset_route auth_routes_prefix: "/auth",
+    #             overrides: [
+    #               ThexstackWeb.AuthOverrides,
+    #               AshAuthentication.Phoenix.Overrides.Default
+    #             ]
+
+    # # Remove this if you do not use the confirmation strategy
+    # confirm_route Thexstack.Accounts.User, :confirm_new_user,
+    #   auth_routes_prefix: "/auth",
+    #   overrides: [ThexstackWeb.AuthOverrides, AshAuthentication.Phoenix.Overrides.Default]
+
+    # # Remove this if you do not use the magic link strategy.
+  end
+
+  # Other scopes may use custom stacks.
+  # scope "/api", ThexstackWeb do
+  #   pipe_through :api
+  # end
 end

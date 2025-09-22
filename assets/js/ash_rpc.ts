@@ -254,25 +254,17 @@ export function buildCSRFHeaders(headers: Record<string, string> = {}): Record<s
 
 
 
-export type RegisterWithPasswordInput = {
+export type RequestMagicLinkInput = {
   email: string;
-  password: string;
-  passwordConfirmation: string;
 };
 
-export type RegisterWithPasswordValidationErrors = {
+export type RequestMagicLinkValidationErrors = {
   email?: string[];
-  password?: string[];
-  passwordConfirmation?: string[];
 };
 
-export type RegisterWithPasswordFields = UnifiedFieldSelection<ThexstackAccountsUserResourceSchema>[];
+type InferRequestMagicLinkResult = {};
 
-type InferRegisterWithPasswordResult<
-  Fields extends RegisterWithPasswordFields,
-> = InferResult<ThexstackAccountsUserResourceSchema, Fields>;
-
-export type RegisterWithPasswordResult<Fields extends RegisterWithPasswordFields> = | { success: true; data: InferRegisterWithPasswordResult<Fields> }
+export type RequestMagicLinkResult = | { success: true; data: InferRequestMagicLinkResult }
 | {
     success: false;
     errors: Array<{
@@ -284,19 +276,17 @@ export type RegisterWithPasswordResult<Fields extends RegisterWithPasswordFields
   }
 ;
 
-export async function registerWithPassword<Fields extends RegisterWithPasswordFields>(
+export async function requestMagicLink(
   config: {
-  input: RegisterWithPasswordInput;
-  fields: Fields;
+  input: RequestMagicLinkInput;
   headers?: Record<string, string>;
   fetchOptions?: RequestInit;
   customFetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 }
-): Promise<RegisterWithPasswordResult<Fields>> {
+): Promise<RequestMagicLinkResult> {
   const payload = {
-    action: "register_with_password",
-    input: config.input,
-    fields: config.fields
+    action: "request_magic_link",
+    input: config.input
   };
 
   const headers: Record<string, string> = {
@@ -322,11 +312,11 @@ export async function registerWithPassword<Fields extends RegisterWithPasswordFi
   }
 
   const result = await response.json();
-  return result as RegisterWithPasswordResult<Fields>;
+  return result as RequestMagicLinkResult;
 }
 
 
-export type ValidateRegisterWithPasswordResult =
+export type ValidateRequestMagicLinkResult =
   | { success: true }
   | {
       success: false;
@@ -340,16 +330,16 @@ export type ValidateRegisterWithPasswordResult =
     };
 
 
-export async function validateRegisterWithPassword(
+export async function validateRequestMagicLink(
   config: {
-  input: RegisterWithPasswordInput;
+  input: RequestMagicLinkInput;
   headers?: Record<string, string>;
   fetchOptions?: RequestInit;
   customFetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 }
-): Promise<ValidateRegisterWithPasswordResult> {
+): Promise<ValidateRequestMagicLinkResult> {
   const payload = {
-    action: "register_with_password",
+    action: "request_magic_link",
     input: config.input
   };
 
@@ -376,7 +366,117 @@ export async function validateRegisterWithPassword(
   }
 
   const result = await response.json();
-  return result as ValidateRegisterWithPasswordResult;
+  return result as ValidateRequestMagicLinkResult;
+}
+
+
+export type CurrentUserFields = UnifiedFieldSelection<ThexstackAccountsUserResourceSchema>[];
+
+type InferCurrentUserResult<
+  Fields extends CurrentUserFields,
+> = InferResult<ThexstackAccountsUserResourceSchema, Fields> | null;
+
+export type CurrentUserResult<Fields extends CurrentUserFields> = | { success: true; data: InferCurrentUserResult<Fields> }
+| {
+    success: false;
+    errors: Array<{
+      type: string;
+      message: string;
+      fieldPath?: string;
+      details: Record<string, string>;
+    }>;
+  }
+;
+
+export async function currentUser<Fields extends CurrentUserFields>(
+  config: {
+  fields: Fields;
+  headers?: Record<string, string>;
+  fetchOptions?: RequestInit;
+  customFetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+}
+): Promise<CurrentUserResult<Fields>> {
+  const payload = {
+    action: "current_user",
+    fields: config.fields
+  };
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...config.headers,
+  };
+
+  const fetchFunction = config.customFetch || fetch;
+  const fetchOptions: RequestInit = {
+    ...config.fetchOptions,
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload),
+  };
+
+  const response = await fetchFunction("/rpc/run", fetchOptions);
+
+  if (!response.ok) {
+    return {
+      success: false,
+      errors: [{ type: "network", message: response.statusText, details: {} }],
+    };
+  }
+
+  const result = await response.json();
+  return result as CurrentUserResult<Fields>;
+}
+
+
+export type ValidateCurrentUserResult =
+  | { success: true }
+  | {
+      success: false;
+      errors: Array<{
+        type: string;
+        message: string;
+        field?: string;
+        fieldPath?: string;
+        details?: Record<string, any>;
+      }>;
+    };
+
+
+export async function validateCurrentUser(
+  config: {
+  headers?: Record<string, string>;
+  fetchOptions?: RequestInit;
+  customFetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+}
+): Promise<ValidateCurrentUserResult> {
+  const payload = {
+    action: "current_user"
+  };
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...config.headers,
+  };
+
+  const fetchFunction = config.customFetch || fetch;
+  const fetchOptions: RequestInit = {
+    ...config.fetchOptions,
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload),
+  };
+
+  const response = await fetchFunction("/rpc/validate", fetchOptions);
+
+  if (!response.ok) {
+    return {
+      success: false,
+      errors: [{ type: "network", message: response.statusText }],
+    };
+  }
+
+  const result = await response.json();
+  return result as ValidateCurrentUserResult;
 }
 
 

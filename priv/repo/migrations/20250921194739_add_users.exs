@@ -1,4 +1,4 @@
-defmodule Thexstack.Repo.Migrations.AddPasswordAuthenticationAndAddPasswordAuth do
+defmodule Thexstack.Repo.Migrations.AddUsers do
   @moduledoc """
   Updates resources based on their most recent snapshots.
 
@@ -8,9 +8,9 @@ defmodule Thexstack.Repo.Migrations.AddPasswordAuthenticationAndAddPasswordAuth 
   use Ecto.Migration
 
   def up do
-    alter table(:users) do
+    create table(:users, primary_key: false) do
+      add :id, :bigserial, null: false, primary_key: true
       add :email, :citext, null: false
-      add :hashed_password, :text, null: false
       add :confirmed_at, :utc_datetime_usec
     end
 
@@ -20,10 +20,6 @@ defmodule Thexstack.Repo.Migrations.AddPasswordAuthenticationAndAddPasswordAuth 
   def down do
     drop_if_exists unique_index(:users, [:email], name: "users_unique_email_index")
 
-    alter table(:users) do
-      remove :confirmed_at
-      remove :hashed_password
-      remove :email
-    end
+    drop table(:users)
   end
 end

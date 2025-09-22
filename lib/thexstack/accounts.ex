@@ -3,7 +3,8 @@ defmodule Thexstack.Accounts do
 
   typescript_rpc do
     resource Thexstack.Accounts.User do
-      rpc_action(:register_with_password, :register_with_password)
+      rpc_action(:request_magic_link, :request_magic_link)
+      rpc_action(:current_user, :current_user)
     end
   end
 

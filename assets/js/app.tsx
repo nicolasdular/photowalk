@@ -2,6 +2,7 @@ import { StrictMode } from 'preact/compat';
 import 'vite/modulepreload-polyfill';
 import { render } from 'preact';
 import { Todos } from './pages/Todos';
+import { SignUp } from './pages/SignUp';
 import {
   Outlet,
   RouterProvider,
@@ -9,25 +10,43 @@ import {
   createRouter,
   createRoute,
   createRootRoute,
+  useLoaderData,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { getCurrentUser } from './auth';
 
 const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <div className="p-2 flex gap-2">
-        <Link to="/" className="[&.active]:font-bold">
-          Home
-        </Link>
-        <Link to="/about" className="[&.active]:font-bold">
-          About
-        </Link>
-      </div>
-      <hr />
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
+  loader: async () => {
+    return { currentUser: await getCurrentUser() };
+  },
+  component: () => {
+    // Access loader data using useLoaderData<typeof rootRoute>()
+    const { currentUser } = useLoaderData({ from: rootRoute.id });
+
+    if (!currentUser) {
+      return <SignUp />;
+    }
+
+    return (
+      <>
+        <div className="p-2 flex gap-2">
+          <div>{currentUser.email}</div>
+          <Link to="/" className="[&.active]:font-bold">
+            Home
+          </Link>
+        </div>
+        <hr />
+        <Outlet />
+        <TanStackRouterDevtools />
+      </>
+    );
+  },
+  errorComponent: ({ error }) => (
+    <div className="p-4 text-red-600">
+      <h2>Something went wrong!</h2>
+      <pre>{error.message}</pre>
+    </div>
   ),
 });
 
@@ -39,8 +58,8 @@ const indexRoute = createRoute({
 
 const aboutRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/about',
-  component: () => <div className="p-2">About</div>,
+  path: '/signup',
+  component: SignUp,
 });
 
 const routeTree = rootRoute.addChildren([indexRoute, aboutRoute]);
