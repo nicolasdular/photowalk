@@ -11,9 +11,14 @@ import {
   createRoute,
   createRootRoute,
   useLoaderData,
+  useRouter,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useMutation,
+} from '@tanstack/react-query';
 import { getCurrentUser } from './auth';
 
 const rootRoute = createRootRoute({
@@ -23,6 +28,35 @@ const rootRoute = createRootRoute({
   component: () => {
     // Access loader data using useLoaderData<typeof rootRoute>()
     const { currentUser } = useLoaderData({ from: rootRoute.id });
+    const router = useRouter();
+
+    const signOut = useMutation({
+      mutationFn: async () => {
+        const csrf =
+          document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute('content') || '';
+
+        const res = await fetch('/auth/sign_out', {
+          method: 'DELETE',
+          headers: {
+            'x-csrf-token': csrf,
+            accept: 'text/html,application/json,*/*',
+          },
+          credentials: 'same-origin',
+        });
+
+        if (res.status >= 400) {
+          throw new Error('Failed to sign out');
+        }
+
+        return true as const;
+      },
+      onSuccess: async () => {
+        // Force a full page reload so SPA state is reset
+        window.location.replace('/');
+      },
+    });
 
     if (!currentUser) {
       return <SignUp />;
@@ -35,6 +69,9 @@ const rootRoute = createRootRoute({
           <Link to="/" className="[&.active]:font-bold">
             Home
           </Link>
+          <button onClick={() => signOut.mutate()} disabled={signOut.isPending}>
+            {signOut.isPending ? 'Signing out…' : 'Sign out'}
+          </button>
         </div>
         <hr />
         <Outlet />
