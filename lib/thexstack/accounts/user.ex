@@ -146,6 +146,12 @@ defmodule Thexstack.Accounts.User do
     attribute :confirmed_at, :utc_datetime_usec
   end
 
+  calculations do
+    calculate :avatar_url, :string, Thexstack.Accounts.AvatarUrl do
+      public? true
+    end
+  end
+
   identities do
     identity :unique_email, [:email]
   end

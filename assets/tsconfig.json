@@ -23,7 +23,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "*": ["../deps/*"]
+      "*": ["../deps/*"],
+      "@catalyst/*": ["js/catalyst/*"]
     },
     "allowJs": true,
     "noEmit": true,

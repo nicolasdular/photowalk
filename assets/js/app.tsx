@@ -6,20 +6,18 @@ import { SignUp } from './pages/SignUp';
 import {
   Outlet,
   RouterProvider,
-  Link,
   createRouter,
   createRoute,
   createRootRoute,
   useLoaderData,
-  useRouter,
 } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import {
   QueryClient,
   QueryClientProvider,
   useMutation,
 } from '@tanstack/react-query';
 import { getCurrentUser } from './auth';
+import { SignedInLayout } from './layouts/SignedInLayout';
 
 const rootRoute = createRootRoute({
   loader: async () => {
@@ -28,7 +26,7 @@ const rootRoute = createRootRoute({
   component: () => {
     // Access loader data using useLoaderData<typeof rootRoute>()
     const { currentUser } = useLoaderData({ from: rootRoute.id });
-    const router = useRouter();
+    // Authenticated root layout below renders the app chrome
 
     const signOut = useMutation({
       mutationFn: async () => {
@@ -44,15 +42,15 @@ const rootRoute = createRootRoute({
             accept: 'text/html,application/json,*/*',
           },
           credentials: 'same-origin',
+          redirect: 'follow',
         });
 
         if (res.status >= 400) {
           throw new Error('Failed to sign out');
         }
-
-        return true as const;
       },
       onSuccess: async () => {
+        console.log('SUCCESS');
         // Force a full page reload so SPA state is reset
         window.location.replace('/');
       },
@@ -63,20 +61,13 @@ const rootRoute = createRootRoute({
     }
 
     return (
-      <>
-        <div className="p-2 flex gap-2">
-          <div>{currentUser.email}</div>
-          <Link to="/" className="[&.active]:font-bold">
-            Home
-          </Link>
-          <button onClick={() => signOut.mutate()} disabled={signOut.isPending}>
-            {signOut.isPending ? 'Signing out…' : 'Sign out'}
-          </button>
-        </div>
-        <hr />
+      <SignedInLayout
+        onSignOut={() => signOut.mutate()}
+        signingOut={signOut.isPending}
+        currentUserAvatarUrl={currentUser.avatarUrl}
+      >
         <Outlet />
-        <TanStackRouterDevtools />
-      </>
+      </SignedInLayout>
     );
   },
   errorComponent: ({ error }) => (

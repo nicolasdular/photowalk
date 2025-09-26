@@ -8,9 +8,10 @@
 // ThexstackAccountsUser Schema
 export type ThexstackAccountsUserResourceSchema = {
   __type: "Resource";
-  __primitiveFields: "id" | "email";
+  __primitiveFields: "id" | "email" | "avatarUrl";
   id: number;
   email: string;
+  avatarUrl: string | null;
 };
 
 
@@ -48,6 +49,12 @@ export type ThexstackAccountsUserFilterInput = {
   };
 
   email?: {
+    eq?: string;
+    notEq?: string;
+    in?: Array<string>;
+  };
+
+  avatarUrl?: {
     eq?: string;
     notEq?: string;
     in?: Array<string>;

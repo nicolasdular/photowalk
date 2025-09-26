@@ -6,7 +6,11 @@ import {
 } from './ash_rpc';
 
 // Define the fields we want from the user
-export const USER_FIELDS: CurrentUserFields = ['id', 'email'] as const;
+export const USER_FIELDS: CurrentUserFields = [
+  'id',
+  'email',
+  'avatarUrl',
+] as const;
 
 // Type for the current user data
 export type CurrentUser = SuccessDataFunc<

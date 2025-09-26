@@ -2,3 +2,8 @@
 @source "../css";
 @source "../js";
 @source "../../lib/thexstack_web";
+
+@theme {
+  --font-sans: Inter, sans-serif;
+  --font-sans--font-feature-settings: 'cv11';
+}

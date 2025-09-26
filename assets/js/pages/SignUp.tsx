@@ -1,6 +1,14 @@
 import { useState } from 'preact/hooks';
 import { useMutation } from '@tanstack/react-query';
 import { requestMagicLink } from '../ash_rpc';
+import { ErrorSummary, FieldErrors } from '../components/FormErrors';
+import { hasFieldError } from '../utils/rpcErrors';
+import { AuthLayout } from '@catalyst/auth-layout';
+import { Heading } from '@catalyst/heading';
+import { Label } from '@catalyst/fieldset';
+import { Field } from '@catalyst/fieldset';
+import { Input } from '@catalyst/input';
+import { Button } from '@catalyst/button';
 
 export function SignUp() {
   const [form, setForm] = useState({ email: '' });
@@ -21,59 +29,67 @@ export function SignUp() {
     mutation.mutate(form.email);
   };
 
-  return (
-    <div class="flex min-h-screen items-center justify-center bg-gray-50">
-      <form
-        onSubmit={handleSubmit}
-        class="bg-white shadow-lg rounded-xl p-8 w-full max-w-md space-y-6"
-        id="magic-link-form"
-      >
-        <h2 class="text-2xl font-bold text-gray-900 mb-2">
-          Sign up with Magic Link
-        </h2>
-        <div>
-          <label
-            htmlFor="email"
-            class="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Email address
-          </label>
-          <input
-            id="email"
-            type="email"
-            required
-            value={form.email}
-            onInput={handleChange}
-            class="block w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            placeholder="you@example.com"
-          />
+  if (mutation.isSuccess && mutation.data?.success) {
+    return (
+      <AuthLayout>
+        <div className="grid w-full max-w-sm grid-cols-1 gap-8">
+          <Heading>Check your email</Heading>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            If an account with that email exists, a magic link has been sent.
+            Please check your inbox.
+          </p>
         </div>
-        <button
-          type="submit"
-          disabled={mutation.isLoading}
-          class={[
-            'w-full py-2 px-4 rounded-lg font-semibold transition',
-            mutation.isLoading
-              ? 'bg-blue-300 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-700 text-white',
-          ].join(' ')}
-        >
-          {mutation.isLoading ? 'Sending...' : 'Send Magic Link'}
-        </button>
-        {mutation.data?.success === false ? (
-          <div class="text-red-600 text-sm mt-2">
-            {mutation.data.errors.map(message => {
-              return <div>{message.message}</div>;
-            }) || 'Something went wrong.'}
-          </div>
-        ) : null}
+      </AuthLayout>
+    );
+  }
 
-        {mutation.data?.success && (
-          <div class="text-green-600 text-sm mt-2">
-            Magic link sent! Check your inbox.
-          </div>
-        )}
+  return (
+    <AuthLayout>
+      <form
+        action="#"
+        method="POST"
+        className="grid w-full max-w-sm grid-cols-1 gap-8"
+      >
+        <Heading>Sign in via Email</Heading>
+        <ErrorSummary
+          errors={
+            mutation.data?.success === false
+              ? (mutation.data as any).errors
+              : undefined
+          }
+        />
+
+        <Field>
+          <Label>Email</Label>
+          <Input
+            type="email"
+            name="email"
+            onChange={handleChange}
+            aria-invalid={
+              mutation.data?.success === false &&
+              hasFieldError((mutation.data as any)?.errors, 'email')
+                ? true
+                : undefined
+            }
+          />
+          <FieldErrors
+            name="email"
+            errors={
+              mutation.data?.success === false
+                ? (mutation.data as any).errors
+                : undefined
+            }
+          />
+        </Field>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={mutation.isPending}
+          onClick={handleSubmit}
+        >
+          {mutation.isPending ? 'Sending...' : 'Send Magic Link'}
+        </Button>
       </form>
-    </div>
+    </AuthLayout>
   );
 }
