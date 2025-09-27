@@ -1,0 +1,14 @@
+# Build artifacts
+_build
+deps
+
+# Node/Bun artifacts
+assets/node_modules
+assets/.vite
+
+# VCS and misc
+.git
+.gitignore
+tmp
+.DS_Store
+
