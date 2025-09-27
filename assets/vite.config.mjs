@@ -11,8 +11,7 @@ export default defineConfig({
     cors: { origin: "http://localhost:4000" },
   },
   optimizeDeps: {
-    // https://vitejs.dev/guide/dep-pre-bundling#monorepos-and-linked-dependencies
-    include: ["phoenix", "phoenix_html", "phoenix_live_view"],
+    include: [],
   },
   build: {
     manifest: true,
@@ -22,14 +21,13 @@ export default defineConfig({
     outDir: "../priv/static",
     emptyOutDir: true,
   },
-  // LV Colocated JS and Hooks
-  // https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.ColocatedJS.html#module-internals
   resolve: {
     alias: [
-      // Place more specific aliases before catch-alls to avoid shadowing
-      { find: "@catalyst", replacement: fileURLToPath(new URL('./js/catalyst', import.meta.url)) },
-      { find: "@", replacement: fileURLToPath(new URL('.', import.meta.url)) },
-      { find: "phoenix-colocated", replacement: `${process.env.MIX_BUILD_PATH}/phoenix-colocated` },
+      { find: '@catalyst', replacement: fileURLToPath(new URL('./js/catalyst', import.meta.url)) },
+      { find: '@', replacement: fileURLToPath(new URL('.', import.meta.url)) },
+      { find: 'react', replacement: 'preact/compat' },
+      { find: 'react-dom', replacement: 'preact/compat' },
+      { find: 'react-dom/test-utils', replacement: 'preact/test-utils' },
     ],
   },
   plugins: [

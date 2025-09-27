@@ -1,8 +1,5 @@
-import { StrictMode } from 'preact/compat';
-import 'vite/modulepreload-polyfill';
+import { StrictMode, lazy, Suspense } from 'preact/compat';
 import { render } from 'preact';
-import { Todos } from './pages/Todos';
-import { SignUp } from './pages/SignUp';
 import {
   Outlet,
   RouterProvider,
@@ -17,7 +14,17 @@ import {
   useMutation,
 } from '@tanstack/react-query';
 import { getCurrentUser } from './auth';
-import { SignedInLayout } from './layouts/SignedInLayout';
+
+// Lazy-load the heavier UI/layout and page components to reduce initial bundle
+const SignedInLayout = lazy(() =>
+  import('./layouts/SignedInLayout').then((m) => ({ default: m.SignedInLayout }))
+);
+const Todos = lazy(() =>
+  import('./pages/Todos').then((m) => ({ default: m.Todos }))
+);
+const SignUp = lazy(() =>
+  import('./pages/SignUp').then((m) => ({ default: m.SignUp }))
+);
 
 const rootRoute = createRootRoute({
   loader: async () => {
@@ -50,7 +57,6 @@ const rootRoute = createRootRoute({
         }
       },
       onSuccess: async () => {
-        console.log('SUCCESS');
         // Force a full page reload so SPA state is reset
         window.location.replace('/');
       },
@@ -107,7 +113,9 @@ if (preactContainer) {
   render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <Suspense fallback={<div />}> 
+          <RouterProvider router={router} />
+        </Suspense>
       </QueryClientProvider>
     </StrictMode>,
     preactContainer
