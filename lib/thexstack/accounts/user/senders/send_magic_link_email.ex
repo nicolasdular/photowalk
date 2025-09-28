@@ -22,7 +22,7 @@ defmodule Thexstack.Accounts.User.Senders.SendMagicLinkEmail do
 
     new()
     # TODO: Replace with your email
-    |> from({"noreply", "noreply@" <> System.get_env("EMAIL_DOMAIN")})
+    |> from({"noreply", "noreply@" <> email_domain()})
     |> to(to_string(email))
     |> subject("Your login link")
     |> html_body(body(token: token, email: email))
@@ -36,5 +36,12 @@ defmodule Thexstack.Accounts.User.Senders.SendMagicLinkEmail do
     <p>Hello, #{params[:email]}! Click this link to sign in:</p>
     <p><a href="#{url(~p"/auth/#{params[:token]}")}">#{url(~p"/auth/#{params[:token]}")}</a></p>
     """
+  end
+
+  defp email_domain do
+    case System.get_env("EMAIL_DOMAIN") do
+      nil -> "example.com"
+      domain -> domain
+    end
   end
 end

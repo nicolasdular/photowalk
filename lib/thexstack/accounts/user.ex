@@ -111,6 +111,21 @@ defmodule Thexstack.Accounts.User do
         allow_nil? false
       end
 
+      validate fn changeset, _context ->
+        email =
+          Ash.Changeset.get_argument(changeset, :email)
+          |> Ash.CiString.value()
+
+        # TODO: Prevent abuse for now
+        allowed_emails = ["hello@nicolasdular.com", "hello@philippspiess.com"]
+
+        if email in allowed_emails do
+          :ok
+        else
+          {:error, "Email is not allowed"}
+        end
+      end
+
       run AshAuthentication.Strategy.MagicLink.Request
     end
   end
