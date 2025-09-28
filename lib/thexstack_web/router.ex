@@ -48,6 +48,12 @@ defmodule ThexstackWeb.Router do
   end
 
   scope "/", ThexstackWeb do
+    pipe_through(:api)
+
+    get("/up", HealthController, :up)
+  end
+
+  scope "/", ThexstackWeb do
     pipe_through(:browser)
 
     get("/auth/:token", MagicLinkController, :magic_link)

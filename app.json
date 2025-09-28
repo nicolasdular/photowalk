@@ -1,0 +1,21 @@
+{
+  "name": "thexstack",
+  "scripts": {
+    "dokku": {
+      "predeploy": "./thexstack/bin/thexstack eval 'Thexstack.Release.migrate'"
+    }
+  },
+  "checks": {
+    "web": [
+      {
+        "type": "http",
+        "path": "/up",
+        "port": 4000,
+        "status": 200,
+        "interval": 10,
+        "timeout": 5,
+        "attempts": 3
+      }
+    ]
+  }
+}
