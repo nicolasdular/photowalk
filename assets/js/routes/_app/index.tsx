@@ -1,5 +1,6 @@
+import { createFileRoute } from '@tanstack/react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { listTodos, createTodo, updateTodo } from '../ash_rpc';
+import { listTodos, createTodo, updateTodo } from '../../ash_rpc';
 import { useState } from 'react';
 import { Input } from '@catalyst/input';
 import { Checkbox, CheckboxField } from '@catalyst/checkbox';
@@ -32,7 +33,7 @@ function TodoItem({ todo }: { todo: any }) {
   );
 }
 
-export function Todos() {
+function Todos() {
   const [name, setName] = useState('');
   const queryClient = useQueryClient();
   const query = useQuery({
@@ -64,8 +65,8 @@ export function Todos() {
         <form
           onSubmit={async e => {
             e.preventDefault();
-            if (e.target && e.target['todo']) {
-              mutation.mutate(e.target['todo'].value);
+            if (e.target && (e.target as any)['todo']) {
+              mutation.mutate((e.target as any)['todo'].value);
             }
           }}
         >
@@ -82,7 +83,11 @@ export function Todos() {
           <div>
             <ul className="mt-10">
               {query.data.data.results.map((todo, index) => {
-                return <TodoItem key={index} todo={todo} />;
+                return (
+                  <li key={index}>
+                    <TodoItem todo={todo} />
+                  </li>
+                );
               })}
             </ul>
           </div>
@@ -91,3 +96,7 @@ export function Todos() {
     </div>
   );
 }
+
+export const Route = createFileRoute('/_app/')({
+  component: Todos,
+});

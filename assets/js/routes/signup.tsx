@@ -1,3 +1,4 @@
+import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { requestMagicLink } from '../ash_rpc';
@@ -10,7 +11,7 @@ import { Field } from '@catalyst/fieldset';
 import { Input } from '@catalyst/input';
 import { Button } from '@catalyst/button';
 
-export function SignUp() {
+function SignUp() {
   const [form, setForm] = useState({ email: '' });
 
   const mutation = useMutation({
@@ -93,3 +94,7 @@ export function SignUp() {
     </AuthLayout>
   );
 }
+
+export const Route = createFileRoute('/signup')({
+  component: SignUp,
+});
