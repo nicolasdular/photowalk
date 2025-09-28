@@ -1,11 +1,14 @@
 # syntax=docker/dockerfile:1
 
+ARG ELIXIR_IMAGE_TAG=1.18.2-erlang-27.2-debian-bookworm-20250113-slim
+
 # ---- Assets stage (Bun + Vite) ----
 FROM oven/bun:1 AS assets
 WORKDIR /app
 
 # Install JS deps with good caching
 COPY assets/package.json assets/bun.lock ./assets/
+COPY deps/phoenix_vite ./deps/phoenix_vite
 RUN cd assets && bun install --frozen-lockfile
 
 # Copy the rest of the assets and build
@@ -14,7 +17,6 @@ RUN cd assets && bun vite build
 
 
 # ---- Elixir build stage (mix release) ----
-ARG ELIXIR_IMAGE_TAG=1.18.3-erlang-27.3.4-debian-buster-20240612
 FROM hexpm/elixir:${ELIXIR_IMAGE_TAG} AS build
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -67,4 +69,3 @@ ENV PHX_SERVER=true MIX_ENV=prod
 EXPOSE 4000
 
 CMD ["./thexstack/bin/thexstack", "start"]
-

@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: thexstack_dev
+      # Optional: explicitly set user
+      POSTGRES_USER: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d thexstack_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Runs Ecto migrations once, after DB is healthy
+  migrate:
+    image: thexstack
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "ecto://postgres:postgres@db:5432/thexstack_dev"
+      SECRET_KEY_BASE: "pPQoFptQYBtXnpZFjKWuaoK1puxge3YGxcv0OG5Wp2eoQe0AxDcOdx1uKlunzspXWHotg2/mh3YrCfT1RBnymg=="
+      TOKEN_SIGNING_SECRET: "wxvDN3mGeEAkkH4JutQfpFhIpRgu03zIatmnCVgiOrU="
+      PHX_HOST: "localhost"
+      PHX_URL_SCHEME: "http"
+      PHX_URL_PORT: "4000"
+      MIX_ENV: "prod"
+      PHX_SERVER: "false"
+    command: ["./thexstack/bin/migrate"]
+
+  app:
+    image: thexstack
+    build: .
+    environment:
+      DATABASE_URL: "ecto://postgres:postgres@db:5432/thexstack_dev"
+      SECRET_KEY_BASE: "pPQoFptQYBtXnpZFjKWuaoK1puxge3YGxcv0OG5Wp2eoQe0AxDcOdx1uKlunzspXWHotg2/mh3YrCfT1RBnymg=="
+      TOKEN_SIGNING_SECRET: "wxvDN3mGeEAkkH4JutQfpFhIpRgu03zIatmnCVgiOrU="
+      PHX_HOST: "localhost"
+      PHX_URL_SCHEME: "http"
+      PHX_URL_PORT: "4000"
+      MIX_ENV: "prod"
+      PHX_SERVER: "true"
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    command: ["./thexstack/bin/server"]
+
+volumes:
+  postgres_data:
