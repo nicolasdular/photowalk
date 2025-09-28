@@ -8,7 +8,6 @@ WORKDIR /app
 
 # Install JS deps with good caching
 COPY assets/package.json assets/bun.lock ./assets/
-COPY deps/phoenix_vite ./deps/phoenix_vite
 RUN cd assets && bun install --frozen-lockfile
 
 # Copy the rest of the assets and build

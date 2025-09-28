@@ -1,7 +1,6 @@
 # Build artifacts
 _build
 deps
-!deps/phoenix_vite
 
 # Node/Bun artifacts
 assets/node_modules
