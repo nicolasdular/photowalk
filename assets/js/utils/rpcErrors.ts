@@ -101,6 +101,63 @@ export function transformRpcErrors(
   return out;
 }
 
+export function getPrimaryErrorMessage(
+  errors: Array<AshRpcError | Record<string, any>> | undefined | null,
+  fallback = "Something went wrong. Please try again."
+): string {
+  const transformed = transformRpcErrors(errors);
+  if (transformed.general.length > 0) {
+    return transformed.general[0];
+  }
+
+  if (transformed.firstField) {
+    const fieldMessages = transformed.fields[transformed.firstField] || [];
+    if (fieldMessages.length > 0) {
+      return fieldMessages[0];
+    }
+  }
+
+  for (const messages of Object.values(transformed.fields)) {
+    if (messages.length > 0) {
+      return messages[0];
+    }
+  }
+
+  return fallback;
+}
+
+export class RpcException extends Error {
+  public readonly errors: Array<AshRpcError | Record<string, any>>;
+
+  constructor(
+    errors: Array<AshRpcError | Record<string, any>> | undefined | null,
+    fallbackMessage = "Something went wrong. Please try again."
+  ) {
+    super(getPrimaryErrorMessage(errors, fallbackMessage));
+    this.name = "RpcException";
+    this.errors = errors ? [...errors] : [];
+  }
+}
+
+export type RpcResult<T> =
+  | { success: true; data: T }
+  | {
+      success: false;
+      errors: Array<AshRpcError | Record<string, any>>;
+    };
+
+export function ensureRpcSuccess<T>(
+  result: RpcResult<T> | undefined | null,
+  fallbackMessage?: string
+): T {
+  if (result && result.success) {
+    return result.data;
+  }
+
+  const errors = result && !result.success ? result.errors : [];
+  throw new RpcException(errors, fallbackMessage);
+}
+
 export function getFieldMessages(
   errors: Array<AshRpcError | Record<string, any>> | undefined | null,
   field: string

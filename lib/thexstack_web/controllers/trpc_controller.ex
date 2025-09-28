@@ -2,8 +2,6 @@ defmodule ThexstackWeb.RpcController do
   use ThexstackWeb, :controller
 
   def run(conn, params) do
-    # Actor (and tenant if needed) must be set on the conn before calling run/2 or validate/2
-    # If your pipeline does not set these, you must add something like the following code:
     result = AshTypescript.Rpc.run_action(:thexstack, conn, params)
     json(conn, result)
   end
