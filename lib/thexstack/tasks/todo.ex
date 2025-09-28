@@ -1,5 +1,8 @@
 defmodule Thexstack.Tasks.Todo do
-  use Ash.Resource, domain: Thexstack.Tasks, data_layer: AshPostgres.DataLayer
+  use Ash.Resource,
+    domain: Thexstack.Tasks,
+    data_layer: AshPostgres.DataLayer,
+    authorizers: [Ash.Policy.Authorizer]
 
   postgres do
     table "todos"
@@ -19,10 +22,25 @@ defmodule Thexstack.Tasks.Todo do
 
     create :create do
       accept [:title, :completed]
+      change relate_actor(:user)
     end
 
     update :update do
       accept [:completed]
+    end
+  end
+
+  policies do
+    policy action_type(:read) do
+      authorize_if relates_to_actor_via(:user)
+    end
+
+    policy action(:create) do
+      authorize_if relating_to_actor(:user)
+    end
+
+    policy action(:update) do
+      authorize_if expr(user_id == ^actor(:id))
     end
   end
 
@@ -35,5 +53,12 @@ defmodule Thexstack.Tasks.Todo do
     end
 
     attribute :completed, :boolean, default: false, public?: true
+  end
+
+  relationships do
+    belongs_to :user, Thexstack.Accounts.User do
+      attribute_type :integer
+      allow_nil? false
+    end
   end
 end

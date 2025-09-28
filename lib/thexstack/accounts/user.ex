@@ -161,6 +161,10 @@ defmodule Thexstack.Accounts.User do
     attribute :confirmed_at, :utc_datetime_usec
   end
 
+  relationships do
+    has_many :todos, Thexstack.Tasks.Todo
+  end
+
   calculations do
     calculate :avatar_url, :string, Thexstack.Accounts.AvatarUrl do
       public? true

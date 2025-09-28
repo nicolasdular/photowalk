@@ -1,25 +1,19 @@
-# Script for populating the database. You can run it as:
-#
-#     mix run priv/repo/seeds.exs
-#
-# Inside the script, you can read and write to any of your
-# repositories directly:
-#
-#     Thexstack.Repo.insert!(%Thexstack.SomeSchema{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
+# Create a user using Ash framework
+{:ok, user} =
+  %Thexstack.Accounts.User{email: "hello@nicolasdular.com"}
+  |> Thexstack.Repo.insert()
 
 [
-  %Thexstack.Tasks.Todo{completed: false, title: "Set up tests"},
-  %Thexstack.Tasks.Todo{completed: false, title: "Set up Resend"},
-  %Thexstack.Tasks.Todo{completed: false, title: "Set up Oban"},
+  %Thexstack.Tasks.Todo{completed: false, title: "Set up tests", user_id: user.id},
+  %Thexstack.Tasks.Todo{completed: false, title: "Set up Resend", user_id: user.id},
+  %Thexstack.Tasks.Todo{completed: false, title: "Set up Oban", user_id: user.id},
   %Thexstack.Tasks.Todo{
     completed: false,
-    title: "Set up deployment using Dokku on fat Hetzner ARM server"
+    title: "Set up deployment using Dokku on fat Hetzner ARM server",
+    user_id: user.id
   },
-  %Thexstack.Tasks.Todo{completed: false, title: "Set up Polar.sh"},
-  %Thexstack.Tasks.Todo{completed: false, title: "Set up telemetry/sentry"},
-  %Thexstack.Tasks.Todo{completed: false, title: "Make lots of money"}
+  %Thexstack.Tasks.Todo{completed: false, title: "Set up Polar.sh", user_id: user.id},
+  %Thexstack.Tasks.Todo{completed: false, title: "Set up telemetry/sentry", user_id: user.id},
+  %Thexstack.Tasks.Todo{completed: false, title: "Make lots of money", user_id: user.id}
 ]
 |> Enum.each(&Thexstack.Repo.insert!/1)

@@ -21,20 +21,20 @@
       "references": null,
       "scale": null,
       "size": null,
-      "source": "title",
-      "type": "text"
+      "source": "email",
+      "type": "citext"
     },
     {
       "allow_nil?": true,
-      "default": "false",
+      "default": "nil",
       "generated?": false,
       "precision": null,
       "primary_key?": false,
       "references": null,
       "scale": null,
       "size": null,
-      "source": "completed",
-      "type": "boolean"
+      "source": "confirmed_at",
+      "type": "utc_datetime_usec"
     }
   ],
   "base_filter": null,
@@ -42,8 +42,23 @@
   "custom_indexes": [],
   "custom_statements": [],
   "has_create_action": true,
-  "hash": "7A639043F0310CCE47F66F41D615457F270CB1B4A4014C8DF81472EAE7B70275",
-  "identities": [],
+  "hash": "03E25A39C7391E9DD38546B93A28F0D246D3D2F1C8D49258B9723FD93675EF7B",
+  "identities": [
+    {
+      "all_tenants?": false,
+      "base_filter": null,
+      "index_name": "users_unique_email_index",
+      "keys": [
+        {
+          "type": "atom",
+          "value": "email"
+        }
+      ],
+      "name": "unique_email",
+      "nils_distinct?": true,
+      "where": null
+    }
+  ],
   "multitenancy": {
     "attribute": null,
     "global": null,
@@ -51,5 +66,5 @@
   },
   "repo": "Elixir.Thexstack.Repo",
   "schema": null,
-  "table": "todos"
+  "table": "users"
 }

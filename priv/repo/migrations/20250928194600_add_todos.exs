@@ -12,10 +12,21 @@ defmodule Thexstack.Repo.Migrations.AddTodos do
       add :id, :bigserial, null: false, primary_key: true
       add :title, :text, null: false
       add :completed, :boolean, default: false
+
+      add :user_id,
+          references(:users,
+            column: :id,
+            name: "todos_user_id_fkey",
+            type: :bigint,
+            prefix: "public"
+          ),
+          null: false
     end
   end
 
   def down do
+    drop constraint(:todos, "todos_user_id_fkey")
+
     drop table(:todos)
   end
 end

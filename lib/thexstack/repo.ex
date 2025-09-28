@@ -5,6 +5,12 @@ defmodule Thexstack.Repo do
   @impl true
   def installed_extensions do
     # Add extensions here, and the migration generator will install them.
+    #
+    # "ash-functions" - Not a real PostgreSQL extension, but tells Ash to create
+    # required functions like ash_raise_error() during migration generation.
+    # This function is needed for authorization policies.
+    #
+    # "citext" - PostgreSQL extension for case-insensitive text fields
     ["ash-functions", "citext"]
   end
 
