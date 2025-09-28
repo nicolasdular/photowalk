@@ -11,13 +11,13 @@
     "@tanstack/react-router-devtools": "^1.131.47",
     "clsx": "^2.1.1",
     "motion": "^12.23.22",
-    "preact": "^10.27.2",
+    "react": "^19.1.1",
     "topbar": "^3.0.0"
   },
   "devDependencies": {
-    "@preact/preset-vite": "^2.10.2",
     "@tailwindcss/vite": "^4.1.0",
     "@tanstack/router-plugin": "^1.131.47",
+    "@vitejs/plugin-react": "^5.0.4",
     "phoenix_vite": "file:../deps/phoenix_vite",
     "prettier": "^3.6.2",
     "tailwindcss": "^4.1.0",

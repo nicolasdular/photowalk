@@ -9,6 +9,21 @@
     <meta name="csrf-token" content={get_csrf_token()} />
     <title>The Stack</title>
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+
+    <%= if PhoenixVite.Components.has_vite_watcher?(ThexstackWeb.Endpoint) do %>
+      <script type="module">
+        // Build the correct dev server origin from Phoenix endpoint config
+        const origin = "<%= static_url(@conn, "/") %>"
+        const preamble = origin.replace(/\/$/, "") + "/@react-refresh"
+
+        const mod = await import(preamble)
+        mod.default.injectIntoGlobalHook(window)
+        window.$RefreshReg$ = () => {}
+        window.$RefreshSig$ = () => (type) => type
+        window.__vite_plugin_react_preamble_installed__ = true
+      </script>
+    <% end %>
+
     <PhoenixVite.Components.assets
       names={["js/app.js", "css/app.css"]}
       manifest={{:thexstack, "priv/static/.vite/manifest.json"}}
@@ -17,6 +32,6 @@
     />
   </head>
   <body>
-    <div id="preact-app"></div>
+    <div id="react-app"></div>
   </body>
 </html>

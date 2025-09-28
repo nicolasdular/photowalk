@@ -1,5 +1,5 @@
-import { StrictMode, lazy, Suspense } from 'preact/compat';
-import { render } from 'preact';
+import { StrictMode, lazy, Suspense } from 'react';
+import { createRoot } from 'react-dom/client';
 import {
   Outlet,
   RouterProvider,
@@ -17,13 +17,13 @@ import { getCurrentUser } from './auth';
 
 // Lazy-load the heavier UI/layout and page components to reduce initial bundle
 const SignedInLayout = lazy(() =>
-  import('./layouts/SignedInLayout').then((m) => ({ default: m.SignedInLayout }))
+  import('./layouts/SignedInLayout').then(m => ({ default: m.SignedInLayout }))
 );
 const Todos = lazy(() =>
-  import('./pages/Todos').then((m) => ({ default: m.Todos }))
+  import('./pages/Todos').then(m => ({ default: m.Todos }))
 );
 const SignUp = lazy(() =>
-  import('./pages/SignUp').then((m) => ({ default: m.SignUp }))
+  import('./pages/SignUp').then(m => ({ default: m.SignUp }))
 );
 
 const rootRoute = createRootRoute({
@@ -33,7 +33,6 @@ const rootRoute = createRootRoute({
   component: () => {
     // Access loader data using useLoaderData<typeof rootRoute>()
     const { currentUser } = useLoaderData({ from: rootRoute.id });
-    // Authenticated root layout below renders the app chrome
 
     const signOut = useMutation({
       mutationFn: async () => {
@@ -57,7 +56,6 @@ const rootRoute = createRootRoute({
         }
       },
       onSuccess: async () => {
-        // Force a full page reload so SPA state is reset
         window.location.replace('/');
       },
     });
@@ -107,17 +105,17 @@ declare module '@tanstack/react-router' {
 }
 
 const queryClient = new QueryClient();
-const preactContainer = document.getElementById('preact-app');
+const reactContainer = document.getElementById('react-app');
 
-if (preactContainer) {
-  render(
+if (reactContainer) {
+  const root = createRoot(reactContainer);
+  root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <Suspense fallback={<div />}> 
+        <Suspense fallback={<div />}>
           <RouterProvider router={router} />
         </Suspense>
       </QueryClientProvider>
-    </StrictMode>,
-    preactContainer
+    </StrictMode>
   );
 }

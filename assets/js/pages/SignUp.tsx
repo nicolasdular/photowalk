@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks';
+import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { requestMagicLink } from '../ash_rpc';
 import { ErrorSummary, FieldErrors } from '../components/FormErrors';
@@ -19,12 +19,12 @@ export function SignUp() {
     },
   });
 
-  const handleChange = (e: Event) => {
+  const handleChange = e => {
     const target = e.target as HTMLInputElement;
     setForm({ email: target.value });
   };
 
-  const handleSubmit = (e: Event) => {
+  const handleSubmit = e => {
     e.preventDefault();
     mutation.mutate(form.email);
   };
