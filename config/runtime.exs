@@ -75,6 +75,11 @@ if config_env() == :prod do
       System.get_env("TOKEN_SIGNING_SECRET") ||
         raise("Missing environment variable `TOKEN_SIGNING_SECRET`!")
 
+  config :thexstack, Thexstack.Mailer,
+    api_key:
+      System.get_env("RESEND_API_KEY") ||
+        raise("Missing environment variable `RESEND_API_KEY`!")
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key
