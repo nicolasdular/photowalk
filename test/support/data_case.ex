@@ -24,6 +24,7 @@ defmodule Thexstack.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Thexstack.DataCase
+      import Thexstack.Factory
     end
   end
 
