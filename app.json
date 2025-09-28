@@ -6,16 +6,14 @@
     }
   },
   "checks": {
-    "web": [
-      {
-        "type": "http",
+    "web": {
+      "attempts": 3,
+      "interval": 10,
+      "timeout": 5,
+      "http": {
         "path": "/up",
-        "port": 4000,
-        "status": 200,
-        "interval": 10,
-        "timeout": 5,
-        "attempts": 3
+        "status": 200
       }
-    ]
+    }
   }
 }
