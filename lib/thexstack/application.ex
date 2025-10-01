@@ -15,8 +15,7 @@ defmodule Thexstack.Application do
       # Start a worker by calling: Thexstack.Worker.start_link(arg)
       # {Thexstack.Worker, arg},
       # Start to serve requests, typically the last entry
-      ThexstackWeb.Endpoint,
-      {AshAuthentication.Supervisor, [otp_app: :thexstack]}
+      ThexstackWeb.Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

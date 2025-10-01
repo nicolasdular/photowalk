@@ -28,6 +28,7 @@ defmodule ThexstackWeb.ConnCase do
       import Plug.Conn
       import Phoenix.ConnTest
       import ThexstackWeb.ConnCase
+      import ThexstackWeb.TestHelpers
     end
   end
 

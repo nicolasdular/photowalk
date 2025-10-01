@@ -13,13 +13,16 @@ defmodule Thexstack.Factory do
     attrs = attrs |> Enum.into(%{email: unique_email()})
 
     %User{}
-    |> struct!(attrs)
+    |> User.changeset(attrs)
     |> Repo.insert!()
   end
 
-  def todo_fixture(actor, attrs \\ %{}) do
-    attrs = Map.merge(%{title: "Test todo", completed: false}, attrs)
+  def todo_fixture(user, attrs \\ %{}) do
+    default_attrs = %{title: "Test todo", completed: false, user_id: user.id}
+    attrs = Map.merge(default_attrs, attrs)
 
-    Ash.create!(Todo, attrs, action: :create, actor: actor, domain: Thexstack.Tasks)
+    %Todo{}
+    |> Todo.changeset(attrs)
+    |> Repo.insert!()
   end
 end

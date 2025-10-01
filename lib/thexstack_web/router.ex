@@ -1,9 +1,8 @@
 defmodule ThexstackWeb.Router do
   use ThexstackWeb, :router
 
-  use AshAuthentication.Phoenix.Router
-
-  import AshAuthentication.Plug.Helpers
+  alias ThexstackWeb.Plugs.Authenticate
+  alias ThexstackWeb.Plugs.RequireAuth
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -12,22 +11,26 @@ defmodule ThexstackWeb.Router do
     plug(:put_root_layout, html: {ThexstackWeb.Layouts, :root})
     plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
-    plug :load_from_session
+    plug(Authenticate)
   end
 
   pipeline :api do
     plug(:accepts, ["json"])
     plug(:fetch_session)
-    plug :load_from_session
-    plug :set_actor, :user
+    plug(Authenticate)
+    plug(OpenApiSpex.Plug.PutApiSpec, module: ThexstackWeb.ApiSpec)
   end
 
-  scope "/rpc", ThexstackWeb do
-    # or :browser if using session-based auth
-    pipe_through(:api)
+  pipeline :public_api do
+    plug(:accepts, ["json"])
+    plug(:fetch_session)
+    plug(OpenApiSpex.Plug.PutApiSpec, module: ThexstackWeb.ApiSpec)
+  end
 
-    post("/run", RpcController, :run)
-    post("/validate", RpcController, :validate)
+  scope "/" do
+    pipe_through(:browser)
+
+    get("/swaggerui", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi")
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
@@ -45,6 +48,32 @@ defmodule ThexstackWeb.Router do
       live_dashboard("/dashboard", metrics: ThexstackWeb.Telemetry)
       forward("/mailbox", Plug.Swoosh.MailboxPreview)
     end
+  end
+
+  scope "/api" do
+    pipe_through(:api)
+
+    get("/openapi", OpenApiSpex.Plug.RenderSpec, [])
+  end
+
+  scope "/api", ThexstackWeb do
+    pipe_through(:public_api)
+
+    # Public auth endpoints
+    post("/auth/request-magic-link", AuthController, :request_magic_link)
+  end
+
+  scope "/api", ThexstackWeb do
+    pipe_through([:api, RequireAuth])
+
+    # Protected API endpoints (require authentication)
+    get("/user/me", UserController, :me)
+
+    # Protected Todo endpoints
+    get("/todos", TodoController, :index)
+    post("/todos", TodoController, :create)
+    patch("/todos/:id", TodoController, :update)
+    delete("/todos/:id", TodoController, :delete)
   end
 
   scope "/", ThexstackWeb do

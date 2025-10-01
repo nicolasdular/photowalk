@@ -7,65 +7,6 @@
 # General application configuration
 import Config
 
-config :ash,
-  allow_forbidden_field_for_relationships_by_default?: true,
-  include_embedded_source_by_default?: false,
-  show_keysets_for_all_actions?: false,
-  default_page_type: :keyset,
-  policies: [no_filter_static_forbidden_reads?: false],
-  keep_read_action_loads_when_loading?: false,
-  default_actions_require_atomic?: true,
-  read_action_after_action_hooks_in_order?: true,
-  bulk_actions_default_to_errors?: true
-
-config :spark,
-  formatter: [
-    remove_parens?: true,
-    "Ash.Resource": [
-      section_order: [
-        :authentication,
-        :tokens,
-        :postgres,
-        :resource,
-        :code_interface,
-        :actions,
-        :policies,
-        :pub_sub,
-        :preparations,
-        :changes,
-        :validations,
-        :multitenancy,
-        :attributes,
-        :relationships,
-        :calculations,
-        :aggregates,
-        :identities
-      ]
-    ],
-    "Ash.Domain": [section_order: [:resources, :policies, :authorization, :domain, :execution]]
-  ]
-
-config :ash_typescript,
-  # Core configuration
-  output_file: "assets/js/ash_rpc.ts",
-  run_endpoint: "/rpc/run",
-  validate_endpoint: "/rpc/validate",
-  input_field_formatter: :camel_case,
-  output_field_formatter: :camel_case,
-
-  # Feature toggles
-  require_tenant_parameters: false,
-  generate_zod_schemas: false,
-  generate_phx_channel_rpc_actions: false,
-  generate_validation_functions: true,
-
-  # Import paths and naming
-  zod_import_path: "zod",
-  zod_schema_suffix: "ZodSchema",
-  phoenix_import_path: "phoenix"
-
-config :thexstack, :ash_domains, [Thexstack.Accounts, Thexstack.Tasks]
-
 config :bun,
   version: "1.2.16",
   assets: [args: [], cd: Path.expand("../assets", __DIR__)],

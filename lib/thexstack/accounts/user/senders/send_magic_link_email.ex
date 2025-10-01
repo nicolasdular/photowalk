@@ -3,14 +3,17 @@ defmodule Thexstack.Accounts.User.Senders.SendMagicLinkEmail do
   Sends a magic link email
   """
 
-  use AshAuthentication.Sender
   use ThexstackWeb, :verified_routes
 
   import Swoosh.Email
   alias Thexstack.Mailer
 
-  @impl true
-  def send(user_or_email, token, _) do
+  @doc """
+  Sends a magic link email to the user.
+
+  Accepts either a user struct or an email string.
+  """
+  def send(user_or_email, token, _opts \\ nil) do
     # if you get a user, its for a user that already exists.
     # if you get an email, then the user does not yet exist.
 
@@ -21,7 +24,6 @@ defmodule Thexstack.Accounts.User.Senders.SendMagicLinkEmail do
       end
 
     new()
-    # TODO: Replace with your email
     |> from({"noreply", "noreply@" <> email_domain()})
     |> to(to_string(email))
     |> subject("Your login link")

@@ -42,13 +42,8 @@ defmodule Thexstack.MixProject do
   defp deps do
     [
       {:bcrypt_elixir, "~> 3.0"},
-      {:picosat_elixir, "~> 0.2"},
-      {:ash_authentication_phoenix, "~> 2.0"},
-      {:ash_postgres, "~> 2.0"},
-      {:ash_phoenix, "~> 2.0"},
-      {:ash_typescript, "~> 0.3.0"},
+      {:open_api_spex, "~> 3.21"},
       {:sourceror, "~> 1.8", only: [:dev, :test]},
-      {:ash, "~> 3.0"},
       {:phoenix_vite, "~> 0.3"},
       {:igniter, "~> 0.6", only: [:dev, :test]},
       {:phoenix, "~> 1.8.1"},
@@ -76,6 +71,7 @@ defmodule Thexstack.MixProject do
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
       {:resend, "~> 0.4.0"},
+      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
       {:bun, "~> 1.5", runtime: Mix.env() == :dev}
     ]
   end
@@ -88,10 +84,10 @@ defmodule Thexstack.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ash.setup", "assets.setup", "assets.build", "run priv/repo/seeds.exs"],
+      setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ash.setup --quiet", "test"],
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["bun.install --if-missing", "bun assets install"],
       "assets.build": ["bun vite build"],
       "assets.deploy": [

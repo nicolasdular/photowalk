@@ -1,21 +1,12 @@
 // Auth utilities for TanStack Router integration
-import {
-  currentUser,
-  type CurrentUserFields,
-  type SuccessDataFunc,
-} from './ash_rpc';
+import { client } from './api/client';
 
-// Define the fields we want from the user
-export const USER_FIELDS: CurrentUserFields = [
-  'id',
-  'email',
-  'avatarUrl',
-] as const;
-
-// Type for the current user data
-export type CurrentUser = SuccessDataFunc<
-  typeof currentUser<typeof USER_FIELDS>
->;
+// Type for the current user data from OpenAPI
+export type CurrentUser = {
+  id: number;
+  email: string;
+  confirmed_at?: string | null;
+} | null;
 
 // Auth context type
 export interface AuthContext {
@@ -26,19 +17,17 @@ export interface AuthContext {
   checkAuth: () => Promise<void>;
 }
 
-// Hook to get current user from RPC
+// Hook to get current user from OpenAPI endpoint
 export async function getCurrentUser(): Promise<CurrentUser> {
   try {
-    const result = await currentUser({
-      fields: USER_FIELDS,
-    });
+    const response = await client.GET('/api/user/me');
 
-    if (result.success) {
-      return result.data;
-    } else {
+    if (response.error) {
       // User is not authenticated or there was an error
       return null;
     }
+
+    return response.data?.data || null;
   } catch (error) {
     console.error('Error fetching current user:', error);
     return null;

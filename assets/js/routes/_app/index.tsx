@@ -1,25 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { listTodos, createTodo, updateTodo } from '../../ash_rpc';
+import { client } from '../../api/client';
+import type { components } from '../../api/schema';
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { Input } from '@catalyst/input';
 import { Checkbox, CheckboxField } from '@catalyst/checkbox';
 import { Label } from '@catalyst/fieldset';
-import { ensureRpcSuccess, RpcException } from '../../utils/rpcErrors';
 
-type Todo = {
-  id: number;
-  title: string;
-  completed: boolean | null;
-};
+type Todo = components['schemas']['Todo'];
 
 const FALLBACK_ERROR = 'Something went wrong. Please try again.';
 
 function resolveErrorMessage(error: unknown): string {
-  if (error instanceof RpcException) {
-    return error.message;
-  }
-
   if (error instanceof Error && error.message) {
     return error.message;
   }
@@ -37,60 +29,32 @@ function TodoItem({
   onClearError: () => void;
 }) {
   const queryClient = useQueryClient();
-  const [checked, setChecked] = useState<boolean>(Boolean(todo.completed));
+  const [checked, setChecked] = useState(todo.completed);
 
-  useEffect(() => {
-    setChecked(Boolean(todo.completed));
-  }, [todo.completed]);
-
-  const mutation = useMutation<
-    Pick<Todo, 'id' | 'completed'>,
-    unknown,
-    boolean,
-    { previousChecked: boolean }
-  >({
+  const mutation = useMutation<Todo, unknown, boolean, undefined>({
     mutationFn: async (nextChecked: boolean) => {
-      const result = await updateTodo({
-        primaryKey: todo.id,
-        input: { completed: nextChecked },
-        fields: ['id', 'completed'],
+      const { data, error } = await client.PATCH('/api/todos/{id}', {
+        params: {
+          path: { id: todo.id },
+        },
+        body: { completed: nextChecked },
       });
 
-      return ensureRpcSuccess(result);
-    },
-    onMutate: async nextChecked => {
-      onClearError();
-      const previousChecked = checked;
+      if (error) {
+        throw new Error('Failed to update todo');
+      }
+
       setChecked(nextChecked);
 
-      return { previousChecked };
+      return data;
     },
-    onError: (error, _variables, context) => {
-      const previousChecked =
-        context?.previousChecked ?? Boolean(todo.completed);
-      setChecked(previousChecked);
+    onError: error => {
       onError(resolveErrorMessage(error));
     },
-    onSuccess: data => {
-      setChecked(Boolean(data?.completed));
+    onSuccess: () => {
+      // Refetch todos so UI reflects latest state
+      queryClient.invalidateQueries({ queryKey: ['todos'] });
       onClearError();
-
-      queryClient.setQueryData(['todos'], old => {
-        if (!old || typeof old !== 'object') return old;
-        if ((old as any).success !== true) return old;
-
-        return {
-          ...(old as any),
-          data: {
-            ...(old as any).data,
-            results: (old as any).data.results.map((item: Todo) =>
-              item.id === todo.id
-                ? { ...item, completed: data?.completed }
-                : item
-            ),
-          },
-        };
-      });
     },
   });
 
@@ -129,30 +93,33 @@ function Todos() {
 
   const query = useQuery({
     queryKey: ['todos'],
-    queryFn: () =>
-      listTodos({
-        fields: ['id', 'title', 'completed'],
-        sort: '-id',
-        page: { limit: 100 },
-      }),
+    queryFn: async () => {
+      const { data, error } = await client.GET('/api/todos');
+
+      if (error) {
+        throw new Error('Failed to load todos');
+      }
+
+      return data.data;
+    },
   });
 
   const todos: Todo[] = useMemo(() => {
-    if (query.data?.success) {
-      return query.data.data.results as Todo[];
-    }
-    return [];
+    return query.data || [];
   }, [query.data]);
 
   const createTodoMutation = useMutation<Todo, unknown, string>({
     mutationFn: async (title: string) => {
       const trimmed = title.trim();
-      const result = await createTodo({
-        input: { title: trimmed },
-        fields: ['id', 'title', 'completed'],
+      const { data, error } = await client.POST('/api/todos', {
+        body: { title: trimmed },
       });
 
-      return ensureRpcSuccess(result);
+      if (error) {
+        throw new Error('Failed to create todo');
+      }
+
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todos'] });
@@ -240,7 +207,7 @@ function Todos() {
           </div>
         ) : null}
 
-        {!isLoading && query.data?.success === false ? (
+        {!isLoading && query.isError ? (
           <div className="mt-10 rounded-xl border border-amber-300/70 bg-amber-50 px-4 py-4 text-sm text-amber-800 shadow-sm dark:border-amber-400/50 dark:bg-amber-500/10 dark:text-amber-200">
             We ran into a problem loading your todos. Please refresh and try
             again.
@@ -261,7 +228,7 @@ function Todos() {
           </ul>
         ) : null}
 
-        {!isLoading && todos.length === 0 && query.data?.success ? (
+        {!isLoading && todos.length === 0 && !query.isError ? (
           <div className="mt-10 rounded-xl border border-dashed border-slate-300/70 bg-white/60 px-6 py-10 text-center text-sm text-slate-500 shadow-inner dark:border-slate-600 dark:bg-slate-800/60 dark:text-slate-300">
             All caught up. Add your first todo above to get started.
           </div>
