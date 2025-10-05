@@ -28,6 +28,7 @@ config :thexstack, ThexstackWeb.Endpoint,
     formats: [html: ThexstackWeb.ErrorHTML, json: ThexstackWeb.ErrorJSON],
     layout: false
   ],
+  email_host: "localhost",
   pubsub_server: Thexstack.PubSub,
   live_view: [signing_salt: "1OQHm6yQ"]
 

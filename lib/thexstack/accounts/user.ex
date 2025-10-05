@@ -3,11 +3,10 @@ defmodule Thexstack.Accounts.User do
   import Ecto.Changeset
 
   schema "users" do
-    field :email, :string
-    field :confirmed_at, :utc_datetime_usec
+    field(:email, :string)
+    field(:confirmed_at, :utc_datetime_usec)
 
-    has_many :todos, Thexstack.Tasks.Todo
-    has_many :tokens, Thexstack.Accounts.Token, foreign_key: :subject, references: :id
+    has_many(:todos, Thexstack.Tasks.Todo)
 
     timestamps()
   end
