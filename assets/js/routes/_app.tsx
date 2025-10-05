@@ -1,18 +1,23 @@
-import { Outlet, createFileRoute, redirect, useLoaderData } from '@tanstack/react-router';
+import {
+  Outlet,
+  createFileRoute,
+  redirect,
+  useLoaderData,
+} from '@tanstack/react-router';
 import { useMutation } from '@tanstack/react-query';
-import { getCurrentUser } from '../auth';
 import { SignedInLayout } from '../layouts/SignedInLayout';
+import client from '../api/client';
 
 export const Route = createFileRoute('/_app')({
   loader: async () => {
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
+    const currentUser = await client.GET('/api/user/me');
+    if (!currentUser.data) {
       throw redirect({ to: '/signup' });
     }
-    return { currentUser } as const;
+    return { currentUser: currentUser.data.data } as const;
   },
   component: () => {
-    const { currentUser } = useLoaderData({ from: Route.id }) as { currentUser: any };
+    const { currentUser } = useLoaderData({ from: Route.id });
 
     const signOut = useMutation({
       mutationFn: async () => {
@@ -44,7 +49,7 @@ export const Route = createFileRoute('/_app')({
       <SignedInLayout
         onSignOut={() => signOut.mutate()}
         signingOut={signOut.isPending}
-        currentUserAvatarUrl={currentUser?.avatarUrl ?? null}
+        currentUser={currentUser}
       >
         <Outlet />
       </SignedInLayout>

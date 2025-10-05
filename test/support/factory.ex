@@ -1,7 +1,7 @@
 defmodule Thexstack.Factory do
   @moduledoc "Test data helpers for succinct fixtures."
 
-  alias Thexstack.{Repo}
+  alias Thexstack.{Repo, Scope}
   alias Thexstack.Accounts.User
   alias Thexstack.Tasks.Todo
 
@@ -25,4 +25,17 @@ defmodule Thexstack.Factory do
     |> Todo.changeset(attrs)
     |> Repo.insert!()
   end
+
+  def scope_fixture(attrs \\ %{}) do
+    attrs = normalize_attrs(attrs)
+
+    name = Map.get(attrs, :name, :test)
+    current_user = Map.get(attrs, :current_user) || Map.get(attrs, :user)
+    metadata = Map.get(attrs, :metadata, %{})
+
+    Scope.new(name: name, current_user: current_user, metadata: metadata)
+  end
+
+  defp normalize_attrs(attrs) when is_list(attrs), do: Map.new(attrs)
+  defp normalize_attrs(%{} = attrs), do: attrs
 end

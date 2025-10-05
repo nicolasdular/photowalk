@@ -70,7 +70,7 @@ type SignedInLayoutProps = React.PropsWithChildren<{
   onSignOut?: () => void;
   signingOut?: boolean;
   currentTeamName?: string;
-  currentUserAvatarUrl?: string | null;
+  currentUser: any;
 }>;
 
 export function SignedInLayout({
@@ -78,8 +78,9 @@ export function SignedInLayout({
   onSignOut,
   signingOut = false,
   currentTeamName = 'The Stack',
-  currentUserAvatarUrl = null,
+  currentUser,
 }: SignedInLayoutProps) {
+  console.log(currentUser);
   return (
     <StackedLayout
       navbar={
@@ -98,7 +99,7 @@ export function SignedInLayout({
           <NavbarSection>
             <Dropdown>
               <DropdownButton as={NavbarItem}>
-                <Avatar src={currentUserAvatarUrl ?? undefined} square />
+                <Avatar src={currentUser.avatar_url} square />
               </DropdownButton>
               <DropdownMenu className="min-w-64" anchor="bottom end">
                 <DropdownItem href="/my-profile">

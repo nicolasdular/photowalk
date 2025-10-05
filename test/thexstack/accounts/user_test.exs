@@ -1,7 +1,7 @@
 defmodule Thexstack.Accounts.UserTest do
   use Thexstack.DataCase, async: true
 
-  alias Thexstack.Accounts.MagicLink
+  alias Thexstack.Accounts
   alias Thexstack.Accounts.User
   alias Thexstack.Repo
 
@@ -36,13 +36,13 @@ defmodule Thexstack.Accounts.UserTest do
       # Test with allowed email - should succeed
       email = allowed_email()
 
-      result = MagicLink.request_magic_link(email)
+      result = Accounts.request_magic_link(email)
       assert {:ok, :sent} = result
 
       # Test with disallowed email - should fail
       email = "notallowed@example.com"
 
-      result = MagicLink.request_magic_link(email)
+      result = Accounts.request_magic_link(email)
       assert {:error, :not_allowed} = result
     end
   end

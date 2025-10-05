@@ -9,12 +9,13 @@ defmodule Thexstack.TasksTest do
     test "returns only todos for the given user ordered newest first" do
       user = user_fixture()
       other_user = user_fixture()
+      scope = scope_fixture(user: user)
 
       older = todo_fixture(user, %{title: "Older"})
       newer = todo_fixture(user, %{title: "Newer"})
       _ignored = todo_fixture(other_user, %{title: "Ignore me"})
 
-      todos = Tasks.list_todos(user)
+      todos = Tasks.list_todos(scope)
 
       assert MapSet.new(Enum.map(todos, & &1.id)) == MapSet.new([older.id, newer.id])
       assert Enum.sort_by(todos, & &1.inserted_at, &>=/2) == todos
@@ -25,9 +26,10 @@ defmodule Thexstack.TasksTest do
   describe "get_todo!/2" do
     test "returns todo owned by the user" do
       user = user_fixture()
+      scope = scope_fixture(user: user)
       todo = todo_fixture(user)
 
-      assert %Todo{id: id} = Tasks.get_todo!(todo.id, user)
+      assert %Todo{id: id} = Tasks.get_todo!(scope, todo.id)
       assert id == todo.id
     end
 
@@ -35,9 +37,10 @@ defmodule Thexstack.TasksTest do
       owner = user_fixture()
       requester = user_fixture()
       todo = todo_fixture(owner)
+      requester_scope = scope_fixture(user: requester)
 
       assert_raise Ecto.NoResultsError, fn ->
-        Tasks.get_todo!(todo.id, requester)
+        Tasks.get_todo!(requester_scope, todo.id)
       end
     end
   end
@@ -45,16 +48,18 @@ defmodule Thexstack.TasksTest do
   describe "create_todo/2" do
     test "creates todo associated to the user when data is valid" do
       user = user_fixture()
+      scope = scope_fixture(user: user)
 
-      assert {:ok, %Todo{} = todo} = Tasks.create_todo(user, %{"title" => "Write docs"})
+      assert {:ok, %Todo{} = todo} = Tasks.create_todo(scope, %{"title" => "Write docs"})
       assert todo.user_id == user.id
       refute todo.completed
     end
 
     test "returns error changeset when data is invalid" do
       user = user_fixture()
+      scope = scope_fixture(user: user)
 
-      assert {:error, %Changeset{} = changeset} = Tasks.create_todo(user, %{title: nil})
+      assert {:error, %Changeset{} = changeset} = Tasks.create_todo(scope, %{title: nil})
       assert "can't be blank" in errors_on(changeset).title
     end
   end
@@ -62,10 +67,11 @@ defmodule Thexstack.TasksTest do
   describe "update_todo/2" do
     test "updates the todo with valid data" do
       user = user_fixture()
+      scope = scope_fixture(user: user)
       todo = todo_fixture(user, %{title: "Start", completed: false})
 
       assert {:ok, %Todo{} = updated} =
-               Tasks.update_todo(todo, %{title: "Finish", completed: true})
+               Tasks.update_todo(scope, todo, %{title: "Finish", completed: true})
 
       assert updated.title == "Finish"
       assert updated.completed
@@ -73,9 +79,10 @@ defmodule Thexstack.TasksTest do
 
     test "returns error changeset with invalid data" do
       user = user_fixture()
+      scope = scope_fixture(user: user)
       todo = todo_fixture(user, %{title: "Locked"})
 
-      assert {:error, %Changeset{} = changeset} = Tasks.update_todo(todo, %{title: nil})
+      assert {:error, %Changeset{} = changeset} = Tasks.update_todo(scope, todo, %{title: nil})
       assert "can't be blank" in errors_on(changeset).title
 
       reloaded = Repo.get!(Todo, todo.id)
@@ -86,22 +93,11 @@ defmodule Thexstack.TasksTest do
   describe "delete_todo/1" do
     test "removes the todo" do
       user = user_fixture()
+      scope = scope_fixture(user: user)
       todo = todo_fixture(user)
 
-      assert {:ok, %Todo{}} = Tasks.delete_todo(todo)
+      assert {:ok, %Todo{}} = Tasks.delete_todo(scope, todo)
       refute Repo.get(Todo, todo.id)
-    end
-  end
-
-  describe "change_todo/2" do
-    test "returns changeset with provided attributes" do
-      user = user_fixture()
-      todo = todo_fixture(user, %{title: "Original"})
-
-      changeset = Tasks.change_todo(todo, %{title: "Updated"})
-
-      assert %Changeset{data: %Todo{}} = changeset
-      assert changeset.changes.title == "Updated"
     end
   end
 end

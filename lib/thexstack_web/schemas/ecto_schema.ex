@@ -3,66 +3,84 @@ defmodule ThexstackWeb.Schemas.EctoSchema do
   Derives OpenApiSpex schemas from Ecto schemas with selective field exposure.
   """
 
-  defmacro derive_schema(ecto_module, opts \\ []) do
-    quote bind_quoted: [ecto_module: ecto_module, opts: opts] do
-      alias OpenApiSpex.Schema
+  alias OpenApiSpex.Schema
 
-      # Only expose fields explicitly listed in :fields option
-      selected_fields = Keyword.get(opts, :fields, [])
-      additional_properties = Keyword.get(opts, :additional_properties, %{})
+  @doc """
+  Builds an `%OpenApiSpex.Schema{}` from the given Ecto schema and list of fields.
 
-      # Build properties from selected Ecto fields
-      ecto_properties =
-        if selected_fields == [] do
-          # If no fields specified, error out - force explicit selection
-          raise ArgumentError,
-                "Must specify :fields option with list of Ecto fields to expose. " <>
-                  "Available fields: #{inspect(ecto_module.__schema__(:fields))}"
-        else
-          Map.new(selected_fields, fn field_name ->
-            unless field_name in ecto_module.__schema__(:fields) do
-              raise ArgumentError,
-                    "Field #{inspect(field_name)} not found in #{inspect(ecto_module)}. " <>
-                      "Available fields: #{inspect(ecto_module.__schema__(:fields))}"
-            end
+  ## Options
 
-            ecto_type = ecto_module.__schema__(:type, field_name)
+    * `:fields` - optional list of fields to expose (defaults to all schema fields)
+    * `:title` - optional title for the schema (defaults to module basename)
+    * `:description` - optional description
+    * `:required` - optional list of required fields (defaults to the provided fields)
+    * `:additional_properties` - map of extra or overriding properties
+    * `:example` - optional example map for the schema
+  """
+  @spec schema_from_fields(module(), Keyword.t()) :: Schema.t()
+  def schema_from_fields(ecto_module, opts) do
+    fields = resolve_fields!(ecto_module, opts)
 
-            openapi_type =
-              ThexstackWeb.Schemas.EctoSchema.map_ecto_type_to_openapi(ecto_type)
+    properties =
+      Enum.reduce(fields, %{}, fn field, acc ->
+        ensure_field_exists!(ecto_module, field)
 
-            {field_name, openapi_type}
-          end)
-        end
+        type = ecto_module.__schema__(:type, field)
+        Map.put(acc, field, map_ecto_type_to_openapi(type))
+      end)
 
-      # Merge with additional API-only properties
-      all_properties = Map.merge(ecto_properties, additional_properties)
+    additional_properties = Keyword.get(opts, :additional_properties, %{})
+    properties = Map.merge(properties, additional_properties)
 
-      title = opts[:title] || (ecto_module |> Module.split() |> List.last())
-      description = opts[:description]
-      required = opts[:required] || []
-      example = opts[:example]
+    required = Keyword.get(opts, :required, fields)
+    title = Keyword.get(opts, :title, default_title(ecto_module))
+    description = Keyword.get(opts, :description)
+    example = Keyword.get(opts, :example)
 
-      schema_opts = %{
-        title: title,
-        description: description,
-        type: :object,
-        properties: all_properties,
-        required: required
-      }
+    schema = %Schema{
+      title: title,
+      description: description,
+      type: :object,
+      properties: properties,
+      required: required
+    }
 
-      schema_opts = if example, do: Map.put(schema_opts, :example, example), else: schema_opts
-
-      OpenApiSpex.schema(schema_opts)
+    if example do
+      %{schema | example: example}
+    else
+      schema
     end
   end
 
-  @doc """
-  Maps Ecto types to OpenAPI Schema types.
-  """
-  def map_ecto_type_to_openapi(ecto_type) do
-    alias OpenApiSpex.Schema
+  defp resolve_fields!(ecto_module, opts) do
+    if Keyword.has_key?(opts, :fields) do
+      fields = Keyword.fetch!(opts, :fields)
 
+      unless is_list(fields) do
+        raise ArgumentError, ":fields must be a list, got: #{inspect(fields)}"
+      end
+
+      fields
+    else
+      ecto_module.__schema__(:fields)
+    end
+  end
+
+  defp ensure_field_exists!(ecto_module, field) do
+    unless field in ecto_module.__schema__(:fields) do
+      raise ArgumentError,
+            "Field #{inspect(field)} not found in #{inspect(ecto_module)}. " <>
+              "Available fields: #{inspect(ecto_module.__schema__(:fields))}"
+    end
+  end
+
+  defp default_title(module) do
+    module
+    |> Module.split()
+    |> List.last()
+  end
+
+  defp map_ecto_type_to_openapi(ecto_type) do
     case ecto_type do
       :id -> %Schema{type: :integer}
       :integer -> %Schema{type: :integer}

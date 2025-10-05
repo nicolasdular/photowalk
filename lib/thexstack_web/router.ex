@@ -1,8 +1,7 @@
 defmodule ThexstackWeb.Router do
   use ThexstackWeb, :router
 
-  alias ThexstackWeb.Plugs.Authenticate
-  alias ThexstackWeb.Plugs.RequireAuth
+  alias ThexstackWeb.Plugs.{Authenticate, RequireAuth, SetScope}
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -12,18 +11,21 @@ defmodule ThexstackWeb.Router do
     plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
     plug(Authenticate)
+    plug(SetScope, :browser)
   end
 
   pipeline :api do
     plug(:accepts, ["json"])
     plug(:fetch_session)
     plug(Authenticate)
+    plug(SetScope, :api)
     plug(OpenApiSpex.Plug.PutApiSpec, module: ThexstackWeb.ApiSpec)
   end
 
   pipeline :public_api do
     plug(:accepts, ["json"])
     plug(:fetch_session)
+    plug(SetScope, :public_api)
     plug(OpenApiSpex.Plug.PutApiSpec, module: ThexstackWeb.ApiSpec)
   end
 
@@ -59,21 +61,17 @@ defmodule ThexstackWeb.Router do
   scope "/api", ThexstackWeb do
     pipe_through(:public_api)
 
-    # Public auth endpoints
     post("/auth/request-magic-link", AuthController, :request_magic_link)
   end
 
   scope "/api", ThexstackWeb do
     pipe_through([:api, RequireAuth])
 
-    # Protected API endpoints (require authentication)
     get("/user/me", UserController, :me)
 
-    # Protected Todo endpoints
     get("/todos", TodoController, :index)
     post("/todos", TodoController, :create)
     patch("/todos/:id", TodoController, :update)
-    delete("/todos/:id", TodoController, :delete)
   end
 
   scope "/", ThexstackWeb do
@@ -85,7 +83,7 @@ defmodule ThexstackWeb.Router do
   scope "/", ThexstackWeb do
     pipe_through(:browser)
 
-    get("/auth/:token", MagicLinkController, :magic_link)
+    get("/auth/:token", SessionController, :magic_link)
     delete("/auth/sign_out", SessionController, :delete)
 
     get("/*path", PageController, :home)

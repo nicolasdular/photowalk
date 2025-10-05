@@ -46,7 +46,7 @@ function TodoItem({
 
       setChecked(nextChecked);
 
-      return data;
+      return data.data;
     },
     onError: error => {
       onError(resolveErrorMessage(error));
@@ -119,7 +119,7 @@ function Todos() {
         throw new Error('Failed to create todo');
       }
 
-      return data;
+      return data.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todos'] });

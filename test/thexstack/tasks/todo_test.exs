@@ -21,13 +21,15 @@ defmodule Thexstack.Tasks.TodoTest do
   test "list returns only current user's todos" do
     user1 = user_fixture()
     user2 = user_fixture()
+    scope1 = scope_fixture(user: user1)
+    scope2 = scope_fixture(user: user2)
 
     _ = todo_fixture(user1, %{title: "u1 - a"})
     _ = todo_fixture(user1, %{title: "u1 - b"})
     _ = todo_fixture(user2, %{title: "u2 - a"})
 
-    todos_for_user1 = Tasks.list_todos(user1)
-    todos_for_user2 = Tasks.list_todos(user2)
+    todos_for_user1 = Tasks.list_todos(scope1)
+    todos_for_user2 = Tasks.list_todos(scope2)
 
     titles1 = Enum.map(todos_for_user1, & &1.title)
     titles2 = Enum.map(todos_for_user2, & &1.title)
@@ -38,11 +40,12 @@ defmodule Thexstack.Tasks.TodoTest do
 
   test "owner can update their todo" do
     owner = user_fixture()
+    scope = scope_fixture(user: owner)
 
     todo = todo_fixture(owner, %{title: "flip me", completed: false})
 
     # Owner updates successfully
-    assert {:ok, updated} = Tasks.update_todo(todo, %{completed: true})
+    assert {:ok, updated} = Tasks.update_todo(scope, todo, %{completed: true})
     assert updated.completed == true
   end
 end

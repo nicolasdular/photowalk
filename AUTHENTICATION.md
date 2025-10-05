@@ -13,8 +13,8 @@ The authentication system uses Phoenix.Token for passwordless authentication via
 #### 1. Magic Link Service (`lib/thexstack/accounts/magic_link.ex`)
 
 The main service module that handles:
-- `request_magic_link(email)` - Generates a signed token and sends magic link email
-- `verify_magic_link(token)` - Verifies token and creates/authenticates user
+- `request_magic_link(scope, email)` - Generates a signed token and sends magic link email
+- `verify_magic_link(scope, token)` - Verifies token and creates/authenticates user
 
 Features:
 - Email allowlist: Only `hello@nicolasdular.com` and `hello@philippspiess.com` can request magic links
@@ -30,6 +30,11 @@ Features:
 - Does not require authentication (just loads if present)
 - Used in both `:browser` and `:api` pipelines
 
+**SetScope Plug** (`lib/thexstack_web/plugs/set_scope.ex`)
+- Builds `%Thexstack.Scope{}` for each request
+- Stores it as `conn.assigns.current_scope`
+- Domains expect the scope as their first argument
+
 **RequireAuth Plug** (`lib/thexstack_web/plugs/require_auth.ex`)
 - Enforces authentication for protected routes
 - Returns 401 JSON error if not authenticated
@@ -37,15 +42,11 @@ Features:
 
 #### 3. Controllers
 
-**MagicLinkController** (`lib/thexstack_web/controllers/magic_link_controller.ex`)
-- Handles the magic link callback: `GET /auth/:token`
-- Verifies token and creates session
-- Redirects to home page
-
 **AuthController** (`lib/thexstack_web/controllers/auth_controller.ex`)
 - `POST /api/auth/request-magic-link` - Request a magic link
 
 **SessionController** (`lib/thexstack_web/controllers/session_controller.ex`)
+- `GET /auth/:token` - Handle magic link callback and create session
 - `DELETE /auth/sign_out` - Sign out (clears session)
 
 **UserController** (`lib/thexstack_web/controllers/user_controller.ex`)
@@ -189,19 +190,23 @@ curl -X POST http://localhost:4000/api/auth/request-magic-link \
 
 ```elixir
 # Test magic link request
-test "request_magic_link/1 sends email for allowed address" do
-  assert {:ok, :sent} = MagicLink.request_magic_link("hello@nicolasdular.com")
+setup do
+  %{scope: Thexstack.Factory.scope_fixture(name: :api)}
 end
 
-test "request_magic_link/1 rejects unauthorized email" do
-  assert {:error, :not_allowed} = MagicLink.request_magic_link("unauthorized@example.com")
+test "request_magic_link/1 sends email for allowed address", %{scope: scope} do
+  assert {:ok, :sent} = MagicLink.request_magic_link(scope, "hello@nicolasdular.com")
+end
+
+test "request_magic_link/1 rejects unauthorized email", %{scope: scope} do
+  assert {:error, :not_allowed} = MagicLink.request_magic_link(scope, "unauthorized@example.com")
 end
 
 # Test token verification
-test "verify_magic_link/1 creates user on first login" do
+test "verify_magic_link/1 creates user on first login", %{scope: scope} do
   token = Phoenix.Token.sign(ThexstackWeb.Endpoint, "magic_link", "hello@nicolasdular.com")
 
-  assert {:ok, user} = MagicLink.verify_magic_link(token)
+  assert {:ok, user} = MagicLink.verify_magic_link(scope, token)
   assert user.email == "hello@nicolasdular.com"
   assert user.confirmed_at
 end

@@ -58,11 +58,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /**
-         * Delete a todo
-         * @description Deletes an existing todo belonging to the authenticated user
-         */
-        delete: operations["ThexstackWeb.TodoController.delete"];
+        delete?: never;
         options?: never;
         head?: never;
         /**
@@ -101,62 +97,94 @@ export interface components {
          * @description A todo item
          * @example {
          *       "completed": false,
-         *       "id": 1,
-         *       "inserted_at": "2024-01-01T12:00:00.000000Z",
-         *       "title": "Buy milk",
-         *       "updated_at": "2024-01-01T12:00:00.000000Z"
+         *       "id": 123,
+         *       "inserted_at": "2024-01-01T12:00:00",
+         *       "title": "Write docs",
+         *       "updated_at": "2024-01-01T12:05:00"
          *     }
          */
         Todo: {
             completed: boolean;
             id: number;
-            /** Format: date-time */
+            /** @description Naive ISO8601 timestamp */
             inserted_at: string;
             title: string;
-            /** Format: date-time */
+            /** @description Naive ISO8601 timestamp */
             updated_at: string;
         };
         /**
-         * TodoListResponse
-         * @description Response schema for listing Todo resources
-         * @example {
-         *       "data": [
-         *         {
-         *           "completed": false,
-         *           "id": 1,
-         *           "inserted_at": "2024-01-01T12:00:00.000000Z",
-         *           "title": "Buy milk",
-         *           "updated_at": "2024-01-01T12:00:00.000000Z"
-         *         }
-         *       ]
-         *     }
+         * TodoCreateParams
+         * @description Attributes for creating a todo
          */
-        TodoListResponse: {
+        TodoCreateParams: {
+            /** @default false */
+            completed: boolean;
+            title: string;
+        };
+        /**
+         * TodoResponse
+         * @description Response schema for a single todo resource
+         */
+        TodoResponse: {
+            /**
+             * Todo
+             * @description A todo item
+             * @example {
+             *       "completed": false,
+             *       "id": 123,
+             *       "inserted_at": "2024-01-01T12:00:00",
+             *       "title": "Write docs",
+             *       "updated_at": "2024-01-01T12:05:00"
+             *     }
+             */
             data: {
                 completed: boolean;
                 id: number;
-                /** Format: date-time */
+                /** @description Naive ISO8601 timestamp */
                 inserted_at: string;
                 title: string;
-                /** Format: date-time */
+                /** @description Naive ISO8601 timestamp */
+                updated_at: string;
+            };
+        };
+        /**
+         * TodoUpdateParams
+         * @description Attributes for updating a todo
+         */
+        TodoUpdateParams: {
+            /** @default false */
+            completed: boolean;
+            title?: string;
+        };
+        /**
+         * TodosResponse
+         * @description Response schema for listing todos
+         */
+        TodosResponse: {
+            data: {
+                completed: boolean;
+                id: number;
+                /** @description Naive ISO8601 timestamp */
+                inserted_at: string;
+                title: string;
+                /** @description Naive ISO8601 timestamp */
                 updated_at: string;
             }[];
         };
-        TodosResponse: components["schemas"]["TodoListResponse"];
         /**
          * User
          * @description A user account
          * @example {
-         *       "avatar_url": "https://gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af",
-         *       "confirmed_at": "2024-01-01T12:00:00.000000Z",
+         *       "avatar_url": "https://gravatar.com/avatar/1a79a4d60de6718e8e5b326e338ae533",
+         *       "confirmed_at": "2024-01-01T12:00:00Z",
          *       "email": "user@example.com",
-         *       "id": 1
+         *       "id": 123
          *     }
          */
         User: {
             /**
              * Format: uri
-             * @description Gravatar URL based on user email
+             * @description Gravatar URL derived from the user's email
              */
             avatar_url?: string;
             /** Format: date-time */
@@ -165,33 +193,32 @@ export interface components {
             id: number;
         };
         /**
-         * UserListResponse
-         * @description Response schema for listing User resources
-         * @example {
-         *       "data": [
-         *         {
-         *           "avatar_url": "https://gravatar.com/avatar/b58996c504c5638798eb6b511e6f49af",
-         *           "confirmed_at": "2024-01-01T12:00:00.000000Z",
-         *           "email": "user@example.com",
-         *           "id": 1
-         *         }
-         *       ]
-         *     }
+         * UserResponse
+         * @description Response schema for a single user
          */
-        UserListResponse: {
+        UserResponse: {
+            /**
+             * User
+             * @description A user account
+             * @example {
+             *       "avatar_url": "https://gravatar.com/avatar/1a79a4d60de6718e8e5b326e338ae533",
+             *       "confirmed_at": "2024-01-01T12:00:00Z",
+             *       "email": "user@example.com",
+             *       "id": 123
+             *     }
+             */
             data: {
                 /**
                  * Format: uri
-                 * @description Gravatar URL based on user email
+                 * @description Gravatar URL derived from the user's email
                  */
                 avatar_url?: string;
                 /** Format: date-time */
                 confirmed_at?: string;
                 email: string;
                 id: number;
-            }[];
+            };
         };
-        UsersResponse: components["schemas"]["UserListResponse"];
     };
     responses: never;
     parameters: never;
@@ -233,17 +260,6 @@ export interface operations {
                     };
                 };
             };
-            /** @description Email is required */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                    };
-                };
-            };
             /** @description Email not authorized */
             403: {
                 headers: {
@@ -272,7 +288,17 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TodoListResponse"];
+                    "application/json": {
+                        data: {
+                            completed: boolean;
+                            id: number;
+                            /** @description Naive ISO8601 timestamp */
+                            inserted_at: string;
+                            title: string;
+                            /** @description Naive ISO8601 timestamp */
+                            updated_at: string;
+                        }[];
+                    };
                 };
             };
         };
@@ -288,12 +314,8 @@ export interface operations {
         requestBody?: {
             content: {
                 "application/json": {
-                    /**
-                     * @description Completion status
-                     * @default false
-                     */
+                    /** @default false */
                     completed?: boolean;
-                    /** @description Title of the todo */
                     title: string;
                 };
             };
@@ -305,41 +327,32 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Todo"];
+                    "application/json": {
+                        /**
+                         * Todo
+                         * @description A todo item
+                         * @example {
+                         *       "completed": false,
+                         *       "id": 123,
+                         *       "inserted_at": "2024-01-01T12:00:00",
+                         *       "title": "Write docs",
+                         *       "updated_at": "2024-01-01T12:05:00"
+                         *     }
+                         */
+                        data: {
+                            completed: boolean;
+                            id: number;
+                            /** @description Naive ISO8601 timestamp */
+                            inserted_at: string;
+                            title: string;
+                            /** @description Naive ISO8601 timestamp */
+                            updated_at: string;
+                        };
+                    };
                 };
             };
             /** @description Validation errors */
             422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
-    "ThexstackWeb.TodoController.delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Todo ID */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Todo deleted */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Todo not found */
-            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -363,9 +376,8 @@ export interface operations {
         requestBody?: {
             content: {
                 "application/json": {
-                    /** @description Completion status */
+                    /** @default false */
                     completed?: boolean;
-                    /** @description Title of the todo */
                     title?: string;
                 };
             };
@@ -377,7 +389,28 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Todo"];
+                    "application/json": {
+                        /**
+                         * Todo
+                         * @description A todo item
+                         * @example {
+                         *       "completed": false,
+                         *       "id": 123,
+                         *       "inserted_at": "2024-01-01T12:00:00",
+                         *       "title": "Write docs",
+                         *       "updated_at": "2024-01-01T12:05:00"
+                         *     }
+                         */
+                        data: {
+                            completed: boolean;
+                            id: number;
+                            /** @description Naive ISO8601 timestamp */
+                            inserted_at: string;
+                            title: string;
+                            /** @description Naive ISO8601 timestamp */
+                            updated_at: string;
+                        };
+                    };
                 };
             };
             /** @description Todo not found */
@@ -416,12 +449,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data?: {
+                        /**
+                         * User
+                         * @description A user account
+                         * @example {
+                         *       "avatar_url": "https://gravatar.com/avatar/1a79a4d60de6718e8e5b326e338ae533",
+                         *       "confirmed_at": "2024-01-01T12:00:00Z",
+                         *       "email": "user@example.com",
+                         *       "id": 123
+                         *     }
+                         */
+                        data: {
+                            /**
+                             * Format: uri
+                             * @description Gravatar URL derived from the user's email
+                             */
+                            avatar_url?: string;
                             /** Format: date-time */
-                            confirmed_at?: string | null;
-                            /** Format: email */
-                            email?: string;
-                            id?: number;
+                            confirmed_at?: string;
+                            email: string;
+                            id: number;
                         };
                     };
                 };

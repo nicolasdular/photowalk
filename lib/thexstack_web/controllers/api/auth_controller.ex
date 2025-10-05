@@ -1,10 +1,4 @@
 defmodule ThexstackWeb.AuthController do
-  @moduledoc """
-  Controller for authentication endpoints.
-
-  Handles magic link requests and other auth-related actions.
-  """
-
   use ThexstackWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
@@ -15,7 +9,8 @@ defmodule ThexstackWeb.AuthController do
 
   operation(:request_magic_link,
     summary: "Request a magic link",
-    description: "Sends a magic link to the provided email address for passwordless authentication",
+    description:
+      "Sends a magic link to the provided email address for passwordless authentication",
     request_body: {
       "Email",
       "application/json",
@@ -36,16 +31,6 @@ defmodule ThexstackWeb.AuthController do
           properties: %{
             success: %Schema{type: :boolean},
             message: %Schema{type: :string}
-          }
-        }
-      },
-      bad_request: {
-        "Email is required",
-        "application/json",
-        %Schema{
-          type: :object,
-          properties: %{
-            error: %Schema{type: :string}
           }
         }
       },
@@ -72,11 +57,5 @@ defmodule ThexstackWeb.AuthController do
         |> put_status(:forbidden)
         |> json(%{error: "Email not authorized"})
     end
-  end
-
-  def request_magic_link(conn, _params) do
-    conn
-    |> put_status(:bad_request)
-    |> json(%{error: "Email is required"})
   end
 end

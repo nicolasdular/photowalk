@@ -1,7 +1,6 @@
 defmodule ThexstackWeb.ApiSpec do
-  alias OpenApiSpex.{Components, Info, OpenApi, Paths, Server}
+  alias OpenApiSpex.{Info, OpenApi, Paths, Server}
   alias ThexstackWeb.{Endpoint, Router}
-  alias ThexstackWeb.Schemas.{Todo, TodoListResponse, User, UserResponse}
   @behaviour OpenApi
 
   @impl OpenApi
@@ -9,8 +8,7 @@ defmodule ThexstackWeb.ApiSpec do
     %OpenApi{
       servers: servers(),
       info: %Info{title: "Thexstack API", version: "1.0"},
-      paths: Paths.from_router(Router),
-      components: components()
+      paths: Paths.from_router(Router)
     }
     |> OpenApiSpex.resolve_schema_modules()
   end
@@ -23,16 +21,5 @@ defmodule ThexstackWeb.ApiSpec do
         # Fallback when endpoint is not running (e.g., during spec generation)
         [%Server{url: "http://localhost:4000"}]
     end
-  end
-
-  defp components do
-    %Components{
-      schemas: %{
-        Todo: Todo,
-        TodosResponse: TodoListResponse,
-        User: User,
-        UsersResponse: UserResponse
-      }
-    }
   end
 end
