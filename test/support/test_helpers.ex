@@ -4,7 +4,7 @@ defmodule ThexstackWeb.TestHelpers do
   import Plug.Conn
 
   alias Phoenix.ConnTest
-  alias Thexstack.Accounts.User
+  alias Thexstack.User
 
   @doc """
   Ensures the connection carries standard JSON API headers.
@@ -12,8 +12,10 @@ defmodule ThexstackWeb.TestHelpers do
   @spec json_conn(Plug.Conn.t()) :: Plug.Conn.t()
   def json_conn(%Plug.Conn{} = conn) do
     conn
+    |> ensure_test_session()
     |> put_req_header("accept", "application/json")
     |> put_req_header("content-type", "application/json")
+    |> put_req_header("x-csrf-token", Plug.CSRFProtection.get_csrf_token())
   end
 
   @doc """
@@ -34,5 +36,11 @@ defmodule ThexstackWeb.TestHelpers do
     conn
     |> log_in_user(user)
     |> json_conn()
+  end
+
+  defp ensure_test_session(%Plug.Conn{private: %{plug_session: _}} = conn), do: conn
+
+  defp ensure_test_session(conn) do
+    ConnTest.init_test_session(conn, %{})
   end
 end

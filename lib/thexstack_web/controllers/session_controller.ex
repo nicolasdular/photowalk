@@ -7,6 +7,7 @@ defmodule ThexstackWeb.SessionController do
     case Accounts.verify_magic_link(token) do
       {:ok, user} ->
         conn
+        |> configure_session(renew: true)
         |> put_session(:user_id, user.id)
         |> redirect(to: "/")
 

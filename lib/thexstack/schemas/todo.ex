@@ -1,4 +1,4 @@
-defmodule Thexstack.Tasks.Todo do
+defmodule Thexstack.Todo do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -6,7 +6,7 @@ defmodule Thexstack.Tasks.Todo do
     field :title, :string
     field :completed, :boolean, default: false
 
-    belongs_to :user, Thexstack.Accounts.User
+    belongs_to :user, Thexstack.User
 
     timestamps()
   end

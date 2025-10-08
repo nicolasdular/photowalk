@@ -1,10 +1,12 @@
 defmodule Thexstack.Accounts.MagicLinkTest do
   use Thexstack.DataCase, async: true
 
+  import Ecto.Query
   import Swoosh.TestAssertions
 
   alias Thexstack.Accounts
-  alias Thexstack.Accounts.User
+  alias Thexstack.MagicLink
+  alias Thexstack.User
   alias Thexstack.Repo
 
   describe "request_magic_link/1" do
@@ -29,6 +31,13 @@ defmodule Thexstack.Accounts.MagicLinkTest do
   end
 
   describe "verify_magic_link/1" do
+    test "token can only be used once" do
+      token = request_magic_link_and_capture_token("hello@nicolasdular.com")
+
+      assert {:ok, %User{}} = Accounts.verify_magic_link(token)
+      assert {:error, :invalid} = Accounts.verify_magic_link(token)
+    end
+
     test "confirms an existing unconfirmed user" do
       email = "hello@nicolasdular.com"
       user = user_fixture(%{email: email, confirmed_at: nil})
@@ -72,6 +81,49 @@ defmodule Thexstack.Accounts.MagicLinkTest do
 
     test "returns error when token invalid" do
       assert {:error, :invalid} = Accounts.verify_magic_link("invalid-token")
+    end
+
+    test "returns error when token expired" do
+      email = "hello@nicolasdular.com"
+
+      expired_token =
+        Phoenix.Token.sign(ThexstackWeb.Endpoint, "magic_link_salt", email,
+          signed_at: System.system_time(:second) - 4_000
+        )
+
+      assert {:error, :invalid} = Accounts.verify_magic_link(expired_token)
+      assert nil == Repo.get_by(User, email: email)
+    end
+
+    test "returns error when magic link expired in storage" do
+      email = "hello@nicolasdular.com"
+      token = request_magic_link_and_capture_token(email)
+
+      hashed_token = :crypto.hash(:sha256, token)
+      expired_at = DateTime.add(DateTime.utc_now(), -60, :second)
+
+      MagicLink
+      |> where([ml], ml.token_hash == ^hashed_token)
+      |> Repo.update_all(set: [expires_at: expired_at])
+
+      assert {:error, :invalid} = Accounts.verify_magic_link(token)
+      assert nil == Repo.get_by(User, email: email)
+    end
+
+    test "returns error when magic link email differs" do
+      email = "hello@nicolasdular.com"
+      token = request_magic_link_and_capture_token(email)
+
+      hashed_token = :crypto.hash(:sha256, token)
+      mismatched_email = "hello@philippspiess.com"
+
+      MagicLink
+      |> where([ml], ml.token_hash == ^hashed_token)
+      |> Repo.update_all(set: [email: mismatched_email])
+
+      assert {:error, :invalid} = Accounts.verify_magic_link(token)
+      assert nil == Repo.get_by(User, email: email)
+      assert nil == Repo.get_by(User, email: mismatched_email)
     end
   end
 

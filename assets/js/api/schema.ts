@@ -13,10 +13,6 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Request a magic link
-         * @description Sends a magic link to the provided email address for passwordless authentication
-         */
         post: operations["ThexstackWeb.AuthController.request_magic_link"];
         delete?: never;
         options?: never;
@@ -31,16 +27,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * List todos for current user
-         * @description Returns all todos belonging to the authenticated user
-         */
+        /** List todos for current user */
         get: operations["ThexstackWeb.TodoController.index"];
         put?: never;
-        /**
-         * Create a new todo
-         * @description Creates a new todo for the authenticated user
-         */
+        /** Create a new todo */
         post: operations["ThexstackWeb.TodoController.create"];
         delete?: never;
         options?: never;
@@ -61,10 +51,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /**
-         * Update a todo
-         * @description Updates an existing todo belonging to the authenticated user
-         */
+        /** Update a todo */
         patch: operations["ThexstackWeb.TodoController.update"];
         trace?: never;
     };
@@ -75,10 +62,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * Get current user
-         * @description Returns the currently authenticated user's information
-         */
+        /** Get current user */
         get: operations["ThexstackWeb.UserController.me"];
         put?: never;
         post?: never;
@@ -92,103 +76,35 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /**
-         * Todo
-         * @description A todo item
-         * @example {
-         *       "completed": false,
-         *       "id": 123,
-         *       "inserted_at": "2024-01-01T12:00:00",
-         *       "title": "Write docs",
-         *       "updated_at": "2024-01-01T12:05:00"
-         *     }
-         */
+        /** Todo */
         Todo: {
             completed: boolean;
             id: number;
-            /** @description Naive ISO8601 timestamp */
+            /** Format: date-time */
             inserted_at: string;
             title: string;
-            /** @description Naive ISO8601 timestamp */
+            /** Format: date-time */
             updated_at: string;
         };
-        /**
-         * TodoCreateParams
-         * @description Attributes for creating a todo
-         */
-        TodoCreateParams: {
-            /** @default false */
-            completed: boolean;
-            title: string;
-        };
-        /**
-         * TodoResponse
-         * @description Response schema for a single todo resource
-         */
+        /** TodoResponse */
         TodoResponse: {
-            /**
-             * Todo
-             * @description A todo item
-             * @example {
-             *       "completed": false,
-             *       "id": 123,
-             *       "inserted_at": "2024-01-01T12:00:00",
-             *       "title": "Write docs",
-             *       "updated_at": "2024-01-01T12:05:00"
-             *     }
-             */
+            /** Todo */
             data: {
                 completed: boolean;
                 id: number;
-                /** @description Naive ISO8601 timestamp */
+                /** Format: date-time */
                 inserted_at: string;
                 title: string;
-                /** @description Naive ISO8601 timestamp */
+                /** Format: date-time */
                 updated_at: string;
             };
         };
         /**
-         * TodoUpdateParams
-         * @description Attributes for updating a todo
-         */
-        TodoUpdateParams: {
-            /** @default false */
-            completed: boolean;
-            title?: string;
-        };
-        /**
-         * TodosResponse
-         * @description Response schema for listing todos
-         */
-        TodosResponse: {
-            data: {
-                completed: boolean;
-                id: number;
-                /** @description Naive ISO8601 timestamp */
-                inserted_at: string;
-                title: string;
-                /** @description Naive ISO8601 timestamp */
-                updated_at: string;
-            }[];
-        };
-        /**
          * User
          * @description A user account
-         * @example {
-         *       "avatar_url": "https://gravatar.com/avatar/1a79a4d60de6718e8e5b326e338ae533",
-         *       "confirmed_at": "2024-01-01T12:00:00Z",
-         *       "email": "user@example.com",
-         *       "id": 123
-         *     }
          */
         User: {
-            /**
-             * Format: uri
-             * @description Gravatar URL derived from the user's email
-             */
             avatar_url?: string;
-            /** Format: date-time */
-            confirmed_at?: string;
             email: string;
             id: number;
         };
@@ -200,21 +116,9 @@ export interface components {
             /**
              * User
              * @description A user account
-             * @example {
-             *       "avatar_url": "https://gravatar.com/avatar/1a79a4d60de6718e8e5b326e338ae533",
-             *       "confirmed_at": "2024-01-01T12:00:00Z",
-             *       "email": "user@example.com",
-             *       "id": 123
-             *     }
              */
             data: {
-                /**
-                 * Format: uri
-                 * @description Gravatar URL derived from the user's email
-                 */
                 avatar_url?: string;
-                /** Format: date-time */
-                confirmed_at?: string;
                 email: string;
                 id: number;
             };
@@ -282,7 +186,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Todos response */
+            /** @description TodosResponse */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -292,10 +196,10 @@ export interface operations {
                         data: {
                             completed: boolean;
                             id: number;
-                            /** @description Naive ISO8601 timestamp */
+                            /** Format: date-time */
                             inserted_at: string;
                             title: string;
-                            /** @description Naive ISO8601 timestamp */
+                            /** Format: date-time */
                             updated_at: string;
                         }[];
                     };
@@ -328,24 +232,14 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /**
-                         * Todo
-                         * @description A todo item
-                         * @example {
-                         *       "completed": false,
-                         *       "id": 123,
-                         *       "inserted_at": "2024-01-01T12:00:00",
-                         *       "title": "Write docs",
-                         *       "updated_at": "2024-01-01T12:05:00"
-                         *     }
-                         */
+                        /** Todo */
                         data: {
                             completed: boolean;
                             id: number;
-                            /** @description Naive ISO8601 timestamp */
+                            /** Format: date-time */
                             inserted_at: string;
                             title: string;
-                            /** @description Naive ISO8601 timestamp */
+                            /** Format: date-time */
                             updated_at: string;
                         };
                     };
@@ -367,7 +261,6 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Todo ID */
                 id: number;
             };
             cookie?: never;
@@ -390,24 +283,14 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /**
-                         * Todo
-                         * @description A todo item
-                         * @example {
-                         *       "completed": false,
-                         *       "id": 123,
-                         *       "inserted_at": "2024-01-01T12:00:00",
-                         *       "title": "Write docs",
-                         *       "updated_at": "2024-01-01T12:05:00"
-                         *     }
-                         */
+                        /** Todo */
                         data: {
                             completed: boolean;
                             id: number;
-                            /** @description Naive ISO8601 timestamp */
+                            /** Format: date-time */
                             inserted_at: string;
                             title: string;
-                            /** @description Naive ISO8601 timestamp */
+                            /** Format: date-time */
                             updated_at: string;
                         };
                     };
@@ -452,21 +335,9 @@ export interface operations {
                         /**
                          * User
                          * @description A user account
-                         * @example {
-                         *       "avatar_url": "https://gravatar.com/avatar/1a79a4d60de6718e8e5b326e338ae533",
-                         *       "confirmed_at": "2024-01-01T12:00:00Z",
-                         *       "email": "user@example.com",
-                         *       "id": 123
-                         *     }
                          */
                         data: {
-                            /**
-                             * Format: uri
-                             * @description Gravatar URL derived from the user's email
-                             */
                             avatar_url?: string;
-                            /** Format: date-time */
-                            confirmed_at?: string;
                             email: string;
                             id: number;
                         };

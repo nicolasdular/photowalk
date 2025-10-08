@@ -5,7 +5,7 @@ defmodule ThexstackWeb.TodoControllerTest do
   import OpenApiSpex.TestAssertions
 
   alias Thexstack.{Repo}
-  alias Thexstack.Tasks.Todo
+  alias Thexstack.Todo
 
   describe "POST /api/todos" do
     setup %{conn: conn} do

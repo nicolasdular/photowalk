@@ -26,6 +26,8 @@ defmodule Mix.Tasks.Openapi.Gen.Spec do
     File.mkdir_p!(output_dir)
     File.write!(output_path, json)
 
+    System.cmd("bun", ["generate:api"], cd: "assets/")
+
     Mix.shell().info("Generated OpenAPI spec at #{output_path}")
   end
 end

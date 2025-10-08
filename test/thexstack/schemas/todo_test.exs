@@ -1,8 +1,8 @@
-defmodule Thexstack.Tasks.TodoTest do
+defmodule Thexstack.TodoTest do
   use Thexstack.DataCase, async: true
 
   alias Thexstack.Tasks
-  alias Thexstack.Tasks.Todo
+  alias Thexstack.Todo
 
   test "create associates todo to user and enforces required fields" do
     user = user_fixture()

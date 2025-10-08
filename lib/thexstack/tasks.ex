@@ -1,8 +1,7 @@
 defmodule Thexstack.Tasks do
   import Ecto.Query, warn: false
   alias Thexstack.{Repo, Scope}
-  alias Thexstack.Accounts.User
-  alias Thexstack.Tasks.Todo
+  alias Thexstack.{User, Todo}
 
   def list_todos(%Scope{} = scope) do
     user = ensure_user!(scope, :list_todos)
@@ -10,6 +9,7 @@ defmodule Thexstack.Tasks do
     Todo
     |> where([t], t.user_id == ^user.id)
     |> order_by([t], desc: t.inserted_at)
+    |> order_by([t], desc: t.id)
     |> Repo.all()
   end
 

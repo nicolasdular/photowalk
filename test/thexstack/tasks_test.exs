@@ -3,7 +3,7 @@ defmodule Thexstack.TasksTest do
 
   alias Ecto.Changeset
   alias Thexstack.Tasks
-  alias Thexstack.Tasks.Todo
+  alias Thexstack.Todo
 
   describe "list_todos/1" do
     test "returns only todos for the given user ordered newest first" do

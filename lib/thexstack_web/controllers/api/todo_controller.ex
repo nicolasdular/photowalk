@@ -4,72 +4,30 @@ defmodule ThexstackWeb.TodoController do
 
   alias OpenApiSpex.Schema
   alias Thexstack.Tasks
-  alias Thexstack.Tasks.Todo
-  alias ThexstackWeb.Schemas.EctoSchema
+  alias Thexstack.Todo
+  alias ThexstackWeb.{Schemas.EctoSchema, TodoJSON}
 
   tags(["todos"])
 
-  @todo_schema EctoSchema.schema_from_fields(Todo,
-                description: "A todo item",
-                fields: [:id, :title, :completed, :inserted_at, :updated_at],
-                additional_properties: %{
-                  inserted_at: %Schema{type: :string, description: "Naive ISO8601 timestamp"},
-                  updated_at: %Schema{type: :string, description: "Naive ISO8601 timestamp"}
-                },
-                example: %{
-                  "id" => 123,
-                  "title" => "Write docs",
-                  "completed" => false,
-                  "inserted_at" => "2024-01-01T12:00:00",
-                  "updated_at" => "2024-01-01T12:05:00"
-                }
-              )
+  @todo_schema EctoSchema.schema_from_fields(Todo, fields: TodoJSON.fields())
 
   @todo_base_params_properties %{
     title: %Schema{type: :string},
     completed: %Schema{type: :boolean, default: false}
   }
 
-  @todo_create_params_schema %Schema{
-    title: "TodoCreateParams",
-    description: "Attributes for creating a todo",
-    type: :object,
-    properties: @todo_base_params_properties,
-    required: [:title]
-  }
-
-  @todo_update_params_schema %Schema{
-    title: "TodoUpdateParams",
-    description: "Attributes for updating a todo",
-    type: :object,
-    properties: @todo_base_params_properties
-  }
-
-  @todo_response_schema %Schema{
-    title: "TodoResponse",
-    description: "Response schema for a single todo resource",
-    type: :object,
-    properties: %{
-      data: @todo_schema
-    },
-    required: [:data]
-  }
-
-  @todos_response_schema %Schema{
-    title: "TodosResponse",
-    description: "Response schema for listing todos",
-    type: :object,
-    properties: %{
-      data: %Schema{type: :array, items: @todo_schema}
-    },
-    required: [:data]
-  }
-
   operation(:index,
     summary: "List todos for current user",
-    description: "Returns all todos belonging to the authenticated user",
     responses: [
-      ok: {"Todos response", "application/json", @todos_response_schema}
+      ok:
+        {"TodosResponse", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             data: %Schema{type: :array, items: @todo_schema}
+           },
+           required: [:data]
+         }}
     ]
   )
 
@@ -77,19 +35,31 @@ defmodule ThexstackWeb.TodoController do
     scope = conn.assigns.current_scope
     todos = Tasks.list_todos(scope)
 
-    json(conn, %{data: render_todos(todos)})
+    render(conn, :index, todos: todos)
   end
 
   operation(:create,
     summary: "Create a new todo",
-    description: "Creates a new todo for the authenticated user",
     request_body: {
       "Todo attributes",
       "application/json",
-      @todo_create_params_schema
+      %Schema{
+        type: :object,
+        properties: @todo_base_params_properties,
+        required: [:title]
+      }
     },
     responses: [
-      created: {"Todo created", "application/json", @todo_response_schema},
+      created:
+        {"Todo created", "application/json",
+         %Schema{
+           title: "TodoResponse",
+           type: :object,
+           properties: %{
+             data: @todo_schema
+           },
+           required: [:data]
+         }},
       unprocessable_entity: {"Validation errors", "application/json", %Schema{type: :object}}
     ]
   )
@@ -101,7 +71,7 @@ defmodule ThexstackWeb.TodoController do
       {:ok, todo} ->
         conn
         |> put_status(:created)
-        |> json(%{data: render_todo(todo)})
+        |> render(:show, todo: todo)
 
       {:error, changeset} ->
         conn
@@ -112,17 +82,27 @@ defmodule ThexstackWeb.TodoController do
 
   operation(:update,
     summary: "Update a todo",
-    description: "Updates an existing todo belonging to the authenticated user",
     parameters: [
-      id: [in: :path, type: :integer, description: "Todo ID", required: true]
+      id: [in: :path, type: :integer, required: true]
     ],
     request_body: {
       "Todo attributes",
       "application/json",
-      @todo_update_params_schema
+      %Schema{
+        type: :object,
+        properties: @todo_base_params_properties
+      }
     },
     responses: [
-      ok: {"Todo updated", "application/json", @todo_response_schema},
+      ok:
+        {"Todo updated", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             data: @todo_schema
+           },
+           required: [:data]
+         }},
       not_found: {"Todo not found", "application/json", %Schema{type: :object}},
       unprocessable_entity: {"Validation errors", "application/json", %Schema{type: :object}}
     ]
@@ -136,7 +116,7 @@ defmodule ThexstackWeb.TodoController do
 
       case Tasks.update_todo(scope, todo, params) do
         {:ok, updated_todo} ->
-          json(conn, %{data: render_todo(updated_todo)})
+          render(conn, :show, todo: updated_todo)
 
         {:error, changeset} ->
           conn
@@ -149,20 +129,6 @@ defmodule ThexstackWeb.TodoController do
         |> put_status(:not_found)
         |> json(%{error: "Todo not found"})
     end
-  end
-
-  def todo_schema, do: @todo_schema
-  def todo_response_schema, do: @todo_response_schema
-  def todos_response_schema, do: @todos_response_schema
-
-  # Private helpers
-
-  defp render_todos(todos), do: Enum.map(todos, &render_todo/1)
-
-  defp render_todo(todo) do
-    todo
-    |> Map.from_struct()
-    |> Map.take([:id, :title, :completed, :inserted_at, :updated_at])
   end
 
   defp format_changeset_errors(changeset) do

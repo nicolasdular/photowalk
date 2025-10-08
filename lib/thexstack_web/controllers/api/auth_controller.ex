@@ -8,9 +8,6 @@ defmodule ThexstackWeb.AuthController do
   tags(["auth"])
 
   operation(:request_magic_link,
-    summary: "Request a magic link",
-    description:
-      "Sends a magic link to the provided email address for passwordless authentication",
     request_body: {
       "Email",
       "application/json",

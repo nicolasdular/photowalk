@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { client } from '../api/client';
 import { AuthLayout } from '@catalyst/auth-layout';
@@ -12,6 +12,21 @@ import { Button } from '@catalyst/button';
 function SignUp() {
   const [form, setForm] = useState({ email: '' });
   const [generalError, setGeneralError] = useState<string | null>(null);
+  const { error: searchError } = Route.useSearch();
+
+  const searchErrorMessage = useMemo(() => {
+    if (!searchError) {
+      return null;
+    }
+
+    if (searchError === 'invalid_token') {
+      return 'The magic link is invalid or has expired. Request a new one.';
+    }
+
+    return 'Something went wrong. Please try again.';
+  }, [searchError]);
+
+  const errorMessage = generalError ?? searchErrorMessage;
 
   const mutation = useMutation({
     mutationFn: async (email: string) => {
@@ -67,10 +82,10 @@ function SignUp() {
       >
         <Heading>Sign in via Email</Heading>
 
-        {generalError && (
+        {errorMessage && (
           <div className="rounded-md bg-red-50 p-4 dark:bg-red-900/10">
             <p className="text-sm text-red-800 dark:text-red-200">
-              {generalError}
+              {errorMessage}
             </p>
           </div>
         )}
@@ -82,7 +97,7 @@ function SignUp() {
             name="email"
             value={form.email}
             onChange={handleChange}
-            aria-invalid={generalError ? true : undefined}
+            aria-invalid={errorMessage ? true : undefined}
           />
         </Field>
         <Button
@@ -99,5 +114,8 @@ function SignUp() {
 }
 
 export const Route = createFileRoute('/signup')({
+  validateSearch: search => ({
+    error: typeof search.error === 'string' ? search.error : undefined,
+  }),
   component: SignUp,
 });

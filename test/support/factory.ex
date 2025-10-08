@@ -2,8 +2,7 @@ defmodule Thexstack.Factory do
   @moduledoc "Test data helpers for succinct fixtures."
 
   alias Thexstack.{Repo, Scope}
-  alias Thexstack.Accounts.User
-  alias Thexstack.Tasks.Todo
+  alias Thexstack.{Todo, User}
 
   def unique_email do
     "user-#{System.unique_integer([:positive])}@example.com"
@@ -31,9 +30,7 @@ defmodule Thexstack.Factory do
 
     name = Map.get(attrs, :name, :test)
     current_user = Map.get(attrs, :current_user) || Map.get(attrs, :user)
-    metadata = Map.get(attrs, :metadata, %{})
-
-    Scope.new(name: name, current_user: current_user, metadata: metadata)
+    Scope.new(name: name, current_user: current_user)
   end
 
   defp normalize_attrs(attrs) when is_list(attrs), do: Map.new(attrs)

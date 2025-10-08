@@ -9,7 +9,8 @@ defmodule ThexstackWeb.Endpoint do
     store: :cookie,
     key: "_thexstack_key",
     signing_salt: "eDU+UpQf",
-    same_site: "Lax"
+    same_site: "Lax",
+    secure: true
   ]
 
   socket "/live", Phoenix.LiveView.Socket,

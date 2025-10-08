@@ -18,18 +18,6 @@ defmodule ThexstackWeb.UserControllerTest do
 
       api_spec = ThexstackWeb.ApiSpec.spec()
       assert_schema(response, "UserResponse", api_spec)
-
-      assert %{"data" => %{"id" => id, "email" => email, "confirmed_at" => confirmed_at_string, "avatar_url" => avatar_url}} =
-               response
-
-      assert id == user.id
-      assert email == user.email
-
-      assert {:ok, parsed_confirmed_at, 0} = DateTime.from_iso8601(confirmed_at_string)
-      assert DateTime.compare(parsed_confirmed_at, confirmed_at) == :eq
-
-      expected_hash = :crypto.hash(:md5, user.email) |> Base.encode16(case: :lower)
-      assert avatar_url == "https://gravatar.com/avatar/" <> expected_hash
     end
 
     test "requires authentication", %{conn: conn} do

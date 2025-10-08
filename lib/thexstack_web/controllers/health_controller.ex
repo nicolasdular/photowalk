@@ -5,4 +5,3 @@ defmodule ThexstackWeb.HealthController do
     send_resp(conn, 200, "ok")
   end
 end
-

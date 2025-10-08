@@ -24,21 +24,17 @@ Features:
 
 #### 2. Authentication Plugs
 
-**Authenticate Plug** (`lib/thexstack_web/plugs/authenticate.ex`)
-- Loads current user from session
-- Sets `conn.assigns.current_user`
-- Does not require authentication (just loads if present)
-- Used in both `:browser` and `:api` pipelines
-
 **SetScope Plug** (`lib/thexstack_web/plugs/set_scope.ex`)
-- Builds `%Thexstack.Scope{}` for each request
-- Stores it as `conn.assigns.current_scope`
+- Loads the current user from the session (clearing invalid sessions)
+- Assigns `conn.assigns.current_user`
+- Builds `%Thexstack.Scope{}` for each request and stores it as `conn.assigns.current_scope`
 - Domains expect the scope as their first argument
 
 **RequireAuth Plug** (`lib/thexstack_web/plugs/require_auth.ex`)
 - Enforces authentication for protected routes
 - Returns 401 JSON error if not authenticated
 - Use this plug on controllers or specific actions that need protection
+- Expects the scope plug (`SetScope`) to run first so that `conn.assigns.current_user` is available
 
 #### 3. Controllers
 

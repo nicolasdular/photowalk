@@ -1,7 +1,7 @@
 defmodule ThexstackWeb.Router do
   use ThexstackWeb, :router
 
-  alias ThexstackWeb.Plugs.{Authenticate, RequireAuth, SetScope}
+  alias ThexstackWeb.Plugs.{RequireAuth, SetScope}
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -10,14 +10,13 @@ defmodule ThexstackWeb.Router do
     plug(:put_root_layout, html: {ThexstackWeb.Layouts, :root})
     plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
-    plug(Authenticate)
     plug(SetScope, :browser)
   end
 
   pipeline :api do
     plug(:accepts, ["json"])
     plug(:fetch_session)
-    plug(Authenticate)
+    plug(:protect_from_forgery)
     plug(SetScope, :api)
     plug(OpenApiSpex.Plug.PutApiSpec, module: ThexstackWeb.ApiSpec)
   end
@@ -25,8 +24,13 @@ defmodule ThexstackWeb.Router do
   pipeline :public_api do
     plug(:accepts, ["json"])
     plug(:fetch_session)
+    plug(:protect_from_forgery)
     plug(SetScope, :public_api)
     plug(OpenApiSpex.Plug.PutApiSpec, module: ThexstackWeb.ApiSpec)
+  end
+
+  pipeline :require_authenticated_user do
+    plug(RequireAuth)
   end
 
   scope "/" do
@@ -65,7 +69,7 @@ defmodule ThexstackWeb.Router do
   end
 
   scope "/api", ThexstackWeb do
-    pipe_through([:api, RequireAuth])
+    pipe_through([:api, :require_authenticated_user])
 
     get("/user/me", UserController, :me)
 

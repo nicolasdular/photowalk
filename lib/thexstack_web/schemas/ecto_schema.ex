@@ -62,12 +62,13 @@ defmodule ThexstackWeb.Schemas.EctoSchema do
 
       fields
     else
-      ecto_module.__schema__(:fields)
+      ecto_module.__schema__(:fields) ++ ecto_module.__schema__(:virtual_fields)
     end
   end
 
   defp ensure_field_exists!(ecto_module, field) do
-    unless field in ecto_module.__schema__(:fields) do
+    unless field in ecto_module.__schema__(:fields) ||
+             field in ecto_module.__schema__(:virtual_fields) do
       raise ArgumentError,
             "Field #{inspect(field)} not found in #{inspect(ecto_module)}. " <>
               "Available fields: #{inspect(ecto_module.__schema__(:fields))}"
