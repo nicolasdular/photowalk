@@ -1,8 +1,8 @@
 {
-  "name": "thexstack",
+  "name": "photowalk",
   "scripts": {
     "dokku": {
-      "predeploy": "./thexstack/bin/thexstack eval 'Thexstack.Release.migrate'"
+      "predeploy": "./photowalk/bin/photowalk eval 'P.Release.migrate'"
     }
   },
   "checks": {

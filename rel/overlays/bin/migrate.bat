@@ -1,1 +1,1 @@
-call "%~dp0\thexstack" eval Thexstack.Release.migrate
+call "%~dp0\photowalk" eval P.Release.migrate

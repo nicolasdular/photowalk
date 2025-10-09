@@ -3,7 +3,7 @@ services:
     image: postgres:15
     environment:
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: thexstack_dev
+      POSTGRES_DB: photowalk_dev
       # Optional: explicitly set user
       POSTGRES_USER: postgres
     ports:
@@ -11,20 +11,20 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d thexstack_dev"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d photowalk_dev"]
       interval: 5s
       timeout: 3s
       retries: 10
 
   # Runs Ecto migrations once, after DB is healthy
   migrate:
-    image: thexstack
+    image: photowalk
     build: .
     depends_on:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: "ecto://postgres:postgres@db:5432/thexstack_dev"
+      DATABASE_URL: "ecto://postgres:postgres@db:5432/photowalk_dev"
       SECRET_KEY_BASE: "pPQoFptQYBtXnpZFjKWuaoK1puxge3YGxcv0OG5Wp2eoQe0AxDcOdx1uKlunzspXWHotg2/mh3YrCfT1RBnymg=="
       TOKEN_SIGNING_SECRET: "wxvDN3mGeEAkkH4JutQfpFhIpRgu03zIatmnCVgiOrU="
       PHX_HOST: "localhost"
@@ -32,13 +32,13 @@ services:
       PHX_URL_PORT: "4000"
       MIX_ENV: "prod"
       PHX_SERVER: "false"
-    command: ["./thexstack/bin/migrate"]
+    command: ["./photowalk/bin/migrate"]
 
   app:
-    image: thexstack
+    image: photowalk
     build: .
     environment:
-      DATABASE_URL: "ecto://postgres:postgres@db:5432/thexstack_dev"
+      DATABASE_URL: "ecto://postgres:postgres@db:5432/photowalk_dev"
       SECRET_KEY_BASE: "pPQoFptQYBtXnpZFjKWuaoK1puxge3YGxcv0OG5Wp2eoQe0AxDcOdx1uKlunzspXWHotg2/mh3YrCfT1RBnymg=="
       TOKEN_SIGNING_SECRET: "wxvDN3mGeEAkkH4JutQfpFhIpRgu03zIatmnCVgiOrU="
       PHX_HOST: "localhost"
@@ -53,7 +53,7 @@ services:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
-    command: ["./thexstack/bin/server"]
+    command: ["./photowalk/bin/server"]
 
 volumes:
   postgres_data:

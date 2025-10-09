@@ -1,4 +1,4 @@
-defmodule Thexstack.Repo.Migrations.AddTodos do
+defmodule P.Repo.Migrations.AddTodos do
   use Ecto.Migration
 
   def change do

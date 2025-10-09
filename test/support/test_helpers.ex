@@ -1,10 +1,10 @@
-defmodule ThexstackWeb.TestHelpers do
+defmodule PWeb.TestHelpers do
   @moduledoc "Shared helpers for web connection tests."
 
   import Plug.Conn
 
   alias Phoenix.ConnTest
-  alias Thexstack.User
+  alias P.User
 
   @doc """
   Ensures the connection carries standard JSON API headers.

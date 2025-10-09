@@ -1,7 +1,7 @@
-defmodule ThexstackWeb.UserControllerTest do
-  use ThexstackWeb.ConnCase, async: true
+defmodule PWeb.UserControllerTest do
+  use PWeb.ConnCase, async: true
 
-  import Thexstack.Factory
+  import P.Factory
   import OpenApiSpex.TestAssertions
 
   describe "GET /api/user/me" do
@@ -16,7 +16,7 @@ defmodule ThexstackWeb.UserControllerTest do
 
       response = json_response(conn, 200)
 
-      api_spec = ThexstackWeb.ApiSpec.spec()
+      api_spec = PWeb.ApiSpec.spec()
       assert_schema(response, "UserResponse", api_spec)
     end
 

@@ -1,4 +1,4 @@
-defmodule Thexstack.Repo.Migrations.AddUsers do
+defmodule P.Repo.Migrations.AddUsers do
   use Ecto.Migration
 
   def change do

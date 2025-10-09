@@ -1,8 +1,8 @@
-defmodule Thexstack.Factory do
+defmodule P.Factory do
   @moduledoc "Test data helpers for succinct fixtures."
 
-  alias Thexstack.{Repo, Scope}
-  alias Thexstack.{Todo, User}
+  alias P.{Repo, Scope}
+  alias P.{Todo, User}
 
   def unique_email do
     "user-#{System.unique_integer([:positive])}@example.com"

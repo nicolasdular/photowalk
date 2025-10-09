@@ -17,7 +17,7 @@ defmodule Mix.Tasks.Openapi.Gen.Spec do
     # Load the application code without starting the full application
     Mix.Task.run("compile")
 
-    spec = ThexstackWeb.ApiSpec.spec()
+    spec = PWeb.ApiSpec.spec()
     json = Jason.encode!(spec, pretty: true)
 
     output_path = Path.join(["priv", "static", "openapi.json"])

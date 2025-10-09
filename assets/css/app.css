@@ -1,7 +1,7 @@
-@import "tailwindcss" source(none);
+@import 'tailwindcss' source(none);
 @source "../css";
 @source "../js";
-@source "../../lib/thexstack_web";
+@source "../../lib/photowalk_web";
 
 @theme {
   --font-sans: Inter, sans-serif;

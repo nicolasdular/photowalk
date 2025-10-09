@@ -4,346 +4,346 @@
  */
 
 export interface paths {
-    "/api/auth/request-magic-link": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["ThexstackWeb.AuthController.request_magic_link"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  '/api/auth/request-magic-link': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/todos": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List todos for current user */
-        get: operations["ThexstackWeb.TodoController.index"];
-        put?: never;
-        /** Create a new todo */
-        post: operations["ThexstackWeb.TodoController.create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    post: operations['PWeb.AuthController.request_magic_link'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/todos': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/todos/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Update a todo */
-        patch: operations["ThexstackWeb.TodoController.update"];
-        trace?: never;
+    /** List todos for current user */
+    get: operations['PWeb.TodoController.index'];
+    put?: never;
+    /** Create a new todo */
+    post: operations['PWeb.TodoController.create'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/todos/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/user/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get current user */
-        get: operations["ThexstackWeb.UserController.me"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update a todo */
+    patch: operations['PWeb.TodoController.update'];
+    trace?: never;
+  };
+  '/api/user/me': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    /** Get current user */
+    get: operations['PWeb.UserController.me'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        /** Todo */
-        Todo: {
-            completed: boolean;
-            id: number;
-            /** Format: date-time */
-            inserted_at: string;
-            title: string;
-            /** Format: date-time */
-            updated_at: string;
+  schemas: {
+    /** Todo */
+    Todo: {
+      completed: boolean;
+      id: number;
+      /** Format: date-time */
+      inserted_at: string;
+      title: string;
+      /** Format: date-time */
+      updated_at: string;
+    };
+    /** TodoResponse */
+    TodoResponse: {
+      /** Todo */
+      data: {
+        completed: boolean;
+        id: number;
+        /** Format: date-time */
+        inserted_at: string;
+        title: string;
+        /** Format: date-time */
+        updated_at: string;
+      };
+    };
+    /**
+     * User
+     * @description A user account
+     */
+    User: {
+      avatar_url?: string;
+      email: string;
+      id: number;
+    };
+    /**
+     * UserResponse
+     * @description Response schema for a single user
+     */
+    UserResponse: {
+      /**
+       * User
+       * @description A user account
+       */
+      data: {
+        avatar_url?: string;
+        email: string;
+        id: number;
+      };
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
+}
+export type $defs = Record<string, never>;
+export interface operations {
+  'PWeb.AuthController.request_magic_link': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Email */
+    requestBody?: {
+      content: {
+        'application/json': {
+          /**
+           * Format: email
+           * @description User's email address
+           */
+          email: string;
         };
-        /** TodoResponse */
-        TodoResponse: {
+      };
+    };
+    responses: {
+      /** @description Magic link sent */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            message?: string;
+            success?: boolean;
+          };
+        };
+      };
+      /** @description Email not authorized */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            error?: string;
+          };
+        };
+      };
+    };
+  };
+  'PWeb.TodoController.index': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description TodosResponse */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            data: {
+              completed: boolean;
+              id: number;
+              /** Format: date-time */
+              inserted_at: string;
+              title: string;
+              /** Format: date-time */
+              updated_at: string;
+            }[];
+          };
+        };
+      };
+    };
+  };
+  'PWeb.TodoController.create': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Todo attributes */
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @default false */
+          completed?: boolean;
+          title: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Todo created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
             /** Todo */
             data: {
-                completed: boolean;
-                id: number;
-                /** Format: date-time */
-                inserted_at: string;
-                title: string;
-                /** Format: date-time */
-                updated_at: string;
+              completed: boolean;
+              id: number;
+              /** Format: date-time */
+              inserted_at: string;
+              title: string;
+              /** Format: date-time */
+              updated_at: string;
             };
+          };
         };
-        /**
-         * User
-         * @description A user account
-         */
-        User: {
-            avatar_url?: string;
-            email: string;
-            id: number;
+      };
+      /** @description Validation errors */
+      422: {
+        headers: {
+          [name: string]: unknown;
         };
-        /**
-         * UserResponse
-         * @description Response schema for a single user
-         */
-        UserResponse: {
+        content: {
+          'application/json': Record<string, never>;
+        };
+      };
+    };
+  };
+  'PWeb.TodoController.update': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    /** @description Todo attributes */
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @default false */
+          completed?: boolean;
+          title?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Todo updated */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** Todo */
+            data: {
+              completed: boolean;
+              id: number;
+              /** Format: date-time */
+              inserted_at: string;
+              title: string;
+              /** Format: date-time */
+              updated_at: string;
+            };
+          };
+        };
+      };
+      /** @description Todo not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': Record<string, never>;
+        };
+      };
+      /** @description Validation errors */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': Record<string, never>;
+        };
+      };
+    };
+  };
+  'PWeb.UserController.me': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Current user */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
             /**
              * User
              * @description A user account
              */
             data: {
-                avatar_url?: string;
-                email: string;
-                id: number;
+              avatar_url?: string;
+              email: string;
+              id: number;
             };
+          };
         };
+      };
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
-}
-export type $defs = Record<string, never>;
-export interface operations {
-    "ThexstackWeb.AuthController.request_magic_link": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Email */
-        requestBody?: {
-            content: {
-                "application/json": {
-                    /**
-                     * Format: email
-                     * @description User's email address
-                     */
-                    email: string;
-                };
-            };
-        };
-        responses: {
-            /** @description Magic link sent */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        message?: string;
-                        success?: boolean;
-                    };
-                };
-            };
-            /** @description Email not authorized */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                    };
-                };
-            };
-        };
-    };
-    "ThexstackWeb.TodoController.index": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description TodosResponse */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            completed: boolean;
-                            id: number;
-                            /** Format: date-time */
-                            inserted_at: string;
-                            title: string;
-                            /** Format: date-time */
-                            updated_at: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "ThexstackWeb.TodoController.create": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Todo attributes */
-        requestBody?: {
-            content: {
-                "application/json": {
-                    /** @default false */
-                    completed?: boolean;
-                    title: string;
-                };
-            };
-        };
-        responses: {
-            /** @description Todo created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** Todo */
-                        data: {
-                            completed: boolean;
-                            id: number;
-                            /** Format: date-time */
-                            inserted_at: string;
-                            title: string;
-                            /** Format: date-time */
-                            updated_at: string;
-                        };
-                    };
-                };
-            };
-            /** @description Validation errors */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
-    "ThexstackWeb.TodoController.update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        /** @description Todo attributes */
-        requestBody?: {
-            content: {
-                "application/json": {
-                    /** @default false */
-                    completed?: boolean;
-                    title?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description Todo updated */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** Todo */
-                        data: {
-                            completed: boolean;
-                            id: number;
-                            /** Format: date-time */
-                            inserted_at: string;
-                            title: string;
-                            /** Format: date-time */
-                            updated_at: string;
-                        };
-                    };
-                };
-            };
-            /** @description Todo not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description Validation errors */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
-    "ThexstackWeb.UserController.me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Current user */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /**
-                         * User
-                         * @description A user account
-                         */
-                        data: {
-                            avatar_url?: string;
-                            email: string;
-                            id: number;
-                        };
-                    };
-                };
-            };
-        };
-    };
+  };
 }

@@ -1,11 +1,11 @@
-defmodule ThexstackWeb.TodoControllerTest do
-  use ThexstackWeb.ConnCase, async: true
+defmodule PWeb.TodoControllerTest do
+  use PWeb.ConnCase, async: true
 
-  import Thexstack.Factory
+  import P.Factory
   import OpenApiSpex.TestAssertions
 
-  alias Thexstack.{Repo}
-  alias Thexstack.Todo
+  alias P.{Repo}
+  alias P.Todo
 
   describe "POST /api/todos" do
     setup %{conn: conn} do
@@ -21,7 +21,7 @@ defmodule ThexstackWeb.TodoControllerTest do
 
       response = json_response(conn, 201)
 
-      api_spec = ThexstackWeb.ApiSpec.spec()
+      api_spec = PWeb.ApiSpec.spec()
       assert_schema(response, "TodoResponse", api_spec)
       assert %{"data" => %{"id" => id, "title" => "Finish docs"}} = response
       assert Repo.get!(Todo, id).user_id == user.id

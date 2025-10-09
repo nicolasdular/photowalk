@@ -2,4 +2,4 @@
 set -eu
 
 cd -P -- "$(dirname -- "$0")"
-exec ./thexstack eval Thexstack.Release.migrate
+exec ./photowalk eval P.Release.migrate

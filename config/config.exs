@@ -16,20 +16,20 @@ config :bun,
     env: %{"MIX_BUILD_PATH" => Mix.Project.build_path()}
   ]
 
-config :thexstack,
-  ecto_repos: [Thexstack.Repo],
+config :photowalk,
+  ecto_repos: [P.Repo],
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint
-config :thexstack, ThexstackWeb.Endpoint,
+config :photowalk, PWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: ThexstackWeb.ErrorHTML, json: ThexstackWeb.ErrorJSON],
+    formats: [html: PWeb.ErrorHTML, json: PWeb.ErrorJSON],
     layout: false
   ],
   email_host: "localhost",
-  pubsub_server: Thexstack.PubSub,
+  pubsub_server: P.PubSub,
   live_view: [signing_salt: "1OQHm6yQ"]
 
 # Configures the mailer
@@ -39,7 +39,7 @@ config :thexstack, ThexstackWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :thexstack, Thexstack.Mailer, adapter: Swoosh.Adapters.Local
+config :photowalk, P.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configures Elixir's Logger
 config :logger, :default_formatter,

@@ -59,7 +59,7 @@ WORKDIR /app
 RUN useradd --create-home appuser
 
 # Copy release from build stage
-COPY --from=build /app/_build/prod/rel/thexstack ./thexstack
+COPY --from=build /app/_build/prod/rel/photowalk ./photowalk
 
 RUN chown -R appuser:appuser /app
 USER appuser
@@ -67,4 +67,4 @@ USER appuser
 ENV PHX_SERVER=true MIX_ENV=prod
 EXPOSE 4000
 
-CMD ["./thexstack/bin/thexstack", "start"]
+CMD ["./photowalk/bin/photowalk", "start"]

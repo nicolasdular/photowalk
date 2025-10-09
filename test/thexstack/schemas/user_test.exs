@@ -1,9 +1,9 @@
-defmodule Thexstack.UserTest do
-  use Thexstack.DataCase, async: true
+defmodule P.UserTest do
+  use P.DataCase, async: true
 
-  alias Thexstack.Accounts
-  alias Thexstack.User
-  alias Thexstack.Repo
+  alias P.Accounts
+  alias P.User
+  alias P.Repo
 
   defp valid_email, do: unique_email()
   defp allowed_email, do: "hello@nicolasdular.com"

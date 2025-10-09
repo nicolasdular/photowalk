@@ -1,13 +1,13 @@
-defmodule Thexstack.Accounts.MagicLinkTest do
-  use Thexstack.DataCase, async: true
+defmodule P.Accounts.MagicLinkTest do
+  use P.DataCase, async: true
 
   import Ecto.Query
   import Swoosh.TestAssertions
 
-  alias Thexstack.Accounts
-  alias Thexstack.MagicLink
-  alias Thexstack.User
-  alias Thexstack.Repo
+  alias P.Accounts
+  alias P.MagicLink
+  alias P.User
+  alias P.Repo
 
   describe "request_magic_link/1" do
     test "returns error for disallowed email" do
@@ -87,7 +87,7 @@ defmodule Thexstack.Accounts.MagicLinkTest do
       email = "hello@nicolasdular.com"
 
       expired_token =
-        Phoenix.Token.sign(ThexstackWeb.Endpoint, "magic_link_salt", email,
+        Phoenix.Token.sign(PWeb.Endpoint, "magic_link_salt", email,
           signed_at: System.system_time(:second) - 4_000
         )
 

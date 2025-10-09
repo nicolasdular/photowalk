@@ -1,9 +1,9 @@
-defmodule Thexstack.MixProject do
+defmodule P.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :thexstack,
+      app: :photowalk,
       version: "0.1.0",
       elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -21,7 +21,7 @@ defmodule Thexstack.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {Thexstack.Application, []},
+      mod: {P.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end

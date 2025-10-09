@@ -1,4 +1,4 @@
-defmodule Thexstack.Repo.Migrations.CreateMagicLinks do
+defmodule P.Repo.Migrations.CreateMagicLinks do
   use Ecto.Migration
 
   def change do

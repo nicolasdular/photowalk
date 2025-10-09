@@ -12,12 +12,12 @@ import Config
 # If you use `mix release`, you need to explicitly enable the server
 # by passing the PHX_SERVER=true when you start it:
 #
-#     PHX_SERVER=true bin/thexstack start
+#     PHX_SERVER=true bin/photowalk start
 #
 # Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
 # script that automatically sets the env var above.
 if System.get_env("PHX_SERVER") do
-  config :thexstack, ThexstackWeb.Endpoint, server: true
+  config :photowalk, PWeb.Endpoint, server: true
 end
 
 if config_env() == :prod do
@@ -30,7 +30,7 @@ if config_env() == :prod do
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
-  config :thexstack, Thexstack.Repo,
+  config :photowalk, P.Repo,
     # ssl: true,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
@@ -55,9 +55,9 @@ if config_env() == :prod do
   url_scheme = System.get_env("PHX_URL_SCHEME") || "https"
   url_port = String.to_integer(System.get_env("PHX_URL_PORT") || "443")
 
-  config :thexstack, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
+  config :photowalk, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
-  config :thexstack, ThexstackWeb.Endpoint,
+  config :photowalk, PWeb.Endpoint,
     url: [host: host, port: url_port, scheme: url_scheme],
     http: [
       # Enable IPv6 and bind on all interfaces.
@@ -70,14 +70,14 @@ if config_env() == :prod do
     force_ssl: [hsts: true, rewrite_on: [:x_forwarded_proto]],
     email_host: System.get_env("EMAIL_HOST") || host,
     secret_key_base: secret_key_base,
-    cache_static_manifest_latest: PhoenixVite.cache_static_manifest_latest(:thexstack)
+    cache_static_manifest_latest: PhoenixVite.cache_static_manifest_latest(:photowalk)
 
-  config :thexstack,
+  config :photowalk,
     token_signing_secret:
       System.get_env("TOKEN_SIGNING_SECRET") ||
         raise("Missing environment variable `TOKEN_SIGNING_SECRET`!")
 
-  config :thexstack, Thexstack.Mailer,
+  config :photowalk, P.Mailer,
     api_key:
       System.get_env("RESEND_API_KEY") ||
         raise("Missing environment variable `RESEND_API_KEY`!")
@@ -87,7 +87,7 @@ if config_env() == :prod do
   # To get SSL working, you will need to add the `https` key
   # to your endpoint configuration:
   #
-  #     config :thexstack, ThexstackWeb.Endpoint,
+  #     config :photowalk, PWeb.Endpoint,
   #       https: [
   #         ...,
   #         port: 443,
@@ -109,7 +109,7 @@ if config_env() == :prod do
   # We also recommend setting `force_ssl` in your config/prod.exs,
   # ensuring no data is ever sent via http, always redirecting to https:
   #
-  #     config :thexstack, ThexstackWeb.Endpoint,
+  #     config :photowalk, PWeb.Endpoint,
   #       force_ssl: [hsts: true]
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
@@ -119,7 +119,7 @@ if config_env() == :prod do
   # In production you need to configure the mailer to use a different adapter.
   # Here is an example configuration for Mailgun:
   #
-  #     config :thexstack, Thexstack.Mailer,
+  #     config :photowalk, P.Mailer,
   #       adapter: Swoosh.Adapters.Mailgun,
   #       api_key: System.get_env("MAILGUN_API_KEY"),
   #       domain: System.get_env("MAILGUN_DOMAIN")

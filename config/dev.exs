@@ -1,11 +1,11 @@
 import Config
 
 # Configure your database
-config :thexstack, Thexstack.Repo,
+config :photowalk, P.Repo,
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  database: "thexstack_dev",
+  database: "photowalk_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -16,7 +16,7 @@ config :thexstack, Thexstack.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :thexstack, ThexstackWeb.Endpoint,
+config :photowalk, PWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: String.to_integer(System.get_env("PORT") || "4000")],
@@ -51,17 +51,17 @@ config :thexstack, ThexstackWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :thexstack, ThexstackWeb.Endpoint,
+config :photowalk, PWeb.Endpoint,
   live_reload: [
     web_console_logger: true,
     patterns: [
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/thexstack_web/(?:controllers|live|components|router)/?.*\.(ex|heex)$"
+      ~r"lib/photowalk_web/(?:controllers|live|components|router)/?.*\.(ex|heex)$"
     ]
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :thexstack, dev_routes: true, token_signing_secret: "FQ+jqBygVaZZ+GjqGaDKKhEa/mB5GLnM"
+config :photowalk, dev_routes: true, token_signing_secret: "FQ+jqBygVaZZ+GjqGaDKKhEa/mB5GLnM"
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :default_formatter, format: "[$level] $message\n"

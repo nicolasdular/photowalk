@@ -64,7 +64,7 @@
     "global": null,
     "strategy": null
   },
-  "repo": "Elixir.Thexstack.Repo",
+  "repo": "Elixir.P.Repo",
   "schema": null,
   "table": "users"
 }

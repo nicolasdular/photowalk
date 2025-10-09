@@ -1,4 +1,4 @@
-defmodule Thexstack.Repo.Migrations.InstallCitexExtension do
+defmodule P.Repo.Migrations.InstallCitexExtension do
   use Ecto.Migration
 
   def up do

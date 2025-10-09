@@ -1,4 +1,4 @@
-defmodule Thexstack.DataCase do
+defmodule P.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -10,7 +10,7 @@ defmodule Thexstack.DataCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use Thexstack.DataCase, async: true`, although
+  by setting `use P.DataCase, async: true`, although
   this option is not recommended for other databases.
   """
 
@@ -18,18 +18,18 @@ defmodule Thexstack.DataCase do
 
   using do
     quote do
-      alias Thexstack.Repo
+      alias P.Repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import Thexstack.DataCase
-      import Thexstack.Factory
+      import P.DataCase
+      import P.Factory
     end
   end
 
   setup tags do
-    Thexstack.DataCase.setup_sandbox(tags)
+    P.DataCase.setup_sandbox(tags)
     :ok
   end
 
@@ -37,14 +37,14 @@ defmodule Thexstack.DataCase do
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Thexstack.Repo, shared: not tags[:async])
+    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(P.Repo, shared: not tags[:async])
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
   end
 
   @doc """
   A helper that transforms changeset errors into a map of messages.
 
-      scope = Thexstack.Factory.scope_fixture()
+      scope = P.Factory.scope_fixture()
       assert {:error, changeset} = Accounts.create_user(scope, %{password: "short"})
       assert "password is too short" in errors_on(changeset).password
       assert %{password: ["password is too short"]} = errors_on(changeset)

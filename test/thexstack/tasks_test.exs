@@ -1,9 +1,9 @@
-defmodule Thexstack.TasksTest do
-  use Thexstack.DataCase, async: true
+defmodule P.TasksTest do
+  use P.DataCase, async: true
 
   alias Ecto.Changeset
-  alias Thexstack.Tasks
-  alias Thexstack.Todo
+  alias P.Tasks
+  alias P.Todo
 
   describe "list_todos/1" do
     test "returns only todos for the given user ordered newest first" do

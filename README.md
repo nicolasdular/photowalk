@@ -1,4 +1,4 @@
-# Thexstack
+# photowalk
 
 To start your Phoenix server:
 
@@ -16,10 +16,10 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
 1. Initial setup
 
 ```sh
-dokku apps:create thexstack
+dokku apps:create photowalk
 sudo dokku plugin:install https://github.com/dokku/dokku-postgres.git
-dokku postgres:create thexstackdb
-dokku postgres:link thexstackdb thexstack
+dokku postgres:create photowalkdb
+dokku postgres:link photowalkdb photowalk
 ```
 
 2. ENV variables
@@ -29,13 +29,13 @@ mix phx.gen.secret # => generates a secret key
 ```
 
 ```sh
-dokku config:set thexstack ENV=prod PHX_HOST=yourdomain.com EMAIL_DOMAIN=youremaildomain.com SECRET_KEY_BASE=generated-key1 TOKEN_SIGNING_SECRET=genereated-key-2 RESEND_API_KEY=re_123123
+dokku config:set photowalk ENV=prod PHX_HOST=yourdomain.com EMAIL_DOMAIN=youremaildomain.com SECRET_KEY_BASE=generated-key1 TOKEN_SIGNING_SECRET=genereated-key-2 RESEND_API_KEY=re_123123
 ```
 
 3. Connect repo
 
 ```
-git remote add dokku dokku@dokku.nicnac.party:thexstack
+git remote add dokku dokku@dokku.nicnac.party:photowalk
 
 git push dokku main
 ```
