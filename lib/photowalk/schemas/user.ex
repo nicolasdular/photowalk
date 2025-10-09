@@ -8,8 +8,6 @@ defmodule P.User do
 
     field :avatar_url, :string, virtual: true
 
-    has_many(:todos, P.Todo)
-
     timestamps()
   end
 

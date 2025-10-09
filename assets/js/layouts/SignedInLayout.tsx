@@ -35,7 +35,7 @@ import {
 } from '@catalyst/sidebar';
 import { StackedLayout } from '@catalyst/stacked-layout';
 
-const navItems = [{ label: 'Todos', url: '/' }];
+const navItems = [{ label: 'Overview', url: '/' }];
 
 function TeamDropdownMenu() {
   return (
@@ -80,7 +80,6 @@ export function SignedInLayout({
   currentTeamName = 'The Stack',
   currentUser,
 }: SignedInLayoutProps) {
-  console.log(currentUser);
   return (
     <StackedLayout
       navbar={

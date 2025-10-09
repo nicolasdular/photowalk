@@ -72,10 +72,6 @@ defmodule PWeb.Router do
     pipe_through([:api, :require_authenticated_user])
 
     get("/user/me", UserController, :me)
-
-    get("/todos", TodoController, :index)
-    post("/todos", TodoController, :create)
-    patch("/todos/:id", TodoController, :update)
   end
 
   scope "/", PWeb do

@@ -2,7 +2,7 @@ defmodule P.Factory do
   @moduledoc "Test data helpers for succinct fixtures."
 
   alias P.{Repo, Scope}
-  alias P.{Todo, User}
+  alias P.User
 
   def unique_email do
     "user-#{System.unique_integer([:positive])}@example.com"
@@ -13,15 +13,6 @@ defmodule P.Factory do
 
     %User{}
     |> User.changeset(attrs)
-    |> Repo.insert!()
-  end
-
-  def todo_fixture(user, attrs \\ %{}) do
-    default_attrs = %{title: "Test todo", completed: false, user_id: user.id}
-    attrs = Map.merge(default_attrs, attrs)
-
-    %Todo{}
-    |> Todo.changeset(attrs)
     |> Repo.insert!()
   end
 

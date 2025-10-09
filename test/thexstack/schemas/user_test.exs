@@ -70,13 +70,4 @@ defmodule P.UserTest do
       assert is_nil(user.confirmed_at) or match?(%DateTime{}, user.confirmed_at)
     end
   end
-
-  describe "relationships" do
-    test "has_many todos relationship" do
-      user = user_fixture(%{email: valid_email()})
-      user_with_todos = Repo.preload(user, :todos)
-      assert is_list(user_with_todos.todos)
-      assert user_with_todos.todos == []
-    end
-  end
 end
