@@ -34,6 +34,19 @@ defmodule P.Factory do
     photo
   end
 
+  def collection_fixture(attrs \\ %{}) do
+    attrs = normalize_attrs(attrs)
+    user = Map.get(attrs, :user) || user_fixture()
+
+    collection_attrs = %{
+      "title" => Map.get(attrs, :title, "Test Collection"),
+      "description" => Map.get(attrs, :description, "A test collection")
+    }
+
+    {:ok, collection} = P.Collections.create_collection(user, collection_attrs)
+    collection
+  end
+
   def upload_fixture do
     build_upload()
   end

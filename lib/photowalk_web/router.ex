@@ -73,6 +73,7 @@ defmodule PWeb.Router do
 
     get("/user/me", UserController, :me)
     resources("/photos", PhotoController, only: [:index, :create])
+    resources("/collections", CollectionController, only: [:index, :create, :show])
   end
 
   scope "/", PWeb do

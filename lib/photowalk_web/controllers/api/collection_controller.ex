@@ -1,0 +1,124 @@
+defmodule PWeb.CollectionController do
+  use PWeb, :controller
+  use OpenApiSpex.ControllerSpecs
+
+  alias OpenApiSpex.Schema
+  alias P.Collections
+  alias P.Collection
+  alias PWeb.CollectionJSON
+  alias PWeb.Schemas.EctoSchema
+
+  action_fallback PWeb.FallbackController
+
+  @collection_resource_schema EctoSchema.schema_from_fields(Collection,
+                                description: "A collection of photos",
+                                fields: CollectionJSON.fields(),
+                                required: CollectionJSON.required_fields()
+                              )
+
+  @collection_list_response_schema %Schema{
+    title: "CollectionListResponse",
+    description: "List of collections for the current user",
+    type: :object,
+    properties: %{
+      data: %Schema{type: :array, items: @collection_resource_schema}
+    },
+    required: [:data]
+  }
+
+  @collection_show_response_schema %Schema{
+    title: "CollectionShowResponse",
+    description: "A single collection",
+    type: :object,
+    properties: %{
+      data: @collection_resource_schema
+    },
+    required: [:data]
+  }
+
+  @collection_create_request_schema %Schema{
+    title: "CollectionCreateRequest",
+    description: "Parameters for creating a collection",
+    type: :object,
+    properties: %{
+      title: %Schema{type: :string, description: "Title of the collection"},
+      description: %Schema{type: :string, description: "Description of the collection"}
+    },
+    required: [:title]
+  }
+
+  @collection_validation_error_schema %Schema{
+    title: "ValidationErrors",
+    type: :object,
+    properties: %{
+      errors: %Schema{
+        type: :object,
+        additionalProperties: %Schema{type: :array, items: %Schema{type: :string}}
+      }
+    },
+    required: [:errors]
+  }
+
+  tags(["collections"])
+
+  operation :index,
+    summary: "List collections",
+    responses: [
+      ok: {"Collections", "application/json", @collection_list_response_schema}
+    ]
+
+  operation :create,
+    summary: "Create a collection",
+    request_body: {
+      "CollectionCreateRequest",
+      "application/json",
+      @collection_create_request_schema,
+      required: true
+    },
+    responses: [
+      created: {
+        "Created collection",
+        "application/json",
+        @collection_show_response_schema
+      },
+      unprocessable_entity: {
+        "Validation errors",
+        "application/json",
+        @collection_validation_error_schema
+      }
+    ]
+
+  operation :show,
+    summary: "Show a collection",
+    parameters: [
+      id: [in: :path, description: "Collection ID", type: :integer, required: true]
+    ],
+    responses: [
+      ok: {"Collection", "application/json", @collection_show_response_schema},
+      not_found: {"Collection not found", "application/json", %Schema{type: :object}}
+    ]
+
+  def index(conn, _params) do
+    user = conn.assigns.current_user
+
+    render(conn, :index, collections: Collections.list_collections_for_user(user))
+  end
+
+  def create(conn, params) do
+    user = conn.assigns.current_user
+
+    with {:ok, collection} <- Collections.create_collection(user, params) do
+      conn
+      |> put_status(:created)
+      |> render(:show, collection: collection)
+    end
+  end
+
+  def show(conn, %{"id" => id}) do
+    user = conn.assigns.current_user
+
+    with {:ok, collection} <- Collections.get_collection_for_user(String.to_integer(id), user) do
+      render(conn, :show, collection: collection)
+    end
+  end
+end

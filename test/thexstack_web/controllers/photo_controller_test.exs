@@ -55,6 +55,55 @@ defmodule PWeb.PhotoControllerTest do
       |> post(~p"/api/photos", %{})
       |> json_response(422)
     end
+
+    test "uploads a photo to a collection", %{conn: conn} do
+      user = user_fixture()
+      collection = collection_fixture(user: user)
+      upload = upload_fixture()
+
+      conn =
+        conn
+        |> auth_json_conn(user)
+        |> post(~p"/api/photos", %{"photo" => upload, "collection_id" => collection.id})
+
+      response = json_response(conn, 201)
+      api_spec = PWeb.ApiSpec.spec()
+
+      assert_schema(response, "PhotoListResponse", api_spec)
+      assert length(response["data"]) == 1
+
+      # Verify the photo was added to the collection
+      photo = P.Repo.get(P.Photo, List.first(response["data"])["id"])
+      assert photo.collection_id == collection.id
+    end
+
+    test "validates collection belongs to user", %{conn: conn} do
+      user = user_fixture()
+      other_user = user_fixture()
+      other_collection = collection_fixture(user: other_user)
+      upload = upload_fixture()
+
+      conn =
+        conn
+        |> auth_json_conn(user)
+        |> post(~p"/api/photos", %{"photo" => upload, "collection_id" => other_collection.id})
+
+      response = json_response(conn, 422)
+      assert response["errors"]["collection_id"] == ["does not belong to you"]
+    end
+
+    test "validates collection exists", %{conn: conn} do
+      user = user_fixture()
+      upload = upload_fixture()
+
+      conn =
+        conn
+        |> auth_json_conn(user)
+        |> post(~p"/api/photos", %{"photo" => upload, "collection_id" => 99999})
+
+      response = json_response(conn, 422)
+      assert response["errors"]["collection_id"] == ["does not exist"]
+    end
   end
 
   describe "GET /api/photos" do

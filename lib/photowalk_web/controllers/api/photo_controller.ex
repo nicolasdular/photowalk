@@ -39,6 +39,10 @@ defmodule PWeb.PhotoController do
         type: :string,
         format: :binary,
         description: "Image file to process"
+      },
+      collection_id: %Schema{
+        type: :integer,
+        description: "Optional ID of the collection to add the photo to"
       }
     },
     required: [:photo]
@@ -94,7 +98,7 @@ defmodule PWeb.PhotoController do
   def create(conn, params) do
     user = conn.assigns.current_user
 
-    with {:ok, photo} <- Photos.create_photo(user, params["photo"]) do
+    with {:ok, photo} <- Photos.create_photo(user, params["photo"], params) do
       conn
       |> put_status(:created)
       |> render(:index, photos: [photo])

@@ -10,6 +10,7 @@ defmodule P.Photo do
 
   alias P.Photos.Uploader
   alias P.User
+  alias P.Collection
 
   schema "photos" do
     field :upload_key, Ecto.UUID
@@ -22,11 +23,12 @@ defmodule P.Photo do
     field :thumbnail_url, :string, virtual: true
 
     belongs_to :user, User
+    belongs_to :collection, Collection
 
     timestamps()
   end
 
-  @cast_fields [:source_filename, :content_type, :user_id, :title]
+  @cast_fields [:source_filename, :content_type, :user_id, :title, :collection_id]
 
   @doc false
   def changeset(photo, attrs) do
@@ -36,6 +38,7 @@ defmodule P.Photo do
     |> cast_attachments(attrs, [:image])
     |> validate_required([:user_id, :upload_key, :image, :title])
     |> assoc_constraint(:user)
+    |> assoc_constraint(:collection)
     |> unique_constraint(:upload_key)
   end
 

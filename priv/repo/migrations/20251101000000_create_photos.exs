@@ -9,11 +9,13 @@ defmodule P.Repo.Migrations.CreatePhotos do
       add :source_filename, :string
       add :content_type, :string
       add :user_id, references(:users, on_delete: :delete_all), null: false
+      add :collection_id, references(:collections, on_delete: :nilify_all)
 
       timestamps(type: :utc_datetime_usec)
     end
 
     create unique_index(:photos, [:upload_key])
     create index(:photos, [:user_id])
+    create index(:photos, [:collection_id])
   end
 end
