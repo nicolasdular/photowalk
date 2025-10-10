@@ -37,3 +37,7 @@ config :phoenix, :plug_init_mode, :runtime
 # Enable helpful, but potentially expensive runtime checks
 config :phoenix_live_view,
   enable_expensive_runtime_checks: true
+
+config :waffle,
+  storage_dir_prefix: "priv/waffle/test",
+  asset_host: nil

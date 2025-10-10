@@ -7,6 +7,8 @@ defmodule P.Application do
 
   @impl true
   def start(_type, _args) do
+    ensure_upload_root!()
+
     children = [
       PWeb.Telemetry,
       P.Repo,
@@ -30,5 +32,22 @@ defmodule P.Application do
   def config_change(changed, _new, removed) do
     PWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp ensure_upload_root! do
+    prefix = Application.get_env(:waffle, :storage_dir_prefix, "priv/waffle/public")
+    storage_dir = Application.get_env(:waffle, :storage_dir, "uploads")
+
+    prefix
+    |> Path.join(storage_dir)
+    |> resolve_upload_path()
+    |> File.mkdir_p!()
+  end
+
+  defp resolve_upload_path(path) do
+    case Path.type(path) do
+      :absolute -> path
+      _ -> :photowalk |> Application.app_dir(path) |> to_string()
+    end
   end
 end

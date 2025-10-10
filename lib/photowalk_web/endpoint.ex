@@ -30,6 +30,15 @@ defmodule PWeb.Endpoint do
     gzip: not code_reloading?,
     only: PWeb.static_paths()
 
+  plug Plug.Static,
+    at: "/uploads",
+    from:
+      :photowalk
+      |> Application.app_dir("priv/waffle/public/uploads")
+      |> to_string(),
+    gzip: false,
+    cache_control_for_etags: "public, max-age=31536000"
+
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
@@ -49,7 +58,8 @@ defmodule PWeb.Endpoint do
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
-    json_decoder: Phoenix.json_library()
+    json_decoder: Phoenix.json_library(),
+    length: Application.compile_env(:photowalk, :upload_max_bytes, 75_000_000)
 
   plug Plug.MethodOverride
   plug Plug.Head

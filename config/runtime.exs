@@ -82,6 +82,11 @@ if config_env() == :prod do
       System.get_env("RESEND_API_KEY") ||
         raise("Missing environment variable `RESEND_API_KEY`!")
 
+  config :waffle,
+    storage: Waffle.Storage.Local,
+    bucket: nil,
+    asset_host: System.get_env("UPLOADS_ASSET_HOST")
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

@@ -1,0 +1,89 @@
+defmodule PWeb.PhotoControllerTest do
+  use PWeb.ConnCase, async: false
+
+  import P.Factory
+  import PWeb.TestHelpers
+  import OpenApiSpex.TestAssertions
+
+  setup do
+    File.rm_rf!(Path.expand("../../priv/waffle/test/uploads", __DIR__))
+
+    on_exit(fn ->
+      File.rm_rf!(Path.expand("../../priv/waffle/test/uploads", __DIR__))
+    end)
+
+    :ok
+  end
+
+  describe "POST /api/photos" do
+    test "uploads and processes a photo", %{conn: conn} do
+      user = user_fixture()
+      upload = upload_fixture()
+
+      conn =
+        conn
+        |> auth_json_conn(user)
+        |> post(~p"/api/photos", %{"photo" => upload})
+
+      response = json_response(conn, 201)
+      api_spec = PWeb.ApiSpec.spec()
+
+      assert_schema(response, "PhotoListResponse", api_spec)
+
+      [%{"thumbnail_url" => thumb_url, "full_url" => full_url}] = response["data"]
+
+      assert thumb_url =~ "/uploads/"
+      assert full_url =~ "/uploads/"
+
+      assert File.exists?(local_path(thumb_url))
+      assert File.exists?(local_path(full_url))
+
+      dir = thumb_url |> local_path() |> Path.dirname()
+
+      assert Enum.sort(Path.wildcard(Path.join(dir, "*.jpg"))) ==
+               Enum.sort([
+                 Path.join(dir, "full.jpg"),
+                 Path.join(dir, "thumb.jpg")
+               ])
+    end
+
+    test "validates missing files", %{conn: conn} do
+      user = user_fixture()
+
+      conn
+      |> auth_json_conn(user)
+      |> post(~p"/api/photos", %{})
+      |> json_response(422)
+    end
+  end
+
+  describe "GET /api/photos" do
+    test "lists photos for the signed-in user", %{conn: conn} do
+      user = user_fixture()
+      photo = photo_fixture(user: user)
+
+      conn =
+        conn
+        |> auth_json_conn(user)
+        |> get(~p"/api/photos")
+
+      response = json_response(conn, 200)
+      api_spec = PWeb.ApiSpec.spec()
+      assert_schema(response, "PhotoListResponse", api_spec)
+
+      assert length(response["data"]) == 1
+      assert List.first(response["data"])["id"] == photo.id
+    end
+  end
+
+  defp local_path(url) do
+    uri = URI.parse(url)
+    base_dir = Path.expand("../../../priv/waffle/test", __DIR__)
+
+    trimmed_path =
+      uri.path
+      |> String.trim_leading("/")
+
+    Path.join(base_dir, trimmed_path)
+  end
+end

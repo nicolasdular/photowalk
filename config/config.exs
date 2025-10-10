@@ -20,6 +20,8 @@ config :photowalk,
   ecto_repos: [P.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+config :photowalk, :upload_max_bytes, 75_000_000
+
 # Configures the endpoint
 config :photowalk, PWeb.Endpoint,
   url: [host: "localhost"],
@@ -48,6 +50,13 @@ config :logger, :default_formatter,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+config :waffle,
+  storage: Waffle.Storage.Local,
+  storage_dir_prefix: "priv/waffle/public",
+  storage_dir: "uploads",
+  bucket: "photowalk-dev",
+  asset_host: nil
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

@@ -64,6 +64,12 @@ defmodule P.MixProject do
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
       {:resend, "~> 0.4.0"},
+      {:waffle, "~> 1.1"},
+      {:waffle_ecto, "~> 0.0"},
+      {:image, "~> 0.62"},
+      {:ex_aws, "~> 2.5"},
+      {:ex_aws_s3, "~> 2.5"},
+      {:hackney, "~> 1.18"},
       {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
       {:bun, "~> 1.5", runtime: Mix.env() == :dev}
     ]

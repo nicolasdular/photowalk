@@ -14,7 +14,7 @@ defmodule PWeb.Router do
   end
 
   pipeline :api do
-    plug(:accepts, ["json"])
+    plug(:accepts, ["json", "multipart"])
     plug(:fetch_session)
     plug(:protect_from_forgery)
     plug(SetScope, :api)
@@ -72,6 +72,7 @@ defmodule PWeb.Router do
     pipe_through([:api, :require_authenticated_user])
 
     get("/user/me", UserController, :me)
+    resources("/photos", PhotoController, only: [:index, :create])
   end
 
   scope "/", PWeb do

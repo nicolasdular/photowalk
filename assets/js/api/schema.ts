@@ -4,149 +4,308 @@
  */
 
 export interface paths {
-  '/api/auth/request-magic-link': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/request-magic-link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["PWeb.AuthController.request_magic_link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['PWeb.AuthController.request_magic_link'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/user/me': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List photos */
+        get: operations["PWeb.PhotoController.index"];
+        put?: never;
+        /** Upload a photo */
+        post: operations["PWeb.PhotoController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get current user */
-    get: operations['PWeb.UserController.me'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/api/user/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get current user */
+        get: operations["PWeb.UserController.me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    /**
-     * User
-     * @description A user account
-     */
-    User: {
-      avatar_url?: string;
-      email: string;
-      id: number;
-    };
-    /**
-     * UserResponse
-     * @description Response schema for a single user
-     */
-    UserResponse: {
-      /**
-       * User
-       * @description A user account
-       */
-      data: {
-        avatar_url?: string;
-        email: string;
-        id: number;
-      };
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
-}
-export type $defs = Record<string, never>;
-export interface operations {
-  'PWeb.AuthController.request_magic_link': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** @description Email */
-    requestBody?: {
-      content: {
-        'application/json': {
-          /**
-           * Format: email
-           * @description User's email address
-           */
-          email: string;
+    schemas: {
+        /**
+         * Photo
+         * @description A processed photo with accessible variants
+         */
+        Photo: {
+            /** Format: uri */
+            full_url: string;
+            id: number;
+            /** Format: date-time */
+            inserted_at?: string;
+            /** Format: uri */
+            thumbnail_url: string;
+            title: string;
+            /** Format: date-time */
+            updated_at?: string;
         };
-      };
-    };
-    responses: {
-      /** @description Magic link sent */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        /**
+         * PhotoListResponse
+         * @description List of photos for the current user
+         */
+        PhotoListResponse: {
+            data: {
+                /** Format: uri */
+                full_url: string;
+                id: number;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** Format: uri */
+                thumbnail_url: string;
+                title: string;
+                /** Format: date-time */
+                updated_at?: string;
+            }[];
         };
-        content: {
-          'application/json': {
-            message?: string;
-            success?: boolean;
-          };
+        /**
+         * PhotoUploadRequest
+         * @description Multipart payload accepting a single photo
+         */
+        PhotoUploadRequest: {
+            /**
+             * Format: binary
+             * @description Image file to process
+             */
+            photo: string;
         };
-      };
-      /** @description Email not authorized */
-      403: {
-        headers: {
-          [name: string]: unknown;
+        /**
+         * User
+         * @description A user account
+         */
+        User: {
+            avatar_url?: string;
+            email: string;
+            id: number;
         };
-        content: {
-          'application/json': {
-            error?: string;
-          };
-        };
-      };
-    };
-  };
-  'PWeb.UserController.me': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Current user */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
+        /**
+         * UserResponse
+         * @description Response schema for a single user
+         */
+        UserResponse: {
             /**
              * User
              * @description A user account
              */
             data: {
-              avatar_url?: string;
-              email: string;
-              id: number;
+                avatar_url?: string;
+                email: string;
+                id: number;
             };
-          };
         };
-      };
+        /** ValidationErrors */
+        ValidationErrors: {
+            errors: {
+                [key: string]: string[];
+            };
+        };
     };
-  };
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
+}
+export type $defs = Record<string, never>;
+export interface operations {
+    "PWeb.AuthController.request_magic_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Email */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: email
+                     * @description User's email address
+                     */
+                    email: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Magic link sent */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message?: string;
+                        success?: boolean;
+                    };
+                };
+            };
+            /** @description Email not authorized */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PWeb.PhotoController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Photos */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** Format: uri */
+                            full_url: string;
+                            id: number;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** Format: uri */
+                            thumbnail_url: string;
+                            title: string;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PWeb.PhotoController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description PhotoUploadRequest */
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description Image file to process
+                     */
+                    photo: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Uploaded photos */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** Format: uri */
+                            full_url: string;
+                            id: number;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** Format: uri */
+                            thumbnail_url: string;
+                            title: string;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description Validation errors */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        errors: {
+                            [key: string]: string[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PWeb.UserController.me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current user */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * User
+                         * @description A user account
+                         */
+                        data: {
+                            avatar_url?: string;
+                            email: string;
+                            id: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
 }
