@@ -67,7 +67,6 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
     ],
-    force_ssl: [hsts: true, rewrite_on: [:x_forwarded_proto]],
     email_host: System.get_env("EMAIL_HOST") || host,
     secret_key_base: secret_key_base,
     cache_static_manifest_latest: PhoenixVite.cache_static_manifest_latest(:photowalk)
