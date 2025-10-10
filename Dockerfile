@@ -19,7 +19,7 @@ RUN cd assets && bun vite build
 FROM hexpm/elixir:${ELIXIR_IMAGE_TAG} AS build
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      build-essential git ca-certificates curl \
+      build-essential git ca-certificates curl libvips \
     && rm -rf /var/lib/apt/lists/*
 
 ENV MIX_ENV=prod
@@ -49,7 +49,7 @@ RUN mix compile && mix release
 FROM debian:bookworm-slim AS runtime
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      openssl libstdc++6 ca-certificates bash \
+      openssl libstdc++6 ca-certificates bash libvips \
     && rm -rf /var/lib/apt/lists/*
 
 ENV LANG=en_US.UTF-8
