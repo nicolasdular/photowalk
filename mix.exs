@@ -71,7 +71,8 @@ defmodule P.MixProject do
       {:ex_aws_s3, "~> 2.5"},
       {:hackney, "~> 1.18"},
       {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:bun, "~> 1.5", runtime: Mix.env() == :dev}
+      {:bun, "~> 1.5", runtime: Mix.env() == :dev},
+      {:sentry, "~> 10.2.0"}
     ]
   end
 

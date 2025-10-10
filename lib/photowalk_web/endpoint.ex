@@ -1,4 +1,6 @@
 defmodule PWeb.Endpoint do
+  use Sentry.PlugCapture
+
   use Phoenix.Endpoint, otp_app: :photowalk
   import PhoenixVite.Plug
 
@@ -65,4 +67,6 @@ defmodule PWeb.Endpoint do
   plug Plug.Head
   plug Plug.Session, @session_options
   plug PWeb.Router
+
+  plug Sentry.PlugContext
 end

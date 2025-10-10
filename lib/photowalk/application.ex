@@ -9,6 +9,10 @@ defmodule P.Application do
   def start(_type, _args) do
     ensure_upload_root!()
 
+    :logger.add_handler(:my_sentry_handler, Sentry.LoggerHandler, %{
+      config: %{metadata: [:file, :line]}
+    })
+
     children = [
       PWeb.Telemetry,
       P.Repo,
