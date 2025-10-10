@@ -36,6 +36,7 @@ defmodule P.Collections do
     # In the future, this will include collections the user is invited to
     case Collection
          |> where([c], c.id == ^id and c.owner_id == ^user_id)
+         |> preload(:photos)
          |> Repo.one() do
       nil -> {:error, :not_found}
       collection -> {:ok, collection}

@@ -67,15 +67,35 @@ defmodule P.Photos do
   defp validate_collection_ownership(changeset, user_id, collection_id) do
     user = %User{id: user_id}
 
-    case Collections.user_owns_collection?(user, collection_id) do
-      {:ok, true} ->
-        changeset
+    # Convert collection_id to integer if it's a string
+    collection_id_int =
+      case collection_id do
+        id when is_integer(id) ->
+          id
 
-      {:error, :not_found} ->
-        Changeset.add_error(changeset, :collection_id, "does not exist")
+        id when is_binary(id) ->
+          case Integer.parse(id) do
+            {int, ""} -> int
+            _ -> nil
+          end
 
-      {:error, :forbidden} ->
-        Changeset.add_error(changeset, :collection_id, "does not belong to you")
+        _ ->
+          nil
+      end
+
+    if is_nil(collection_id_int) do
+      Changeset.add_error(changeset, :collection_id, "must be a valid integer")
+    else
+      case Collections.user_owns_collection?(user, collection_id_int) do
+        {:ok, true} ->
+          changeset
+
+        {:error, :not_found} ->
+          Changeset.add_error(changeset, :collection_id, "does not exist")
+
+        {:error, :forbidden} ->
+          Changeset.add_error(changeset, :collection_id, "does not belong to you")
+      end
     end
   end
 end

@@ -20,6 +20,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/collections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List collections */
+        get: operations["PWeb.CollectionController.index"];
+        put?: never;
+        /** Create a collection */
+        post: operations["PWeb.CollectionController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/collections/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Show a collection */
+        get: operations["PWeb.CollectionController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/photos": {
         parameters: {
             query?: never;
@@ -60,6 +95,72 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /**
+         * Collection
+         * @description A collection of photos
+         */
+        Collection: {
+            description?: string;
+            id: number;
+            /** Format: date-time */
+            inserted_at?: string;
+            title: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        /**
+         * CollectionCreateRequest
+         * @description Parameters for creating a collection
+         */
+        CollectionCreateRequest: {
+            /** @description Description of the collection */
+            description?: string;
+            /** @description Title of the collection */
+            title: string;
+        };
+        /**
+         * CollectionListResponse
+         * @description List of collections for the current user
+         */
+        CollectionListResponse: {
+            data: {
+                description?: string;
+                id: number;
+                /** Format: date-time */
+                inserted_at?: string;
+                title: string;
+                /** Format: date-time */
+                updated_at?: string;
+            }[];
+        };
+        /**
+         * CollectionShowResponse
+         * @description A single collection with its photos
+         */
+        CollectionShowResponse: {
+            data: {
+                description?: string;
+                id: number;
+                /** Format: date-time */
+                inserted_at?: string;
+                title: string;
+                /** Format: date-time */
+                updated_at?: string;
+            } & {
+                photos?: {
+                    /** Format: uri */
+                    full_url: string;
+                    id: number;
+                    /** Format: date-time */
+                    inserted_at?: string;
+                    /** Format: uri */
+                    thumbnail_url: string;
+                    title: string;
+                    /** Format: date-time */
+                    updated_at?: string;
+                }[];
+            };
+        };
+        /**
          * Photo
          * @description A processed photo with accessible variants
          */
@@ -98,6 +199,8 @@ export interface components {
          * @description Multipart payload accepting a single photo
          */
         PhotoUploadRequest: {
+            /** @description Optional ID of the collection to add the photo to */
+            collection_id?: number;
             /**
              * Format: binary
              * @description Image file to process
@@ -188,6 +291,157 @@ export interface operations {
             };
         };
     };
+    "PWeb.CollectionController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Collections */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            description?: string;
+                            id: number;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            title: string;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PWeb.CollectionController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CollectionCreateRequest */
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Description of the collection */
+                    description?: string;
+                    /** @description Title of the collection */
+                    title: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Created collection */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            description?: string;
+                            id: number;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            title: string;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        } & {
+                            photos?: {
+                                /** Format: uri */
+                                full_url: string;
+                                id: number;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                /** Format: uri */
+                                thumbnail_url: string;
+                                title: string;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            /** @description Validation errors */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        errors: {
+                            [key: string]: string[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PWeb.CollectionController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Collection ID */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Collection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            description?: string;
+                            id: number;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            title: string;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        } & {
+                            photos?: {
+                                /** Format: uri */
+                                full_url: string;
+                                id: number;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                /** Format: uri */
+                                thumbnail_url: string;
+                                title: string;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            /** @description Collection not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "PWeb.PhotoController.index": {
         parameters: {
             query?: never;
@@ -232,6 +486,8 @@ export interface operations {
         requestBody: {
             content: {
                 "multipart/form-data": {
+                    /** @description Optional ID of the collection to add the photo to */
+                    collection_id?: number;
                     /**
                      * Format: binary
                      * @description Image file to process

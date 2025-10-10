@@ -4,17 +4,39 @@ defmodule PWeb.CollectionController do
 
   alias OpenApiSpex.Schema
   alias P.Collections
-  alias P.Collection
-  alias PWeb.CollectionJSON
+  alias P.{Collection, Photo}
+  alias PWeb.{CollectionJSON, PhotoJSON}
   alias PWeb.Schemas.EctoSchema
 
   action_fallback PWeb.FallbackController
+
+  @photo_resource_schema EctoSchema.schema_from_fields(Photo,
+                           description: "A processed photo with accessible variants",
+                           fields: PhotoJSON.fields(),
+                           required: PhotoJSON.required_fields(),
+                           additional_properties: %{
+                             thumbnail_url: %Schema{type: :string, format: :uri},
+                             full_url: %Schema{type: :string, format: :uri}
+                           }
+                         )
 
   @collection_resource_schema EctoSchema.schema_from_fields(Collection,
                                 description: "A collection of photos",
                                 fields: CollectionJSON.fields(),
                                 required: CollectionJSON.required_fields()
                               )
+
+  @collection_with_photos_schema %Schema{
+    allOf: [
+      @collection_resource_schema,
+      %Schema{
+        type: :object,
+        properties: %{
+          photos: %Schema{type: :array, items: @photo_resource_schema}
+        }
+      }
+    ]
+  }
 
   @collection_list_response_schema %Schema{
     title: "CollectionListResponse",
@@ -28,10 +50,10 @@ defmodule PWeb.CollectionController do
 
   @collection_show_response_schema %Schema{
     title: "CollectionShowResponse",
-    description: "A single collection",
+    description: "A single collection with its photos",
     type: :object,
     properties: %{
-      data: @collection_resource_schema
+      data: @collection_with_photos_schema
     },
     required: [:data]
   }
