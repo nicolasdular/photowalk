@@ -53,7 +53,7 @@ function TeamDropdownMenu() {
         <Avatar
           slot="icon"
           initials="WC"
-          className="bg-purple-500 text-white"
+          className="bg-purple-100 text-purple-700"
         />
         <DropdownLabel>Workcation</DropdownLabel>
       </DropdownItem>

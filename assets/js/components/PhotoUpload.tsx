@@ -131,32 +131,32 @@ export function PhotoUpload({
         className={[
           'relative flex cursor-pointer flex-col items-center justify-center gap-6 rounded-3xl border-2 border-dashed p-10 transition-all duration-200 ease-out',
           isDropping
-            ? 'border-sky-400/80 bg-sky-500/10 shadow-[0_25px_80px_-40px_rgba(56,189,248,0.8)]'
-            : 'border-slate-700/80 bg-slate-900/60 shadow-[0_20px_60px_-30px_rgba(15,23,42,0.9)] hover:border-slate-500/80 hover:bg-slate-900/80',
+            ? 'border-sky-300 bg-sky-50 shadow-[0_35px_90px_-40px_rgba(56,189,248,0.6)]'
+            : 'border-slate-200 bg-white/95 shadow-xl shadow-slate-200/70 hover:border-slate-300 hover:bg-white',
         ].join(' ')}
       >
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-sky-500/15 text-sky-200">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-sky-100 text-sky-600 shadow-inner shadow-sky-200/80">
           <span className="text-2xl">⟳</span>
         </div>
         <div className="text-center">
-          <p className="text-lg font-semibold text-white">
+          <p className="text-lg font-semibold text-slate-900">
             {uploadMutation.isPending
               ? 'Uploading your photos…'
               : 'Drop photos or click to browse'}
           </p>
-          <p className="mt-2 text-sm text-slate-400">
+          <p className="mt-2 text-sm text-slate-600">
             We instantly craft a gallery-ready set with large and thumbnail
             variants optimized for blazing-fast previews.
           </p>
         </div>
-        <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-medium text-slate-400">
-          <span className="rounded-full bg-slate-800/70 px-3 py-1">
+        <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-medium text-slate-600">
+          <span className="rounded-full bg-slate-100 px-3 py-1">
             Guided sequential uploads
           </span>
-          <span className="rounded-full bg-slate-800/70 px-3 py-1">
+          <span className="rounded-full bg-slate-100 px-3 py-1">
             Intelligent resizing
           </span>
-          <span className="rounded-full bg-slate-800/70 px-3 py-1">
+          <span className="rounded-full bg-slate-100 px-3 py-1">
             Lossless color handling
           </span>
         </div>
@@ -168,12 +168,12 @@ export function PhotoUpload({
           className="hidden"
           onChange={event => handleFiles(event.target.files)}
         />
-        <div className="pointer-events-none absolute inset-0 rounded-3xl border border-white/5">
-          <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-sky-500/5 via-transparent to-transparent" />
+        <div className="pointer-events-none absolute inset-0 rounded-3xl border border-slate-100">
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-sky-100/40 via-transparent to-transparent" />
         </div>
       </div>
       {localError || (uploadMutation.isError && mutationError) ? (
-        <p className="mt-3 text-sm text-rose-300">
+        <p className="mt-3 text-sm text-rose-500">
           {localError || mutationError}
         </p>
       ) : null}

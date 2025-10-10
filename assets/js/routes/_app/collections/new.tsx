@@ -51,20 +51,20 @@ function NewCollectionPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-950 pb-24 pt-16 text-slate-50">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-white to-sky-50 pb-24 pt-16 text-slate-900">
       <div className="mx-auto w-full max-w-2xl space-y-10 px-6 sm:px-10">
         <header className="space-y-4">
-          <span className="inline-flex items-center gap-2 rounded-full bg-sky-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-sky-200">
+          <span className="inline-flex items-center gap-2 rounded-full bg-sky-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-sky-700 shadow-sm shadow-sky-200">
             New Collection
           </span>
           <div className="space-y-3">
             <Heading
               level={1}
-              className="text-4xl font-semibold tracking-tight text-white sm:text-5xl"
+              className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl"
             >
               Create a new collection
             </Heading>
-            <Text className="max-w-2xl text-base leading-relaxed text-slate-300">
+            <Text className="max-w-2xl text-base leading-relaxed text-slate-600">
               Give your collection a name and description to help organize your
               photos.
             </Text>
@@ -72,7 +72,7 @@ function NewCollectionPage() {
         </header>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="rounded-3xl border border-slate-800/80 bg-slate-900/70 p-8 space-y-6">
+          <div className="rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-xl shadow-slate-200/70 backdrop-blur-sm transition hover:shadow-2xl">
             <Field>
               <Label>Title</Label>
               <Input
@@ -83,7 +83,7 @@ function NewCollectionPage() {
                 invalid={!!errors.title}
               />
               {errors.title && (
-                <Text className="text-sm text-rose-300 mt-1">
+                <Text className="mt-1 text-sm text-rose-500">
                   {errors.title[0]}
                 </Text>
               )}
@@ -99,7 +99,7 @@ function NewCollectionPage() {
                 rows={4}
               />
               {errors.description && (
-                <Text className="text-sm text-rose-300 mt-1">
+                <Text className="mt-1 text-sm text-rose-500">
                   {errors.description[0]}
                 </Text>
               )}
@@ -114,7 +114,12 @@ function NewCollectionPage() {
             >
               {createMutation.isPending ? 'Creating...' : 'Create Collection'}
             </Button>
-            <Button type="button" plain onClick={() => navigate({ to: '/' })}>
+            <Button
+              type="button"
+              plain
+              className="text-slate-500 hover:text-slate-700"
+              onClick={() => navigate({ to: '/' })}
+            >
               Cancel
             </Button>
           </div>

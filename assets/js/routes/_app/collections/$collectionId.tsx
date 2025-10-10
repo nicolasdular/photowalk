@@ -30,25 +30,18 @@ function CollectionDetailPage() {
   const isLoading = collectionQuery.isLoading;
 
   if (isLoading) {
-    return (
-      <div className="min-h-[calc(100vh-4rem)] bg-slate-950 pb-24 pt-16 text-slate-50">
-        <div className="mx-auto w-full max-w-6xl space-y-10 px-6 sm:px-10">
-          <div className="h-32 animate-pulse rounded-3xl bg-slate-800/70" />
-          <div className="h-64 animate-pulse rounded-3xl bg-slate-800/70" />
-        </div>
-      </div>
-    );
+    return null;
   }
 
   if (!collection) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-slate-950 pb-24 pt-16 text-slate-50">
+      <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-white to-sky-50 pb-24 pt-16 text-slate-900">
         <div className="mx-auto w-full max-w-6xl space-y-10 px-6 sm:px-10">
-          <div className="flex flex-col items-center justify-center gap-6 rounded-3xl border border-slate-800/80 bg-slate-900/70 p-16 text-center">
-            <Heading level={2} className="text-2xl font-semibold text-white">
+          <div className="flex flex-col items-center justify-center gap-6 rounded-3xl border border-slate-200 bg-white/95 p-16 text-center shadow-xl shadow-slate-200/70">
+            <Heading level={2} className="text-2xl font-semibold text-slate-900">
               Collection not found
             </Heading>
-            <Link to="/" className="text-sky-200 hover:text-sky-100">
+            <Link to="/" className="text-sky-600 hover:text-sky-500">
               ← Back to collections
             </Link>
           </div>
@@ -58,24 +51,24 @@ function CollectionDetailPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-950 pb-24 pt-16 text-slate-50">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-white to-sky-50 pb-24 pt-16 text-slate-900">
       <div className="mx-auto w-full max-w-6xl space-y-10 px-6 sm:px-10">
         <header className="space-y-4">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-sm text-sky-200 hover:text-sky-100"
+            className="inline-flex items-center gap-2 text-sm text-sky-600 hover:text-sky-500"
           >
             ← Back to collections
           </Link>
           <div className="space-y-3">
             <Heading
               level={1}
-              className="text-4xl font-semibold tracking-tight text-white sm:text-5xl"
+              className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl"
             >
               {collection.title}
             </Heading>
             {collection.description && (
-              <Text className="max-w-2xl text-base leading-relaxed text-slate-300">
+              <Text className="max-w-2xl text-base leading-relaxed text-slate-600">
                 {collection.description}
               </Text>
             )}
@@ -88,7 +81,7 @@ function CollectionDetailPage() {
         />
 
         <section className="space-y-6">
-          <Heading level={2} className="text-2xl font-semibold text-white">
+          <Heading level={2} className="text-2xl font-semibold text-slate-900">
             Photos in this collection
           </Heading>
 
@@ -97,20 +90,20 @@ function CollectionDetailPage() {
               {Array.from({ length: 6 }).map((_, index) => (
                 <div
                   key={`skeleton-${index}`}
-                  className="h-64 animate-pulse rounded-3xl bg-slate-800/70"
+                  className="h-64 animate-pulse rounded-3xl border border-slate-200 bg-white/70 shadow-inner shadow-slate-200/40"
                 />
               ))}
             </div>
           ) : photos.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-slate-800/80 bg-slate-900/70 p-12 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-800/80 text-slate-300">
+            <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-slate-200 bg-white/95 p-12 text-center shadow-xl shadow-slate-200/70">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-sky-100 text-sky-600 shadow-inner shadow-sky-200/80">
                 <span className="text-2xl">📷</span>
               </div>
               <div className="space-y-2">
-                <Heading level={3} className="text-xl font-semibold text-white">
+                <Heading level={3} className="text-xl font-semibold text-slate-900">
                   No photos yet
                 </Heading>
-                <Text className="text-sm text-slate-400">
+                <Text className="text-sm text-slate-600">
                   Upload your first photo to this collection using the form
                   above.
                 </Text>
@@ -121,7 +114,7 @@ function CollectionDetailPage() {
               {photos.map(photo => (
                 <figure
                   key={photo.id}
-                  className="group relative overflow-hidden rounded-3xl bg-slate-900/80 shadow-[0_25px_60px_-30px_rgba(15,23,42,0.9)] transition hover:-translate-y-1 hover:shadow-[0_30px_80px_-40px_rgba(59,130,246,0.5)]"
+                  className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white/95 shadow-xl shadow-slate-200/70 transition duration-200 hover:-translate-y-1 hover:shadow-2xl"
                 >
                   <img
                     src={photo.thumbnail_url}
@@ -129,25 +122,25 @@ function CollectionDetailPage() {
                     className="h-64 w-full object-cover transition duration-300 group-hover:scale-[1.03]"
                     loading="lazy"
                   />
-                  <figcaption className="flex flex-col gap-3 border-t border-white/5 bg-gradient-to-b from-transparent via-slate-950/60 to-slate-950/90 p-5 text-sm text-slate-300">
+                  <figcaption className="flex flex-col gap-3 border-t border-slate-100 bg-gradient-to-b from-white via-white to-slate-50 p-5 text-sm text-slate-600">
                     <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-slate-500">
                       <span>{formatDate(photo.inserted_at)}</span>
-                      <span className="rounded-full bg-sky-500/10 px-2 py-0.5 text-sky-200">
+                      <span className="rounded-full bg-sky-100 px-2 py-0.5 text-sky-700">
                         Full &amp; thumbnail
                       </span>
                     </div>
                     <div>
-                      <p className="text-base font-semibold text-white">
+                      <p className="text-base font-semibold text-slate-900">
                         {photo.title || 'Untitled capture'}
                       </p>
-                      <p className="mt-1 text-xs text-slate-400">
+                      <p className="mt-1 text-xs text-slate-500">
                         Ready to share — optimized in two resolutions.
                       </p>
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <a
                         href={photo.full_url}
-                        className="inline-flex items-center gap-1 rounded-full bg-sky-500/10 px-3 py-1 font-medium text-sky-200 transition hover:bg-sky-500/20"
+                        className="inline-flex items-center gap-1 rounded-full bg-sky-100 px-3 py-1 font-medium text-sky-700 transition hover:bg-sky-200"
                         target="_blank"
                         rel="noreferrer"
                       >

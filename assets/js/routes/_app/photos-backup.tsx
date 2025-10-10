@@ -128,18 +128,18 @@ function PhotosDashboard() {
     uploadMutation.error instanceof Error ? uploadMutation.error.message : '';
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-950 pb-24 pt-16 text-slate-50">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-white to-sky-50 pb-24 pt-16 text-slate-900">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 sm:px-10 xl:flex-row">
         <section className="flex-1 space-y-10">
           <header className="space-y-4">
-            <span className="inline-flex items-center gap-2 rounded-full bg-sky-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-sky-200">
+            <span className="inline-flex items-center gap-2 rounded-full bg-sky-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-sky-700 shadow-sm shadow-sky-200">
               Your library
             </span>
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+              <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
                 Curate every walk with luminous galleries
               </h1>
-              <p className="max-w-2xl text-base leading-relaxed text-slate-300">
+              <p className="max-w-2xl text-base leading-relaxed text-slate-600">
                 Import the hero shot from your latest roam and we’ll polish it
                 into a thumb-forward gallery-ready pair the moment you press
                 upload. Drag, drop, or tap to add a handful—we’ll perfect them
@@ -209,32 +209,32 @@ function UploadPanel({
         className={[
           'relative flex cursor-pointer flex-col items-center justify-center gap-6 rounded-3xl border-2 border-dashed p-10 transition-all duration-200 ease-out',
           isDropping
-            ? 'border-sky-400/80 bg-sky-500/10 shadow-[0_25px_80px_-40px_rgba(56,189,248,0.8)]'
-            : 'border-slate-700/80 bg-slate-900/60 shadow-[0_20px_60px_-30px_rgba(15,23,42,0.9)] hover:border-slate-500/80 hover:bg-slate-900/80',
+            ? 'border-sky-300 bg-sky-50 shadow-[0_35px_90px_-40px_rgba(56,189,248,0.6)]'
+            : 'border-slate-200 bg-white/95 shadow-xl shadow-slate-200/70 hover:border-slate-300 hover:bg-white',
         ].join(' ')}
       >
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-sky-500/15 text-sky-200">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-sky-100 text-sky-600 shadow-inner shadow-sky-200/80">
           <span className="text-2xl">⟳</span>
         </div>
         <div className="text-center">
-          <p className="text-lg font-semibold text-white">
+          <p className="text-lg font-semibold text-slate-900">
             {isUploading
               ? 'Uploading your photos…'
               : 'Drop photos or click to browse'}
           </p>
-          <p className="mt-2 text-sm text-slate-400">
+          <p className="mt-2 text-sm text-slate-600">
             We instantly craft a gallery-ready set with large and thumbnail
             variants optimized for blazing-fast previews.
           </p>
         </div>
-        <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-medium text-slate-400">
-          <span className="rounded-full bg-slate-800/70 px-3 py-1">
+        <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-medium text-slate-600">
+          <span className="rounded-full bg-slate-100 px-3 py-1">
             Guided sequential uploads
           </span>
-          <span className="rounded-full bg-slate-800/70 px-3 py-1">
+          <span className="rounded-full bg-slate-100 px-3 py-1">
             Intelligent resizing
           </span>
-          <span className="rounded-full bg-slate-800/70 px-3 py-1">
+          <span className="rounded-full bg-slate-100 px-3 py-1">
             Lossless color handling
           </span>
         </div>
@@ -246,11 +246,11 @@ function UploadPanel({
           className="hidden"
           onChange={onInputChange}
         />
-        <div className="pointer-events-none absolute inset-0 rounded-3xl border border-white/5">
-          <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-sky-500/5 via-transparent to-transparent" />
+        <div className="pointer-events-none absolute inset-0 rounded-3xl border border-slate-100">
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-sky-100/40 via-transparent to-transparent" />
         </div>
       </div>
-      {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
+      {error ? <p className="mt-3 text-sm text-rose-500">{error}</p> : null}
     </div>
   );
 }
@@ -268,7 +268,7 @@ function Gallery({ photos, loading, empty }: GalleryProps) {
         {Array.from({ length: 6 }).map((_, index) => (
           <div
             key={`skeleton-${index}`}
-            className="h-64 animate-pulse rounded-3xl bg-slate-800/70"
+            className="h-64 animate-pulse rounded-3xl border border-slate-200 bg-white/70 shadow-inner shadow-slate-200/40"
           />
         ))}
       </div>
@@ -277,15 +277,15 @@ function Gallery({ photos, loading, empty }: GalleryProps) {
 
   if (empty) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-slate-800/80 bg-slate-900/70 p-12 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-800/80 text-slate-300">
+      <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-slate-200 bg-white/95 p-12 text-center shadow-xl shadow-slate-200/70">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-sky-100 text-sky-600 shadow-inner shadow-sky-200/80">
           <span className="text-2xl">📷</span>
         </div>
         <div className="space-y-2">
-          <h2 className="text-xl font-semibold text-white">
+          <h2 className="text-xl font-semibold text-slate-900">
             You haven’t uploaded any walks yet
           </h2>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-slate-600">
             Start by dropping a favorite shot or selecting it from your library
             to see it bloom into a curated gallery.
           </p>
@@ -299,7 +299,7 @@ function Gallery({ photos, loading, empty }: GalleryProps) {
       {photos.map(photo => (
         <figure
           key={photo.id}
-          className="group relative overflow-hidden rounded-3xl bg-slate-900/80 shadow-[0_25px_60px_-30px_rgba(15,23,42,0.9)] transition hover:-translate-y-1 hover:shadow-[0_30px_80px_-40px_rgba(59,130,246,0.5)]"
+          className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white/95 shadow-xl shadow-slate-200/70 transition duration-200 hover:-translate-y-1 hover:shadow-2xl"
         >
           <img
             src={photo.thumbnail_url}
@@ -307,18 +307,18 @@ function Gallery({ photos, loading, empty }: GalleryProps) {
             className="h-64 w-full object-cover transition duration-300 group-hover:scale-[1.03]"
             loading="lazy"
           />
-          <figcaption className="flex flex-col gap-3 border-t border-white/5 bg-gradient-to-b from-transparent via-slate-950/60 to-slate-950/90 p-5 text-sm text-slate-300">
+          <figcaption className="flex flex-col gap-3 border-t border-slate-100 bg-gradient-to-b from-white via-white to-slate-50 p-5 text-sm text-slate-600">
             <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-slate-500">
               <span>{formatDate(photo.inserted_at)}</span>
-              <span className="rounded-full bg-sky-500/10 px-2 py-0.5 text-sky-200">
+              <span className="rounded-full bg-sky-100 px-2 py-0.5 text-sky-700">
                 Full &amp; thumbnail
               </span>
             </div>
             <div>
-              <p className="text-base font-semibold text-white">
+              <p className="text-base font-semibold text-slate-900">
                 {photo.title || 'Untitled capture'}
               </p>
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-xs text-slate-500">
                 Ready to share — optimized in two resolutions for hero moments
                 and speed.
               </p>
@@ -326,7 +326,7 @@ function Gallery({ photos, loading, empty }: GalleryProps) {
             <div className="flex items-center justify-between text-xs">
               <a
                 href={photo.full_url}
-                className="inline-flex items-center gap-1 rounded-full bg-sky-500/10 px-3 py-1 font-medium text-sky-200 transition hover:bg-sky-500/20"
+                className="inline-flex items-center gap-1 rounded-full bg-sky-100 px-3 py-1 font-medium text-sky-700 transition hover:bg-sky-200"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -354,22 +354,22 @@ function InsightsPanel({ totalPhotos, updating }: InsightsPanelProps) {
   }, [totalPhotos, updating]);
 
   return (
-    <aside className="w-full max-w-sm space-y-6 rounded-3xl border border-slate-800/80 bg-slate-900/70 p-8 shadow-[0_25px_60px_-35px_rgba(15,23,42,0.85)]">
+    <aside className="w-full max-w-sm space-y-6 rounded-3xl border border-slate-200 bg-white/95 p-8 shadow-xl shadow-slate-200/70">
       <div className="space-y-2">
         <p className="text-sm uppercase tracking-[0.3em] text-slate-500">
           Momentum
         </p>
-        <h2 className="text-2xl font-semibold text-white">{status}</h2>
+        <h2 className="text-2xl font-semibold text-slate-900">{status}</h2>
       </div>
-      <div className="rounded-2xl border border-white/5 bg-slate-950/60 p-6">
-        <p className="text-sm text-slate-400">Photos processed to date</p>
-        <p className="mt-4 text-5xl font-semibold text-white">{totalPhotos}</p>
+      <div className="rounded-2xl border border-slate-100 bg-gradient-to-br from-white via-white to-slate-50 p-6 shadow-inner shadow-slate-200/60">
+        <p className="text-sm text-slate-600">Photos processed to date</p>
+        <p className="mt-4 text-5xl font-semibold text-slate-900">{totalPhotos}</p>
         <p className="mt-6 text-xs text-slate-500">
           Each upload receives a 2048px hero version plus a 512px square
           thumbnail for silky-fast grids and previews.
         </p>
       </div>
-      <div className="space-y-3 text-xs text-slate-400">
+      <div className="space-y-3 text-xs text-slate-600">
         <p>Need local testing?</p>
         <ul className="space-y-2">
           <li>

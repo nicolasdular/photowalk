@@ -24,66 +24,64 @@ function CollectionsDashboard() {
   const isEmpty = !collections.length && !collectionsQuery.isLoading;
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] text-slate-50">
-      <div className="mx-auto w-full max-w-6xl space-y-10 px-6 sm:px-10">
-        <header className="space-y-4">
-          <span className="inline-flex items-center gap-2 rounded-full bg-sky-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-sky-200">
-            Your Collections
-          </span>
-          <div className="flex items-start justify-between gap-6">
-            <div className="space-y-3">
-              <Heading
-                level={1}
-                className="text-4xl font-semibold tracking-tight text-white sm:text-5xl"
-              >
-                Organize your photo walks into collections
-              </Heading>
-              <Text className="max-w-2xl text-base leading-relaxed text-slate-300">
-                Create collections to group photos from your walks. Each
-                collection can hold multiple photos and helps you keep your
-                memories organized.
-              </Text>
-            </div>
-            {!isEmpty && (
-              <Link to="/collections/new">
-                <Button color="sky" className="whitespace-nowrap">
-                  New Collection
-                </Button>
-              </Link>
-            )}
+    <>
+      <header className="space-y-4">
+        <span className="inline-flex items-center gap-2 rounded-full bg-sky-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-sky-700 shadow-sm shadow-sky-200">
+          Your Collections
+        </span>
+        <div className="flex items-start justify-between gap-6">
+          <div className="space-y-3">
+            <Heading
+              level={1}
+              className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl"
+            >
+              Organize your photo walks into collections
+            </Heading>
+            <Text className="max-w-2xl text-base leading-relaxed text-slate-600">
+              Create collections to group photos from your walks. Each
+              collection can hold multiple photos and helps you keep your
+              memories organized.
+            </Text>
           </div>
-        </header>
+          {!isEmpty && (
+            <Link to="/collections/new">
+              <Button color="sky" className="whitespace-nowrap">
+                New Collection
+              </Button>
+            </Link>
+          )}
+        </div>
+      </header>
 
-        {collectionsQuery.isLoading ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={`skeleton-${index}`}
-                className="h-48 animate-pulse rounded-3xl bg-slate-800/70"
-              />
-            ))}
-          </div>
-        ) : isEmpty ? (
-          <EmptyState />
-        ) : (
-          <CollectionsGrid collections={collections} />
-        )}
-      </div>
-    </div>
+      {collectionsQuery.isLoading ? (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div
+              key={`collection-skeleton-${index}`}
+              className="h-48 rounded-3xl border border-slate-200 bg-white/70 shadow-inner shadow-slate-200/40 backdrop-blur animate-pulse"
+            />
+          ))}
+        </div>
+      ) : isEmpty ? (
+        <EmptyState />
+      ) : (
+        <CollectionsGrid collections={collections} />
+      )}
+    </>
   );
 }
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center gap-6 rounded-3xl border border-slate-800/80 bg-slate-900/70 p-16 text-center">
-      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-slate-800/80 text-slate-300">
+    <div className="flex flex-col items-center justify-center gap-6 rounded-3xl border border-slate-200 bg-white/90 p-16 text-center shadow-xl shadow-slate-200/70 backdrop-blur">
+      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-sky-100 text-sky-600 shadow-inner shadow-sky-200/80">
         <span className="text-4xl">📁</span>
       </div>
       <div className="space-y-4">
-        <Heading level={2} className="text-2xl font-semibold text-white">
+        <Heading level={2} className="text-2xl font-semibold text-slate-900">
           No collections yet
         </Heading>
-        <Text className="max-w-md text-sm text-slate-400">
+        <Text className="max-w-md text-sm text-slate-600">
           Get started by creating your first collection. You can then add photos
           to it and organize your photo walks beautifully.
         </Text>
@@ -111,10 +109,10 @@ function CollectionsGrid({ collections }: CollectionsGridProps) {
           params={{ collectionId: collection.id?.toString() ?? '' }}
           className="group"
         >
-          <article className="relative overflow-hidden rounded-3xl border border-slate-800/80 bg-slate-900/80 p-6 shadow-[0_25px_60px_-30px_rgba(15,23,42,0.9)] transition hover:-translate-y-1 hover:border-slate-700/80 hover:shadow-[0_30px_80px_-40px_rgba(59,130,246,0.5)]">
+          <article className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-xl shadow-slate-200/70 transition duration-200 hover:-translate-y-1 hover:shadow-2xl">
             <div className="space-y-4">
               <div className="flex items-start justify-between gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-500/15 text-sky-200">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-100 text-sky-600 shadow-inner shadow-sky-200/70">
                   <span className="text-2xl">📸</span>
                 </div>
                 <span className="text-xs uppercase tracking-[0.2em] text-slate-500">
@@ -122,18 +120,21 @@ function CollectionsGrid({ collections }: CollectionsGridProps) {
                 </span>
               </div>
               <div className="space-y-2">
-                <Heading level={3} className="text-xl font-semibold text-white">
+                <Heading
+                  level={3}
+                  className="text-xl font-semibold text-slate-900"
+                >
                   {collection.title}
                 </Heading>
                 {collection.description && (
-                  <Text className="line-clamp-2 text-sm text-slate-400">
+                  <Text className="line-clamp-2 text-sm text-slate-600">
                     {collection.description}
                   </Text>
                 )}
               </div>
             </div>
-            <div className="pointer-events-none absolute inset-0 rounded-3xl border border-white/5">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-sky-500/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+            <div className="pointer-events-none absolute inset-0 rounded-3xl border border-slate-100/80">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-sky-100/40 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             </div>
           </article>
         </Link>
