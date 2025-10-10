@@ -7,8 +7,6 @@ import Config
 # before starting your production server.
 config :thexstack, ThexstackWeb.Endpoint, []
 
-config :photowalk, PWeb.Endpoint, force_ssl: [hsts: true]
-
 # Configures Swoosh API Client
 config :swoosh, api_client: Swoosh.ApiClient.Req
 
