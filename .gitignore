@@ -33,3 +33,4 @@ photowalk-*.tar
 npm-debug.log
 /assets/node_modules/
 .lexical/
+.mise.local.toml

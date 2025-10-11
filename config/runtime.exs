@@ -20,6 +20,71 @@ if System.get_env("PHX_SERVER") do
   config :photowalk, PWeb.Endpoint, server: true
 end
 
+r2_bucket =
+  case System.get_env("R2_BUCKET") do
+    "" -> nil
+    value -> value
+  end
+
+if r2_bucket do
+  account_id =
+    System.get_env("R2_ACCOUNT_ID") ||
+      raise "Missing environment variable `R2_ACCOUNT_ID`!"
+
+  access_key_id =
+    System.get_env("R2_ACCESS_KEY_ID") ||
+      raise "Missing environment variable `R2_ACCESS_KEY_ID`!"
+
+  secret_access_key =
+    System.get_env("R2_SECRET_ACCESS_KEY") ||
+      raise "Missing environment variable `R2_SECRET_ACCESS_KEY`!"
+
+  region = "auto"
+
+  public_host =
+    case System.get_env("R2_PUBLIC_HOST") do
+      "" -> "https://#{account_id}.r2.cloudflarestorage.com/#{r2_bucket}"
+      nil -> "https://#{account_id}.r2.cloudflarestorage.com/#{r2_bucket}"
+      value -> value
+    end
+
+  config :waffle,
+    storage: Waffle.Storage.S3,
+    storage_dir_prefix: nil,
+    bucket: r2_bucket,
+    asset_host: public_host
+
+  config :ex_aws,
+    access_key_id: access_key_id,
+    secret_access_key: secret_access_key,
+    region: region,
+    s3: [
+      scheme: "https://",
+      host: "#{account_id}.r2.cloudflarestorage.com",
+      region: region
+    ]
+else
+  local_bucket =
+    case System.get_env("WAFFLE_BUCKET") do
+      "" -> "photowalk-dev"
+      nil -> "photowalk-dev"
+      value -> value
+    end
+
+  asset_host =
+    case System.get_env("WAFFLE_ASSET_HOST") do
+      "" -> nil
+      value -> value
+    end
+
+  config :waffle,
+    storage: Waffle.Storage.Local,
+    storage_dir_prefix: "priv/waffle/public",
+    storage_dir: "uploads",
+    bucket: local_bucket,
+    asset_host: asset_host
+end
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -80,11 +145,6 @@ if config_env() == :prod do
     api_key:
       System.get_env("RESEND_API_KEY") ||
         raise("Missing environment variable `RESEND_API_KEY`!")
-
-  config :waffle,
-    storage: Waffle.Storage.Local,
-    bucket: nil,
-    asset_host: System.get_env("UPLOADS_ASSET_HOST")
 
   # ## SSL Support
   #
