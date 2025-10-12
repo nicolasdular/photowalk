@@ -7,7 +7,7 @@ defmodule P.Photos.Uploader do
   alias Image
 
   @extension_whitelist ~w(.jpg .jpeg .png .heic .heif .webp)
-  @thumbnail_dimensions %{full: 2048, thumb: 512}
+  @thumbnail_dimensions %{full: 2048, thumb: 1024}
   @versions Map.keys(@thumbnail_dimensions)
   @quality 90
 

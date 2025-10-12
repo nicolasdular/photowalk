@@ -139,7 +139,7 @@ export interface components {
          * @description List of collections for the current user
          */
         CollectionListResponse: {
-            data: {
+            data: ({
                 description?: string;
                 id: number;
                 /** Format: date-time */
@@ -147,7 +147,22 @@ export interface components {
                 title: string;
                 /** Format: date-time */
                 updated_at?: string;
-            }[];
+            } & {
+                /** @description Array of photo thumbnails for the collection */
+                thumbnails?: {
+                    allowed_to_delete?: boolean;
+                    /** Format: uri */
+                    full_url: string;
+                    id: number;
+                    /** Format: date-time */
+                    inserted_at?: string;
+                    /** Format: uri */
+                    thumbnail_url: string;
+                    title: string;
+                    /** Format: date-time */
+                    updated_at?: string;
+                }[];
+            })[];
         };
         /**
          * CollectionShowResponse
@@ -332,7 +347,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data: {
+                        data: ({
                             description?: string;
                             id: number;
                             /** Format: date-time */
@@ -340,7 +355,22 @@ export interface operations {
                             title: string;
                             /** Format: date-time */
                             updated_at?: string;
-                        }[];
+                        } & {
+                            /** @description Array of photo thumbnails for the collection */
+                            thumbnails?: {
+                                allowed_to_delete?: boolean;
+                                /** Format: uri */
+                                full_url: string;
+                                id: number;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                /** Format: uri */
+                                thumbnail_url: string;
+                                title: string;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            }[];
+                        })[];
                     };
                 };
             };

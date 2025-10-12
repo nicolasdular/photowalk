@@ -19,7 +19,7 @@ defmodule PWeb.CollectionControllerTest do
     test "lists collections for the signed-in user", %{conn: conn} do
       user = user_fixture()
       collection = collection_fixture(user: user)
-
+      photo = photo_fixture(user: user, collection: collection)
       # Create a collection for another user to ensure it's not returned
       other_user = user_fixture()
       _other_collection = collection_fixture(user: other_user)
@@ -36,6 +36,7 @@ defmodule PWeb.CollectionControllerTest do
       assert length(response["data"]) == 1
       assert List.first(response["data"])["id"] == collection.id
       assert List.first(response["data"])["title"] == collection.title
+      assert hd(hd(response["data"])["thumbnails"])["id"] == photo.id
     end
 
     test "returns empty list when user has no collections", %{conn: conn} do

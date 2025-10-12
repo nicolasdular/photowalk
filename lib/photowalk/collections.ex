@@ -8,12 +8,13 @@ defmodule P.Collections do
   alias P.{Collection, Repo, User}
 
   @spec list_collections_for_user(User.t()) :: [Collection.t()]
-  def list_collections_for_user(%User{id: user_id}) do
+  def list_collections_for_user(%User{id: user_id}, opts \\ %{}) do
     # For now, only show collections owned by the user
     # In the future, this will include collections the user is invited to
     Collection
     |> where([c], c.owner_id == ^user_id)
     |> order_by([c], desc: c.inserted_at)
+    |> maybe_preload(opts[:preloads])
     |> Repo.all()
   end
 
@@ -57,4 +58,8 @@ defmodule P.Collections do
         {:error, :forbidden}
     end
   end
+
+  defp maybe_preload(query, nil), do: query
+  defp maybe_preload(query, preloads) when is_list(preloads), do: preload(query, ^preloads)
+  defp maybe_preload(query, preload) when is_atom(preload), do: preload(query, ^preload)
 end

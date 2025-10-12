@@ -29,8 +29,15 @@ defmodule P.Factory do
     attrs = normalize_attrs(attrs)
     user = Map.get(attrs, :user) || user_fixture()
     upload = Map.get(attrs, :upload) || build_upload()
+    collection = Map.get(attrs, :collection)
 
-    {:ok, photo} = P.Photos.create_photo(user, upload)
+    photo_attrs =
+      case collection do
+        nil -> %{}
+        collection -> %{"collection_id" => collection.id}
+      end
+
+    {:ok, photo} = P.Photos.create_photo(user, upload, photo_attrs)
     photo
   end
 

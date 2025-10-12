@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { type FormEvent, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { client } from '../api/client';
 import { Button } from '@/components/ui/button';
@@ -12,10 +12,14 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import type { paths } from '@/api/schema';
+
+type MagicLinkRequest = NonNullable<
+  paths['/api/auth/request-magic-link']['post']['requestBody']
+>['content']['application/json'];
 
 function SignUp() {
-  const [form, setForm] = useState({ email: '' });
-  const [generalError, setGeneralError] = useState<string | null>(null);
+  const [email, setEmail] = useState('');
   const { error: searchError } = Route.useSearch();
 
   const searchErrorMessage = useMemo(() => {
@@ -30,12 +34,10 @@ function SignUp() {
     return 'Something went wrong. Please try again.';
   }, [searchError]);
 
-  const errorMessage = generalError ?? searchErrorMessage;
-
   const mutation = useMutation({
-    mutationFn: async (email: string) => {
+    mutationFn: async (formData: MagicLinkRequest) => {
       const response = await client.POST('/api/auth/request-magic-link', {
-        body: { email },
+        body: formData,
       });
 
       if (response.error) {
@@ -44,23 +46,13 @@ function SignUp() {
 
       return response.data;
     },
-    onError: (error: Error) => {
-      setGeneralError(error.message);
-    },
-    onSuccess: () => {
-      setGeneralError(null);
-    },
   });
 
-  const handleChange = e => {
-    const target = e.target as HTMLInputElement;
-    setForm({ email: target.value });
-    setGeneralError(null);
-  };
+  const errorMessage = searchErrorMessage ?? mutation.error?.message;
 
-  const handleSubmit = e => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    mutation.mutate(form.email);
+    mutation.mutate({ email });
   };
 
   if (mutation.isSuccess) {
@@ -83,13 +75,15 @@ function SignUp() {
 
   return (
     <main className="flex min-h-dvh flex-col p-2">
-      <div className="flex grow items-center justify-center p-6">
+      <div className="flex grow items-center justify-center p-6 flex-col gap-4">
         <Card className="w-full max-w-sm">
           <CardHeader>
-            <CardTitle>Sign in via Email</CardTitle>
+            <CardTitle className="text-center">
+              <h1 className="text-2xl font-bold">Photowalk</h1>
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <form action="#" method="POST" className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {errorMessage && (
                 <div className="rounded-md bg-red-50 p-4 dark:bg-red-900/10">
                   <p className="text-sm text-red-800 dark:text-red-200">
@@ -104,16 +98,17 @@ function SignUp() {
                   id="email"
                   type="email"
                   name="email"
-                  value={form.email}
-                  onChange={handleChange}
+                  required
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
                   aria-invalid={errorMessage ? true : undefined}
+                  aria-describedby={errorMessage ? 'email-error' : undefined}
                 />
               </div>
               <Button
                 type="submit"
                 className="w-full"
                 disabled={mutation.isPending}
-                onClick={handleSubmit}
               >
                 {mutation.isPending ? 'Sending...' : 'Send Magic Link'}
               </Button>

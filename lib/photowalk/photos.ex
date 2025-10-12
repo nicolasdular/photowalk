@@ -2,7 +2,7 @@ defmodule P.Photos do
   import Ecto.Query, warn: false
 
   alias Ecto.Changeset
-  alias P.{Collections, Photo, Repo, User}
+  alias P.{Collections, Collection, Photo, Repo, User}
   alias P.Photos.Uploader
 
   @type upload_param :: Plug.Upload.t()
@@ -45,6 +45,14 @@ defmodule P.Photos do
       nil -> {:error, :not_found}
       {:error, _} = error -> error
     end
+  end
+
+  def thumnbnails_for(%Collection{id: collection_id}) do
+    Photo
+    |> where([p], p.collection_id == ^collection_id)
+    |> order_by([p], desc: p.inserted_at)
+    |> limit(4)
+    |> Repo.all()
   end
 
   @spec insert_photo(User.t(), Plug.Upload.t(), photo_params()) ::

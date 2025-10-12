@@ -13,8 +13,8 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppPhotosBackupRouteImport } from './routes/_app/photos-backup'
-import { Route as AppCollectionsNewRouteImport } from './routes/_app/collections/new'
-import { Route as AppCollectionsCollectionIdRouteImport } from './routes/_app/collections/$collectionId'
+import { Route as AppWalksNewRouteImport } from './routes/_app/walks/new'
+import { Route as AppWalksCollectionIdRouteImport } from './routes/_app/walks/$collectionId'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -35,31 +35,30 @@ const AppPhotosBackupRoute = AppPhotosBackupRouteImport.update({
   path: '/photos-backup',
   getParentRoute: () => AppRoute,
 } as any)
-const AppCollectionsNewRoute = AppCollectionsNewRouteImport.update({
-  id: '/collections/new',
-  path: '/collections/new',
+const AppWalksNewRoute = AppWalksNewRouteImport.update({
+  id: '/walks/new',
+  path: '/walks/new',
   getParentRoute: () => AppRoute,
 } as any)
-const AppCollectionsCollectionIdRoute =
-  AppCollectionsCollectionIdRouteImport.update({
-    id: '/collections/$collectionId',
-    path: '/collections/$collectionId',
-    getParentRoute: () => AppRoute,
-  } as any)
+const AppWalksCollectionIdRoute = AppWalksCollectionIdRouteImport.update({
+  id: '/walks/$collectionId',
+  path: '/walks/$collectionId',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/photos-backup': typeof AppPhotosBackupRoute
   '/': typeof AppIndexRoute
-  '/collections/$collectionId': typeof AppCollectionsCollectionIdRoute
-  '/collections/new': typeof AppCollectionsNewRoute
+  '/walks/$collectionId': typeof AppWalksCollectionIdRoute
+  '/walks/new': typeof AppWalksNewRoute
 }
 export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/photos-backup': typeof AppPhotosBackupRoute
   '/': typeof AppIndexRoute
-  '/collections/$collectionId': typeof AppCollectionsCollectionIdRoute
-  '/collections/new': typeof AppCollectionsNewRoute
+  '/walks/$collectionId': typeof AppWalksCollectionIdRoute
+  '/walks/new': typeof AppWalksNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -67,8 +66,8 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_app/photos-backup': typeof AppPhotosBackupRoute
   '/_app/': typeof AppIndexRoute
-  '/_app/collections/$collectionId': typeof AppCollectionsCollectionIdRoute
-  '/_app/collections/new': typeof AppCollectionsNewRoute
+  '/_app/walks/$collectionId': typeof AppWalksCollectionIdRoute
+  '/_app/walks/new': typeof AppWalksNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -76,23 +75,18 @@ export interface FileRouteTypes {
     | '/signup'
     | '/photos-backup'
     | '/'
-    | '/collections/$collectionId'
-    | '/collections/new'
+    | '/walks/$collectionId'
+    | '/walks/new'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/signup'
-    | '/photos-backup'
-    | '/'
-    | '/collections/$collectionId'
-    | '/collections/new'
+  to: '/signup' | '/photos-backup' | '/' | '/walks/$collectionId' | '/walks/new'
   id:
     | '__root__'
     | '/_app'
     | '/signup'
     | '/_app/photos-backup'
     | '/_app/'
-    | '/_app/collections/$collectionId'
-    | '/_app/collections/new'
+    | '/_app/walks/$collectionId'
+    | '/_app/walks/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -130,18 +124,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPhotosBackupRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/collections/new': {
-      id: '/_app/collections/new'
-      path: '/collections/new'
-      fullPath: '/collections/new'
-      preLoaderRoute: typeof AppCollectionsNewRouteImport
+    '/_app/walks/new': {
+      id: '/_app/walks/new'
+      path: '/walks/new'
+      fullPath: '/walks/new'
+      preLoaderRoute: typeof AppWalksNewRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/collections/$collectionId': {
-      id: '/_app/collections/$collectionId'
-      path: '/collections/$collectionId'
-      fullPath: '/collections/$collectionId'
-      preLoaderRoute: typeof AppCollectionsCollectionIdRouteImport
+    '/_app/walks/$collectionId': {
+      id: '/_app/walks/$collectionId'
+      path: '/walks/$collectionId'
+      fullPath: '/walks/$collectionId'
+      preLoaderRoute: typeof AppWalksCollectionIdRouteImport
       parentRoute: typeof AppRoute
     }
   }
@@ -150,15 +144,15 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppPhotosBackupRoute: typeof AppPhotosBackupRoute
   AppIndexRoute: typeof AppIndexRoute
-  AppCollectionsCollectionIdRoute: typeof AppCollectionsCollectionIdRoute
-  AppCollectionsNewRoute: typeof AppCollectionsNewRoute
+  AppWalksCollectionIdRoute: typeof AppWalksCollectionIdRoute
+  AppWalksNewRoute: typeof AppWalksNewRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppPhotosBackupRoute: AppPhotosBackupRoute,
   AppIndexRoute: AppIndexRoute,
-  AppCollectionsCollectionIdRoute: AppCollectionsCollectionIdRoute,
-  AppCollectionsNewRoute: AppCollectionsNewRoute,
+  AppWalksCollectionIdRoute: AppWalksCollectionIdRoute,
+  AppWalksNewRoute: AppWalksNewRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

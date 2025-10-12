@@ -3,7 +3,7 @@ defmodule PWeb.CollectionJSON do
   alias PWeb.PhotoJSON
 
   def index(%{collections: collections} = assigns) do
-    %{data: Enum.map(collections, &data(&1, assigns))}
+    %{data: Enum.map(collections, &index_data(&1, assigns))}
   end
 
   def show(%{collection: collection} = assigns) do
@@ -16,16 +16,17 @@ defmodule PWeb.CollectionJSON do
 
   def required_fields, do: [:id, :title]
 
+  defp index_data(collection, assigns) do
+    base_data(collection)
+    |> Map.put(
+      :thumbnails,
+      Enum.map(P.Photos.thumnbnails_for(collection), &PhotoJSON.data(&1, Map.new(assigns)))
+    )
+  end
+
   defp data(%Collection{} = collection, assigns) do
     assigns = Map.new(assigns)
-
-    base_data = %{
-      id: collection.id,
-      title: collection.title,
-      description: collection.description,
-      inserted_at: format_datetime(collection.inserted_at),
-      updated_at: format_datetime(collection.updated_at)
-    }
+    base_data = base_data(collection)
 
     # Include photos if they're preloaded
     case collection do
@@ -38,6 +39,16 @@ defmodule PWeb.CollectionJSON do
       _ ->
         base_data
     end
+  end
+
+  defp base_data(%Collection{} = collection) do
+    %{
+      id: collection.id,
+      title: collection.title,
+      description: collection.description,
+      inserted_at: format_datetime(collection.inserted_at),
+      updated_at: format_datetime(collection.updated_at)
+    }
   end
 
   defp format_datetime(%NaiveDateTime{} = naive) do

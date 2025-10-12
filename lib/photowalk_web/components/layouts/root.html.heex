@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <title>The Stack</title>
+    <title>Photowalk</title>
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
 
     <%= if PhoenixVite.Components.has_vite_watcher?(PWeb.Endpoint) do %>
@@ -31,7 +31,7 @@
       to_url={fn p -> static_url(@conn, p) end}
     />
   </head>
-  <body class="bg-slate-100 text-slate-900">
+  <body class=" text-slate-900">
     <div id="react-app"></div>
   </body>
 </html>

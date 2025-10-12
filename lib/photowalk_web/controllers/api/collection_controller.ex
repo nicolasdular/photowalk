@@ -44,7 +44,24 @@ defmodule PWeb.CollectionController do
     description: "List of collections for the current user",
     type: :object,
     properties: %{
-      data: %Schema{type: :array, items: @collection_resource_schema}
+      data: %Schema{
+        type: :array,
+        items: %Schema{
+          allOf: [
+            @collection_resource_schema,
+            %Schema{
+              type: :object,
+              properties: %{
+                thumbnails: %Schema{
+                  type: :array,
+                  items: @photo_resource_schema,
+                  description: "Array of photo thumbnails for the collection"
+                }
+              }
+            }
+          ]
+        }
+      }
     },
     required: [:data]
   }
@@ -124,7 +141,10 @@ defmodule PWeb.CollectionController do
   def index(conn, _params) do
     user = conn.assigns.current_user
 
-    render(conn, :index, collections: Collections.list_collections_for_user(user), current_user: user)
+    render(conn, :index,
+      collections: Collections.list_collections_for_user(user, %{preloads: [:photos]}),
+      current_user: user
+    )
   end
 
   def create(conn, params) do
