@@ -26,7 +26,7 @@ r2_bucket =
     value -> value
   end
 
-if r2_bucket && Mix.env() == :prod do
+if r2_bucket do
   account_id =
     System.get_env("R2_ACCOUNT_ID") ||
       raise "Missing environment variable `R2_ACCOUNT_ID`!"

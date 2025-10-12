@@ -32,13 +32,16 @@ defmodule PWeb.Endpoint do
     gzip: not code_reloading?,
     only: PWeb.static_paths()
 
-  plug Plug.Static,
-    at: "/uploads",
-    from:
-      Application.compile_env(:waffle, :storage_dir_prefix)
-      |> Path.join(Application.compile_env(:waffle, :storage_dir)),
-    gzip: false,
-    cache_control_for_etags: "public, max-age=31536000"
+  if Application.compile_env(:waffle, :storage_dir_prefix) do
+    plug Plug.Static,
+      at: "/uploads",
+      from:
+        Application.compile_env(:waffle, :storage_dir_prefix)
+        |> Path.join(Application.compile_env(:waffle, :storage_dir))
+        |> to_string(),
+      gzip: false,
+      cache_control_for_etags: "public, max-age=31536000"
+  end
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
