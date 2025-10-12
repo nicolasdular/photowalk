@@ -1,6 +1,6 @@
 @import 'tailwindcss' source(none);
 @source "../css";
-@source "../js";
+@source "../src";
 @source "../../lib/photowalk_web";
 
 @theme {

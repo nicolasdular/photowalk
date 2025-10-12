@@ -24,7 +24,7 @@
     "baseUrl": ".",
     "paths": {
       "*": ["../deps/*"],
-      "@catalyst/*": ["js/catalyst/*"]
+      "@catalyst/*": ["src/catalyst/*"]
     },
     "allowJs": true,
     "noEmit": true,
@@ -32,5 +32,5 @@
     "jsxImportSource": "react",
     "strictNullChecks": true
   },
-  "include": ["js/**/*"]
+  "include": ["src/**/*"]
 }

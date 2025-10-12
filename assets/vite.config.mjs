@@ -17,7 +17,7 @@ export default defineConfig({
   build: {
     manifest: true,
     rollupOptions: {
-      input: ['js/app.js', 'css/app.css'],
+      input: ['src/app.js', 'css/app.css'],
     },
     outDir: '../priv/static',
     emptyOutDir: true,
@@ -26,7 +26,7 @@ export default defineConfig({
     alias: [
       {
         find: '@catalyst',
-        replacement: fileURLToPath(new URL('./js/catalyst', import.meta.url)),
+        replacement: fileURLToPath(new URL('./src/catalyst', import.meta.url)),
       },
       { find: '@', replacement: fileURLToPath(new URL('.', import.meta.url)) },
     ],
@@ -41,8 +41,8 @@ export default defineConfig({
   plugins: [
     tanstackRouter({
       target: 'react',
-      routesDirectory: 'js/routes',
-      generatedRouteTree: 'js/routeTree.gen.ts',
+      routesDirectory: 'src/routes',
+      generatedRouteTree: 'src/routeTree.gen.ts',
       autoCodeSplitting: true,
     }),
     react(),

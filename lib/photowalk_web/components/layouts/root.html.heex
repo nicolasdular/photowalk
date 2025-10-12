@@ -25,7 +25,7 @@
     <% end %>
 
     <PhoenixVite.Components.assets
-      names={["js/app.js", "css/app.css"]}
+      names={["src/app.js", "css/app.css"]}
       manifest={{:photowalk, "priv/static/.vite/manifest.json"}}
       dev_server={PhoenixVite.Components.has_vite_watcher?(PWeb.Endpoint)}
       to_url={fn p -> static_url(@conn, p) end}

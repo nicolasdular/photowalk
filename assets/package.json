@@ -2,7 +2,7 @@
   "scripts": {
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "generate:api": "openapi-typescript ../priv/static/openapi.json -o ./js/api/schema.ts"
+    "generate:api": "openapi-typescript ../priv/static/openapi.json -o ./src/api/schema.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
