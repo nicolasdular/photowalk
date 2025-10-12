@@ -85,10 +85,8 @@ function SignUp() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {errorMessage && (
-                <div className="rounded-md bg-red-50 p-4 dark:bg-red-900/10">
-                  <p className="text-sm text-red-800 dark:text-red-200">
-                    {errorMessage}
-                  </p>
+                <div className="rounded-md bg-red-50 p-4">
+                  <p className="text-sm text-red-800 ">{errorMessage}</p>
                 </div>
               )}
 

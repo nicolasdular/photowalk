@@ -11,7 +11,7 @@ defmodule PWeb.UserJSON do
 
   def summary(%User{} = user), do: serialize(user)
 
-  defp serialize(%User{} = user) do
+  def serialize(%User{} = user) do
     user
     |> Map.from_struct()
     |> Map.take(@fields -- [:avatar_url])

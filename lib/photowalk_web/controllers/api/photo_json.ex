@@ -15,14 +15,10 @@ defmodule PWeb.PhotoJSON do
 
   def required_fields, do: [:id, :title, :thumbnail_url, :full_url]
 
-  @doc """
-  Converts a Photo struct to a map representation.
-  Public function to allow reuse in other JSON modules.
-  """
   def data(%Photo{} = photo, assigns \\ %{}) do
     assigns = Map.new(assigns)
 
-    %{
+    base_data = %{
       id: photo.id,
       thumbnail_url: Photo.url(photo, :thumb),
       full_url: Photo.url(photo, :full),
@@ -31,6 +27,14 @@ defmodule PWeb.PhotoJSON do
       title: photo.title,
       allowed_to_delete: allowed_to_delete?(photo, assigns)
     }
+
+    case photo do
+      %{user: %Ecto.Association.NotLoaded{}} ->
+        base_data
+
+      %Photo{user: user} ->
+        Map.put(base_data, :user, PWeb.UserJSON.serialize(user))
+    end
   end
 
   defp allowed_to_delete?(photo, assigns) do

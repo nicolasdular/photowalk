@@ -75,7 +75,7 @@ export function SignedInLayout({
         </div>
       </header>
 
-      <main className="container mx-auto px-4 pt-8">{children}</main>
+      <main className="container mx-auto px-4 pb-8 pt-8">{children}</main>
     </>
   );
 }

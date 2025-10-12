@@ -113,6 +113,7 @@ defmodule PWeb.CollectionControllerTest do
     test "shows a collection owned by the user", %{conn: conn} do
       user = user_fixture()
       collection = collection_fixture(user: user)
+      photo = photo_fixture(user: user, collection: collection)
 
       conn =
         conn
@@ -126,6 +127,8 @@ defmodule PWeb.CollectionControllerTest do
       assert response["data"]["id"] == collection.id
       assert response["data"]["title"] == collection.title
       assert response["data"]["description"] == collection.description
+      assert hd(response["data"]["photos"])["id"] == photo.id
+      assert hd(response["data"]["photos"])["user"]["id"] == photo.user_id
     end
 
     test "includes deletion permissions for photos", %{conn: conn} do

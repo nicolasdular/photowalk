@@ -178,7 +178,7 @@ export interface components {
                 /** Format: date-time */
                 updated_at?: string;
             } & {
-                photos?: {
+                photos?: ({
                     allowed_to_delete?: boolean;
                     /** Format: uri */
                     full_url: string;
@@ -190,7 +190,14 @@ export interface components {
                     title: string;
                     /** Format: date-time */
                     updated_at?: string;
-                }[];
+                } & {
+                    /** User */
+                    user?: {
+                        avatar_url?: string;
+                        email: string;
+                        id: number;
+                    };
+                })[];
             };
         };
         /** NotFoundError */
@@ -411,7 +418,7 @@ export interface operations {
                             /** Format: date-time */
                             updated_at?: string;
                         } & {
-                            photos?: {
+                            photos?: ({
                                 allowed_to_delete?: boolean;
                                 /** Format: uri */
                                 full_url: string;
@@ -423,7 +430,14 @@ export interface operations {
                                 title: string;
                                 /** Format: date-time */
                                 updated_at?: string;
-                            }[];
+                            } & {
+                                /** User */
+                                user?: {
+                                    avatar_url?: string;
+                                    email: string;
+                                    id: number;
+                                };
+                            })[];
                         };
                     };
                 };
@@ -471,7 +485,7 @@ export interface operations {
                             /** Format: date-time */
                             updated_at?: string;
                         } & {
-                            photos?: {
+                            photos?: ({
                                 allowed_to_delete?: boolean;
                                 /** Format: uri */
                                 full_url: string;
@@ -483,7 +497,14 @@ export interface operations {
                                 title: string;
                                 /** Format: date-time */
                                 updated_at?: string;
-                            }[];
+                            } & {
+                                /** User */
+                                user?: {
+                                    avatar_url?: string;
+                                    email: string;
+                                    id: number;
+                                };
+                            })[];
                         };
                     };
                 };

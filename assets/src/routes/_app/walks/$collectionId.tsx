@@ -1,8 +1,13 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import client from '../../../api/client';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  createFileRoute,
+  Link,
+  Outlet,
+  useMatches,
+} from '@tanstack/react-router';
 import type { components } from '../../../api/schema';
 import { useState } from 'react';
+import client from '../../../api/client';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { ArrowLeft, CameraIcon, ExternalLink } from 'lucide-react';
@@ -17,6 +22,7 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty';
 import { UploadPhotosButton } from '@/components/upload-photos-button';
+import { useCollectionQuery } from '@/lib/hooks/useCollectionQuery';
 
 type Collection = components['schemas']['Collection'];
 type Photo = components['schemas']['Photo'];
@@ -26,23 +32,17 @@ function CollectionDetailPage() {
   const queryClient = useQueryClient();
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [pendingPhotoId, setPendingPhotoId] = useState<number | null>(null);
+  const matches = useMatches();
 
-  const collectionQuery = useQuery({
-    queryKey: ['collection', collectionId],
-    queryFn: async () => {
-      const { data, error } = await client.GET('/api/collections/{id}', {
-        params: { path: { id: parseInt(collectionId) } },
-      });
-      if (error) {
-        throw error;
-      }
-      return data?.data;
-    },
-  });
+  const collectionQuery = useCollectionQuery(collectionId);
 
   const collection = collectionQuery.data;
   const photos = (collection?.photos as Photo[] | undefined) ?? [];
   const isLoading = collectionQuery.isLoading;
+
+  const isViewingPhoto = matches.some(
+    match => match.routeId === '/_app/walks/$collectionId/photos/$photoId'
+  );
 
   const deletePhotoMutation = useMutation({
     mutationFn: async (photoId: number) => {
@@ -59,7 +59,9 @@ function CollectionDetailPage() {
       setPendingPhotoId(photoId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['collection', collectionId] });
+      queryClient.invalidateQueries({
+        queryKey: ['collection', Number(collectionId)],
+      });
     },
     onError: error => {
       console.error('Failed to delete photo', error);
@@ -101,8 +103,26 @@ function CollectionDetailPage() {
 
   if (collection?.photos?.length === 0) {
     return (
-      <EmptyState collectionId={collection.id} onSuccess={refetchCollection} />
+      <>
+        <PageTitle
+          title={collection.title}
+          backLink={
+            <Link to="/" className="inline-flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back to walks
+            </Link>
+          }
+        />
+        <EmptyState
+          collectionId={collection.id}
+          onSuccess={refetchCollection}
+        />
+      </>
     );
+  }
+
+  if (isViewingPhoto) {
+    return <Outlet />;
   }
 
   return (
@@ -121,11 +141,12 @@ function CollectionDetailPage() {
           />
         }
         title={collection.title}
-        subTitle={<span>{collection.photos?.length} Photos</span>}
-      ></PageTitle>
-      {collection.description && (
-        <p className="text-muted-foreground">{collection.description}</p>
-      )}
+        subTitle={
+          <div>
+            <p>{collection.photos?.length} photos</p>
+          </div>
+        }
+      />
 
       <section className="space-y-6">
         {deleteError && (
@@ -134,48 +155,27 @@ function CollectionDetailPage() {
           </div>
         )}
 
-        {collectionQuery.isLoading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={`skeleton-${index}`}
-                className="h-64 animate-pulse rounded-lg bg-muted"
-              />
-            ))}
-          </div>
-        ) : photos.length === 0 ? (
-          <div className="text-center py-12 border rounded-lg bg-muted/20">
-            <h3 className="text-lg font-semibold mb-2">No photos yet</h3>
-            <p className="text-sm text-muted-foreground">
-              Upload your first photo to this collection.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {photos.map(photo => (
-              <div key={photo.id} className="group relative flex flex-col ">
-                <div className="aspect-[4/5] w-full overflow-hidden bg-muted">
-                  <img
-                    src={photo.thumbnail_url}
-                    alt={photo.title || 'Photo'}
-                    className="h-full w-full object-cover rounded-xl"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="flex-1 flex flex-col justify-between p-4 space-y-2">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{formatDate(photo.inserted_at)}</span>
-                  </div>
-                  <div>
-                    <p className="font-semibold truncate">
-                      {photo.title || 'Untitled'}
-                    </p>
-                  </div>
-                </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+          {photos.map(photo => (
+            <Link
+              key={photo.id}
+              to="/walks/$collectionId/photos/$photoId"
+              params={{
+                collectionId: collectionId,
+                photoId: String(photo.id),
+              }}
+              className="group relative flex flex-col overflow-hidden rounded-2xl "
+            >
+              <div className="relative aspect-[4/5] w-full overflow-hidden">
+                <img
+                  src={photo.thumbnail_url}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
               </div>
-            ))}
-          </div>
-        )}
+            </Link>
+          ))}
+        </div>
       </section>
     </>
   );
@@ -202,17 +202,6 @@ function EmptyState({
       </EmptyContent>
     </Empty>
   );
-}
-
-function formatDate(value?: string | null) {
-  if (!value) return 'Just now';
-  const date = new Date(value);
-  return new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date);
 }
 
 export const Route = createFileRoute('/_app/walks/$collectionId')({

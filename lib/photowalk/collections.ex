@@ -32,12 +32,13 @@ defmodule P.Collections do
 
   @spec get_collection_for_user(integer(), User.t()) ::
           {:ok, Collection.t()} | {:error, :not_found}
-  def get_collection_for_user(id, %User{id: user_id}) when is_integer(id) do
+  def get_collection_for_user(id, %User{id: user_id}, opts \\ %{preloads: [:photos]})
+      when is_integer(id) do
     # For now, only allow access to owned collections
     # In the future, this will include collections the user is invited to
     case Collection
          |> where([c], c.id == ^id and c.owner_id == ^user_id)
-         |> preload(:photos)
+         |> maybe_preload(opts[:preloads])
          |> Repo.one() do
       nil -> {:error, :not_found}
       collection -> {:ok, collection}

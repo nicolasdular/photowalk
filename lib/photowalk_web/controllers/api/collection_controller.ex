@@ -27,18 +27,6 @@ defmodule PWeb.CollectionController do
                                 required: CollectionJSON.required_fields()
                               )
 
-  @collection_with_photos_schema %Schema{
-    allOf: [
-      @collection_resource_schema,
-      %Schema{
-        type: :object,
-        properties: %{
-          photos: %Schema{type: :array, items: @photo_resource_schema}
-        }
-      }
-    ]
-  }
-
   @collection_list_response_schema %Schema{
     title: "CollectionListResponse",
     description: "List of collections for the current user",
@@ -71,7 +59,34 @@ defmodule PWeb.CollectionController do
     description: "A single collection with its photos",
     type: :object,
     properties: %{
-      data: @collection_with_photos_schema
+      data: %Schema{
+        allOf: [
+          @collection_resource_schema,
+          %Schema{
+            type: :object,
+            properties: %{
+              photos: %Schema{
+                type: :array,
+                items: %Schema{
+                  allOf: [
+                    @photo_resource_schema,
+                    %Schema{
+                      type: :object,
+                      properties: %{
+                        user:
+                          EctoSchema.schema_from_fields(P.User,
+                            required: [:id, :email],
+                            fields: PWeb.UserJSON.fields()
+                          )
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
     },
     required: [:data]
   }
@@ -142,7 +157,7 @@ defmodule PWeb.CollectionController do
     user = conn.assigns.current_user
 
     render(conn, :index,
-      collections: Collections.list_collections_for_user(user, %{preloads: [:photos]}),
+      collections: Collections.list_collections_for_user(user),
       current_user: user
     )
   end
@@ -160,7 +175,10 @@ defmodule PWeb.CollectionController do
   def show(conn, %{"id" => id}) do
     user = conn.assigns.current_user
 
-    with {:ok, collection} <- Collections.get_collection_for_user(String.to_integer(id), user) do
+    with {:ok, collection} <-
+           Collections.get_collection_for_user(String.to_integer(id), user, %{
+             preloads: [photos: :user]
+           }) do
       render(conn, :show, collection: collection, current_user: user)
     end
   end

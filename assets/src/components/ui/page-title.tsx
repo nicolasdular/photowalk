@@ -10,7 +10,7 @@ export function PageTitle({
   children?: React.ReactNode;
   actions?: React.ReactNode;
   backLink?: React.ReactNode;
-  title: React.ReactNode;
+  title?: React.ReactNode;
   subTitle?: React.ReactNode;
 }) {
   return (

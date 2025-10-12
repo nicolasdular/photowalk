@@ -95,12 +95,12 @@ function CollectionsGrid({ collections }: CollectionsGridProps) {
           <div className="overflow-hidden rounded-lg">
             {collection.thumbnails?.length === 0 ? (
               <>
-                <div className="h-100 w-100 bg-muted flex items-center justify-center rounded-lg">
+                <div className="h-120 w-100 bg-muted flex items-center justify-center rounded-lg">
                   <span className="text-muted-foreground">No Photos yet</span>
                 </div>
-                <span className="text-sm font-medium text-slate-900">
+                <div className="text-sm font-medium text-slate-900 mt-2">
                   {collection.title}
-                </span>
+                </div>
               </>
             ) : (
               <>
@@ -109,9 +109,9 @@ function CollectionsGrid({ collections }: CollectionsGridProps) {
                   alt={collection.title}
                   className="h-120 w-100 object-cover rounded-xl"
                 />
-                <span className="text-sm font-medium text-slate-900">
+                <div className="text-sm font-medium text-slate-900 mt-2">
                   {collection.title}
-                </span>
+                </div>
               </>
             )}
           </div>
