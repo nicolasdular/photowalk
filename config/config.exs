@@ -48,6 +48,10 @@ config :logger, :default_formatter,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+config :waffle,
+  storage_dir_prefix: nil,
+  storage_dir: "uploads"
+
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 

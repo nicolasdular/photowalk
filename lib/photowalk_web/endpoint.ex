@@ -63,7 +63,7 @@ defmodule PWeb.Endpoint do
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
     json_decoder: Phoenix.json_library(),
-    length: Application.compile_env(:photowalk, :upload_max_bytes, 75_000_000)
+    length: Application.compile_env(:photowalk, :upload_max_bytes, 30_000_000)
 
   plug Plug.MethodOverride
   plug Plug.Head
