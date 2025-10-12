@@ -3,6 +3,7 @@ defmodule P.Photos do
 
   alias Ecto.Changeset
   alias P.{Collections, Photo, Repo, User}
+  alias P.Photos.Uploader
 
   @type upload_param :: Plug.Upload.t()
   @type photo_params :: %{optional(atom() | String.t()) => any()}
@@ -30,6 +31,21 @@ defmodule P.Photos do
     do: {:error, Ecto.Changeset.add_error(%Changeset{}, :photo, "invalid file")}
 
   def create_photo(_, _, _), do: {:error, :no_file}
+
+  @spec delete_photo(User.t(), integer() | String.t()) ::
+          {:ok, Photo.t()} | {:error, :not_found | Ecto.Changeset.t()}
+  def delete_photo(%User{id: user_id}, photo_id) do
+    with {:ok, id} <- normalize_photo_id(photo_id),
+         %Photo{} = photo <- fetch_photo_for_user(user_id, id),
+         {:ok, deleted_photo} <- Repo.delete(photo) do
+      maybe_delete_upload(deleted_photo)
+      {:ok, deleted_photo}
+    else
+      {:error, :invalid_id} -> {:error, :not_found}
+      nil -> {:error, :not_found}
+      {:error, _} = error -> error
+    end
+  end
 
   @spec insert_photo(User.t(), Plug.Upload.t(), photo_params()) ::
           {:ok, Photo.t()} | {:error, Changeset.t()}
@@ -97,5 +113,34 @@ defmodule P.Photos do
           Changeset.add_error(changeset, :collection_id, "does not belong to you")
       end
     end
+  end
+
+  defp normalize_photo_id(id) when is_integer(id) and id > 0, do: {:ok, id}
+
+  defp normalize_photo_id(id) when is_binary(id) do
+    case Integer.parse(id) do
+      {int, ""} when int > 0 -> {:ok, int}
+      _ -> {:error, :invalid_id}
+    end
+  end
+
+  defp normalize_photo_id(_), do: {:error, :invalid_id}
+
+  defp fetch_photo_for_user(user_id, photo_id) do
+    Photo
+    |> where([p], p.id == ^photo_id and p.user_id == ^user_id)
+    |> Repo.one()
+  end
+
+  defp maybe_delete_upload(%Photo{image: nil}), do: :ok
+
+  defp maybe_delete_upload(%Photo{} = photo) do
+    try do
+      Uploader.delete({photo.image, photo})
+    rescue
+      _ -> :ok
+    end
+
+    :ok
   end
 end

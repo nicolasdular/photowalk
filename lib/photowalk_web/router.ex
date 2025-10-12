@@ -72,7 +72,7 @@ defmodule PWeb.Router do
     pipe_through([:api, :require_authenticated_user])
 
     get("/user/me", UserController, :me)
-    resources("/photos", PhotoController, only: [:index, :create])
+    resources("/photos", PhotoController, only: [:index, :create, :delete])
     resources("/collections", CollectionController, only: [:index, :create, :show])
   end
 

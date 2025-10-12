@@ -73,6 +73,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/photos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete photo */
+        delete: operations["PWeb.PhotoController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/user/me": {
         parameters: {
             query?: never;
@@ -147,6 +164,7 @@ export interface components {
                 updated_at?: string;
             } & {
                 photos?: {
+                    allowed_to_delete?: boolean;
                     /** Format: uri */
                     full_url: string;
                     id: number;
@@ -160,11 +178,17 @@ export interface components {
                 }[];
             };
         };
+        /** NotFoundError */
+        NotFoundError: {
+            /** @description Error message */
+            error: string;
+        };
         /**
          * Photo
          * @description A processed photo with accessible variants
          */
         Photo: {
+            allowed_to_delete?: boolean;
             /** Format: uri */
             full_url: string;
             id: number;
@@ -182,6 +206,7 @@ export interface components {
          */
         PhotoListResponse: {
             data: {
+                allowed_to_delete?: boolean;
                 /** Format: uri */
                 full_url: string;
                 id: number;
@@ -357,6 +382,7 @@ export interface operations {
                             updated_at?: string;
                         } & {
                             photos?: {
+                                allowed_to_delete?: boolean;
                                 /** Format: uri */
                                 full_url: string;
                                 id: number;
@@ -416,6 +442,7 @@ export interface operations {
                             updated_at?: string;
                         } & {
                             photos?: {
+                                allowed_to_delete?: boolean;
                                 /** Format: uri */
                                 full_url: string;
                                 id: number;
@@ -459,6 +486,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: {
+                            allowed_to_delete?: boolean;
                             /** Format: uri */
                             full_url: string;
                             id: number;
@@ -505,6 +533,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: {
+                            allowed_to_delete?: boolean;
                             /** Format: uri */
                             full_url: string;
                             id: number;
@@ -529,6 +558,39 @@ export interface operations {
                         errors: {
                             [key: string]: string[];
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PWeb.PhotoController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Photo ID */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Photo deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Error message */
+                        error: string;
                     };
                 };
             };

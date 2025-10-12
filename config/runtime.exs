@@ -26,7 +26,7 @@ r2_bucket =
     value -> value
   end
 
-if r2_bucket do
+if r2_bucket && Mix.env() == :prod do
   account_id =
     System.get_env("R2_ACCOUNT_ID") ||
       raise "Missing environment variable `R2_ACCOUNT_ID`!"
@@ -63,26 +63,6 @@ if r2_bucket do
       host: "#{account_id}.r2.cloudflarestorage.com",
       region: region
     ]
-else
-  local_bucket =
-    case System.get_env("WAFFLE_BUCKET") do
-      "" -> "photowalk-dev"
-      nil -> "photowalk-dev"
-      value -> value
-    end
-
-  asset_host =
-    case System.get_env("WAFFLE_ASSET_HOST") do
-      "" -> nil
-      value -> value
-    end
-
-  config :waffle,
-    storage: Waffle.Storage.Local,
-    storage_dir_prefix: "priv/waffle/public",
-    storage_dir: "uploads",
-    bucket: local_bucket,
-    asset_host: asset_host
 end
 
 if config_env() == :prod do

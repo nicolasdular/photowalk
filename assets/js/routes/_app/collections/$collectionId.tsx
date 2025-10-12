@@ -1,16 +1,21 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import client from '../../../api/client';
 import type { components } from '../../../api/schema';
+import { useState } from 'react';
 import { Heading } from '../../../catalyst/heading';
 import { Text } from '../../../catalyst/text';
 import { PhotoUpload } from '../../../components/PhotoUpload';
+import { Button } from '../../../catalyst/button';
 
 type Collection = components['schemas']['Collection'];
 type Photo = components['schemas']['Photo'];
 
 function CollectionDetailPage() {
   const { collectionId } = Route.useParams();
+  const queryClient = useQueryClient();
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [pendingPhotoId, setPendingPhotoId] = useState<number | null>(null);
 
   const collectionQuery = useQuery({
     queryKey: ['collection', collectionId],
@@ -26,8 +31,38 @@ function CollectionDetailPage() {
   });
 
   const collection = collectionQuery.data;
-  const photos = (collection as any)?.photos ?? [];
+  const photos = (collection?.photos as Photo[] | undefined) ?? [];
   const isLoading = collectionQuery.isLoading;
+
+  const deletePhotoMutation = useMutation({
+    mutationFn: async (photoId: number) => {
+      const { error } = await client.DELETE('/api/photos/{id}', {
+        params: { path: { id: photoId } },
+      });
+
+      if (error) {
+        throw error;
+      }
+    },
+    onMutate: photoId => {
+      setDeleteError(null);
+      setPendingPhotoId(photoId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['collection', collectionId] });
+    },
+    onError: error => {
+      console.error('Failed to delete photo', error);
+      setDeleteError('We could not delete this photo. Please try again.');
+    },
+    onSettled: () => {
+      setPendingPhotoId(null);
+    },
+  });
+
+  const handleDeletePhoto = (photoId: number) => {
+    deletePhotoMutation.mutate(photoId);
+  };
 
   if (isLoading) {
     return null;
@@ -84,6 +119,12 @@ function CollectionDetailPage() {
           <Heading level={2} className="text-2xl font-semibold text-slate-900">
             Photos in this collection
           </Heading>
+
+          {deleteError && (
+            <div className="rounded-xl border border-rose-200 bg-rose-50/80 px-4 py-3 text-sm text-rose-700 shadow-sm">
+              {deleteError}
+            </div>
+          )}
 
           {collectionQuery.isLoading ? (
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
@@ -146,6 +187,16 @@ function CollectionDetailPage() {
                       >
                         View full size ↗
                       </a>
+                      {photo.allowed_to_delete && (
+                        <Button
+                          color="rose"
+                          onClick={() => handleDeletePhoto(photo.id)}
+                          disabled={pendingPhotoId === photo.id}
+                          className="!px-3 !py-1 text-xs font-semibold uppercase tracking-[0.18em]"
+                        >
+                          {pendingPhotoId === photo.id ? 'Deleting…' : 'Delete'}
+                        </Button>
+                      )}
                     </div>
                   </figcaption>
                 </figure>

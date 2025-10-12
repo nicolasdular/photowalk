@@ -16,7 +16,8 @@ defmodule PWeb.CollectionController do
                            required: PhotoJSON.required_fields(),
                            additional_properties: %{
                              thumbnail_url: %Schema{type: :string, format: :uri},
-                             full_url: %Schema{type: :string, format: :uri}
+                             full_url: %Schema{type: :string, format: :uri},
+                             allowed_to_delete: %Schema{type: :boolean}
                            }
                          )
 
@@ -123,7 +124,7 @@ defmodule PWeb.CollectionController do
   def index(conn, _params) do
     user = conn.assigns.current_user
 
-    render(conn, :index, collections: Collections.list_collections_for_user(user))
+    render(conn, :index, collections: Collections.list_collections_for_user(user), current_user: user)
   end
 
   def create(conn, params) do
@@ -132,7 +133,7 @@ defmodule PWeb.CollectionController do
     with {:ok, collection} <- Collections.create_collection(user, params) do
       conn
       |> put_status(:created)
-      |> render(:show, collection: collection)
+      |> render(:show, collection: collection, current_user: user)
     end
   end
 
@@ -140,7 +141,7 @@ defmodule PWeb.CollectionController do
     user = conn.assigns.current_user
 
     with {:ok, collection} <- Collections.get_collection_for_user(String.to_integer(id), user) do
-      render(conn, :show, collection: collection)
+      render(conn, :show, collection: collection, current_user: user)
     end
   end
 end

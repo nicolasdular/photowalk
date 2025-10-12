@@ -4,6 +4,7 @@ defmodule PWeb.PhotoControllerTest do
   import P.Factory
   import PWeb.TestHelpers
   import OpenApiSpex.TestAssertions
+  alias PWeb.PhotoJSON
 
   setup do
     File.rm_rf!(Path.expand("../../priv/waffle/test/uploads", __DIR__))
@@ -30,10 +31,12 @@ defmodule PWeb.PhotoControllerTest do
 
       assert_schema(response, "PhotoListResponse", api_spec)
 
-      [%{"thumbnail_url" => thumb_url, "full_url" => full_url}] = response["data"]
+      [%{"thumbnail_url" => thumb_url, "full_url" => full_url, "allowed_to_delete" => allowed?}] =
+        response["data"]
 
       assert thumb_url =~ "/uploads/"
       assert full_url =~ "/uploads/"
+      assert allowed?
 
       assert File.exists?(local_path(thumb_url))
       assert File.exists?(local_path(full_url))
@@ -121,7 +124,62 @@ defmodule PWeb.PhotoControllerTest do
       assert_schema(response, "PhotoListResponse", api_spec)
 
       assert length(response["data"]) == 1
-      assert List.first(response["data"])["id"] == photo.id
+      response_photo = List.first(response["data"])
+      assert response_photo["id"] == photo.id
+      assert response_photo["allowed_to_delete"]
+    end
+  end
+
+  describe "DELETE /api/photos/:id" do
+    test "deletes a photo belonging to the user", %{conn: conn} do
+      user = user_fixture()
+      photo = photo_fixture(user: user)
+
+      conn =
+        conn
+        |> auth_json_conn(user)
+        |> delete(~p"/api/photos/#{photo.id}")
+
+      assert response(conn, 204)
+
+      refute P.Repo.get(P.Photo, photo.id)
+    end
+
+    test "does not allow deleting a photo belonging to another user", %{conn: conn} do
+      user = user_fixture()
+      other_user = user_fixture()
+      photo = photo_fixture(user: other_user)
+
+      conn =
+        conn
+        |> auth_json_conn(user)
+        |> delete(~p"/api/photos/#{photo.id}")
+
+      assert json_response(conn, 404)
+      assert P.Repo.get(P.Photo, photo.id)
+    end
+
+    test "returns 404 for non-existent photo", %{conn: conn} do
+      user = user_fixture()
+
+      conn =
+        conn
+        |> auth_json_conn(user)
+        |> delete(~p"/api/photos/999999")
+
+      assert json_response(conn, 404)
+    end
+  end
+
+  describe "photo serialization" do
+    test "marks photos as not deletable when the user is not the owner" do
+      owner = user_fixture()
+      other_user = user_fixture()
+      photo = photo_fixture(user: owner)
+
+      %{data: [serialized_photo]} = PhotoJSON.index(%{photos: [photo], current_user: other_user})
+
+      refute serialized_photo[:allowed_to_delete]
     end
   end
 

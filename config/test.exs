@@ -39,5 +39,8 @@ config :phoenix_live_view,
   enable_expensive_runtime_checks: true
 
 config :waffle,
+  storage: Waffle.Storage.Local,
   storage_dir_prefix: "priv/waffle/test",
-  asset_host: nil
+  storage_dir: "uploads",
+  asset_host: nil,
+  bucket: "photowalk-dev"

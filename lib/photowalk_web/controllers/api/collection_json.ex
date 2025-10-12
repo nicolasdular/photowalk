@@ -2,12 +2,12 @@ defmodule PWeb.CollectionJSON do
   alias P.Collection
   alias PWeb.PhotoJSON
 
-  def index(%{collections: collections}) do
-    %{data: Enum.map(collections, &data/1)}
+  def index(%{collections: collections} = assigns) do
+    %{data: Enum.map(collections, &data(&1, assigns))}
   end
 
-  def show(%{collection: collection}) do
-    %{data: data(collection)}
+  def show(%{collection: collection} = assigns) do
+    %{data: data(collection, assigns)}
   end
 
   def fields do
@@ -16,7 +16,9 @@ defmodule PWeb.CollectionJSON do
 
   def required_fields, do: [:id, :title]
 
-  defp data(%Collection{} = collection) do
+  defp data(%Collection{} = collection, assigns) do
+    assigns = Map.new(assigns)
+
     base_data = %{
       id: collection.id,
       title: collection.title,
@@ -31,7 +33,7 @@ defmodule PWeb.CollectionJSON do
         base_data
 
       %{photos: photos} when is_list(photos) ->
-        Map.put(base_data, :photos, Enum.map(photos, &PhotoJSON.data/1))
+        Map.put(base_data, :photos, Enum.map(photos, &PhotoJSON.data(&1, assigns)))
 
       _ ->
         base_data

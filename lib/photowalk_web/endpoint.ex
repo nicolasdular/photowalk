@@ -35,9 +35,8 @@ defmodule PWeb.Endpoint do
   plug Plug.Static,
     at: "/uploads",
     from:
-      :photowalk
-      |> Application.app_dir("priv/waffle/public/uploads")
-      |> to_string(),
+      Application.compile_env(:waffle, :storage_dir_prefix)
+      |> Path.join(Application.compile_env(:waffle, :storage_dir)),
     gzip: false,
     cache_control_for_etags: "public, max-age=31536000"
 

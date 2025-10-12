@@ -16,7 +16,8 @@ defmodule PWeb.PhotoController do
                            required: PhotoJSON.required_fields(),
                            additional_properties: %{
                              thumbnail_url: %Schema{type: :string, format: :uri},
-                             full_url: %Schema{type: :string, format: :uri}
+                             full_url: %Schema{type: :string, format: :uri},
+                             allowed_to_delete: %Schema{type: :boolean}
                            }
                          )
 
@@ -60,6 +61,15 @@ defmodule PWeb.PhotoController do
     required: [:errors]
   }
 
+  @not_found_schema %Schema{
+    title: "NotFoundError",
+    type: :object,
+    properties: %{
+      error: %Schema{type: :string, description: "Error message"}
+    },
+    required: [:error]
+  }
+
   tags(["photos"])
 
   operation :index,
@@ -89,10 +99,25 @@ defmodule PWeb.PhotoController do
       }
     ]
 
+  operation :delete,
+    summary: "Delete photo",
+    parameters: [
+      id: [
+        in: :path,
+        description: "Photo ID",
+        type: :integer,
+        required: true
+      ]
+    ],
+    responses: [
+      no_content: {"Photo deleted", nil, nil},
+      not_found: {"Not found", "application/json", @not_found_schema}
+    ]
+
   def index(conn, _params) do
     user = conn.assigns.current_user
 
-    render(conn, :index, photos: Photos.list_photos_for_user(user))
+    render(conn, :index, photos: Photos.list_photos_for_user(user), current_user: user)
   end
 
   def create(conn, params) do
@@ -101,7 +126,15 @@ defmodule PWeb.PhotoController do
     with {:ok, photo} <- Photos.create_photo(user, params["photo"], params) do
       conn
       |> put_status(:created)
-      |> render(:index, photos: [photo])
+      |> render(:index, photos: [photo], current_user: user)
+    end
+  end
+
+  def delete(conn, %{"id" => id}) do
+    user = conn.assigns.current_user
+
+    with {:ok, _photo} <- Photos.delete_photo(user, id) do
+      send_resp(conn, :no_content, "")
     end
   end
 end

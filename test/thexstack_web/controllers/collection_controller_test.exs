@@ -5,6 +5,16 @@ defmodule PWeb.CollectionControllerTest do
   import PWeb.TestHelpers
   import OpenApiSpex.TestAssertions
 
+  setup do
+    File.rm_rf!(Path.expand("../../priv/waffle/test/uploads", __DIR__))
+
+    on_exit(fn ->
+      File.rm_rf!(Path.expand("../../priv/waffle/test/uploads", __DIR__))
+    end)
+
+    :ok
+  end
+
   describe "GET /api/collections" do
     test "lists collections for the signed-in user", %{conn: conn} do
       user = user_fixture()
@@ -115,6 +125,25 @@ defmodule PWeb.CollectionControllerTest do
       assert response["data"]["id"] == collection.id
       assert response["data"]["title"] == collection.title
       assert response["data"]["description"] == collection.description
+    end
+
+    test "includes deletion permissions for photos", %{conn: conn} do
+      user = user_fixture()
+      collection = collection_fixture(user: user)
+      upload = upload_fixture()
+
+      {:ok, photo} = P.Photos.create_photo(user, upload, %{"collection_id" => collection.id})
+
+      conn =
+        conn
+        |> auth_json_conn(user)
+        |> get(~p"/api/collections/#{collection.id}")
+
+      response = json_response(conn, 200)
+
+      [photo_payload] = response["data"]["photos"]
+      assert photo_payload["id"] == photo.id
+      assert photo_payload["allowed_to_delete"]
     end
 
     test "returns 404 when collection doesn't exist", %{conn: conn} do
