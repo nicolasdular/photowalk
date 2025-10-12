@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite';
-import { fileURLToPath } from 'node:url';
 import { phoenixVitePlugin } from './phoenix-vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
+import path from "path"
 
 export default defineConfig({
   server: {
@@ -23,13 +23,11 @@ export default defineConfig({
     emptyOutDir: true,
   },
   resolve: {
-    alias: [
-      {
-        find: '@catalyst',
-        replacement: fileURLToPath(new URL('./src/catalyst', import.meta.url)),
-      },
-      { find: '@', replacement: fileURLToPath(new URL('.', import.meta.url)) },
-    ],
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+      "@components": path.resolve(__dirname, "./src/components"),
+      "@catalyst": path.resolve(__dirname, "./src/catalyst"),
+    },
     // Ensure only a single React instance is bundled to avoid
     dedupe: [
       'react',

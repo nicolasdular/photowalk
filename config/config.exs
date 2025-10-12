@@ -20,7 +20,7 @@ config :photowalk,
   ecto_repos: [P.Repo],
   generators: [timestamp_type: :utc_datetime]
 
-config :photowalk, :upload_max_bytes, 75_000_000
+config :photowalk, :upload_max_bytes, 30_000_000
 
 # Configures the endpoint
 config :photowalk, PWeb.Endpoint,

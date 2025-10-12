@@ -2,12 +2,16 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { client } from '../api/client';
-import { AuthLayout } from '@catalyst/auth-layout';
-import { Heading } from '@catalyst/heading';
-import { Label } from '@catalyst/fieldset';
-import { Field } from '@catalyst/fieldset';
-import { Input } from '@catalyst/input';
-import { Button } from '@catalyst/button';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 function SignUp() {
   const [form, setForm] = useState({ email: '' });
@@ -61,55 +65,63 @@ function SignUp() {
 
   if (mutation.isSuccess) {
     return (
-      <AuthLayout>
-        <div className="grid w-full max-w-sm grid-cols-1 gap-8">
-          <Heading>Check your email</Heading>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            If an account with that email exists, a magic link has been sent.
-            Please check your inbox.
-          </p>
+      <main className="flex min-h-dvh flex-col p-2">
+        <div className="flex grow items-center justify-center p-6">
+          <Card className="w-full max-w-sm">
+            <CardHeader>
+              <CardTitle>Check your email</CardTitle>
+              <CardDescription>
+                If an account with that email exists, a magic link has been
+                sent. Please check your inbox.
+              </CardDescription>
+            </CardHeader>
+          </Card>
         </div>
-      </AuthLayout>
+      </main>
     );
   }
 
   return (
-    <AuthLayout>
-      <form
-        action="#"
-        method="POST"
-        className="grid w-full max-w-sm grid-cols-1 gap-8"
-      >
-        <Heading>Sign in via Email</Heading>
+    <main className="flex min-h-dvh flex-col p-2">
+      <div className="flex grow items-center justify-center p-6">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle>Sign in via Email</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form action="#" method="POST" className="space-y-4">
+              {errorMessage && (
+                <div className="rounded-md bg-red-50 p-4 dark:bg-red-900/10">
+                  <p className="text-sm text-red-800 dark:text-red-200">
+                    {errorMessage}
+                  </p>
+                </div>
+              )}
 
-        {errorMessage && (
-          <div className="rounded-md bg-red-50 p-4 dark:bg-red-900/10">
-            <p className="text-sm text-red-800 dark:text-red-200">
-              {errorMessage}
-            </p>
-          </div>
-        )}
-
-        <Field>
-          <Label>Email</Label>
-          <Input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            aria-invalid={errorMessage ? true : undefined}
-          />
-        </Field>
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={mutation.isPending}
-          onClick={handleSubmit}
-        >
-          {mutation.isPending ? 'Sending...' : 'Send Magic Link'}
-        </Button>
-      </form>
-    </AuthLayout>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  aria-invalid={errorMessage ? true : undefined}
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={mutation.isPending}
+                onClick={handleSubmit}
+              >
+                {mutation.isPending ? 'Sending...' : 'Send Magic Link'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </main>
   );
 }
 
