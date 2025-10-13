@@ -12,7 +12,7 @@ export const Route = createFileRoute('/_app')({
   loader: async () => {
     const currentUser = await client.GET('/api/user/me');
     if (!currentUser.data) {
-      throw redirect({ to: '/signup' });
+      throw redirect({ to: '/signin' });
     }
     return { currentUser: currentUser.data.data } as const;
   },

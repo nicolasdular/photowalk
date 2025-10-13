@@ -3,6 +3,7 @@ defmodule P.Repo.Migrations.AddUsers do
 
   def change do
     create table(:users) do
+      add :name, :string, null: false
       add :email, :citext, null: false
       add :confirmed_at, :utc_datetime_usec
 

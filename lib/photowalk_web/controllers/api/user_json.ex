@@ -1,7 +1,7 @@
 defmodule PWeb.UserJSON do
   alias P.User
 
-  @fields [:id, :email, :avatar_url]
+  @fields [:id, :email, :avatar_url, :name]
 
   def fields, do: @fields
 

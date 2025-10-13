@@ -62,6 +62,9 @@ export function SignedInLayout({
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <span>{currentUser.name}</span>
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={handleSignOut}
                 disabled={signingOut}

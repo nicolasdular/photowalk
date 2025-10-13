@@ -10,7 +10,7 @@ defmodule P.Factory do
   end
 
   def user_fixture(attrs \\ %{}) do
-    attrs = attrs |> Enum.into(%{email: unique_email()})
+    attrs = attrs |> Enum.into(%{email: unique_email(), name: "Test User"})
 
     %User{}
     |> User.changeset(attrs)

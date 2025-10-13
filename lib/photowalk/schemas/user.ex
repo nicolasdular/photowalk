@@ -3,6 +3,7 @@ defmodule P.User do
   import Ecto.Changeset
 
   schema "users" do
+    field(:name, :string)
     field(:email, :string)
     field(:confirmed_at, :utc_datetime_usec)
 
@@ -23,7 +24,14 @@ defmodule P.User do
 
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :confirmed_at])
+    |> cast(attrs, [:email, :confirmed_at, :name])
+    |> validate_required([:email, :name])
+    |> unique_constraint(:email)
+  end
+
+  def magic_link_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :confirmed_at, :name])
     |> validate_required([:email])
     |> unique_constraint(:email)
   end

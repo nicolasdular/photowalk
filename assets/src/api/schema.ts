@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/signup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["PWeb.AuthController.signup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/collections": {
         parameters: {
             query?: never;
@@ -196,6 +212,7 @@ export interface components {
                         avatar_url?: string;
                         email: string;
                         id: number;
+                        name?: string;
                     };
                 })[];
             };
@@ -262,6 +279,7 @@ export interface components {
             avatar_url?: string;
             email: string;
             id: number;
+            name?: string;
         };
         /**
          * UserResponse
@@ -276,6 +294,7 @@ export interface components {
                 avatar_url?: string;
                 email: string;
                 id: number;
+                name?: string;
             };
         };
         /** ValidationErrors */
@@ -309,6 +328,50 @@ export interface operations {
                      * @description User's email address
                      */
                     email: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Magic link sent */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message?: string;
+                        success?: boolean;
+                    };
+                };
+            };
+            /** @description Email not authorized */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PWeb.AuthController.signup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Email */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Format: email */
+                    email: string;
+                    /** Format: name */
+                    name: string;
                 };
             };
         };
@@ -436,6 +499,7 @@ export interface operations {
                                     avatar_url?: string;
                                     email: string;
                                     id: number;
+                                    name?: string;
                                 };
                             })[];
                         };
@@ -503,6 +567,7 @@ export interface operations {
                                     avatar_url?: string;
                                     email: string;
                                     id: number;
+                                    name?: string;
                                 };
                             })[];
                         };
@@ -671,6 +736,7 @@ export interface operations {
                             avatar_url?: string;
                             email: string;
                             id: number;
+                            name?: string;
                         };
                     };
                 };

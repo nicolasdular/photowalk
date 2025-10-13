@@ -19,19 +19,53 @@ defmodule P.Accounts do
     Repo.get_by(User, email: email)
   end
 
+  @spec signup(String.t(), String.t()) ::
+          {:ok, :sent} | {:error, Ecto.Changeset.t() | :not_allowed}
+  def signup(email, name) do
+    email = email |> String.trim() |> String.downcase()
+    name = String.trim(name)
+
+    if email in @allowed_emails do
+      case Repo.get_by(User, email: email) do
+        nil ->
+          # Create user with unconfirmed status
+          %User{}
+          |> User.changeset(%{email: email, name: name, confirmed_at: nil})
+          |> Repo.insert()
+          |> case do
+            {:ok, _user} ->
+              token = Phoenix.Token.sign(PWeb.Endpoint, @signature_salt, email)
+              store_magic_link!(email, token)
+              SendMagicLinkEmail.send(email, token)
+              {:ok, :sent}
+
+            {:error, changeset} ->
+              {:error, changeset}
+          end
+
+        _existing_user ->
+          {:error, :email_taken}
+      end
+    else
+      {:error, :not_allowed}
+    end
+  end
+
   @spec request_magic_link(String.t()) :: {:ok, :sent} | {:error, :not_allowed}
   def request_magic_link(email) do
     email = email |> String.trim() |> String.downcase()
 
-    if email in @allowed_emails do
-      token = Phoenix.Token.sign(PWeb.Endpoint, @signature_salt, email)
+    case Repo.get_by(User, email: email) do
+      nil ->
+        {:error, :no_account}
 
-      store_magic_link!(email, token)
-      SendMagicLinkEmail.send(email, token)
+      _user ->
+        token = Phoenix.Token.sign(PWeb.Endpoint, @signature_salt, email)
 
-      {:ok, :sent}
-    else
-      {:error, :not_allowed}
+        store_magic_link!(email, token)
+        SendMagicLinkEmail.send(email, token)
+
+        {:ok, :sent}
     end
   end
 
@@ -75,42 +109,14 @@ defmodule P.Accounts do
 
   defp fetch_user_for_email(email, now) do
     case Repo.get_by(User, email: email) do
-      nil -> insert_user(email, now)
+      nil -> Repo.rollback(:invalid)
       %User{} = user -> ensure_user_confirmed(user, now)
     end
   end
 
-  defp insert_user(email, now) do
-    %User{}
-    |> User.changeset(%{email: email, confirmed_at: now})
-    |> Repo.insert()
-    |> case do
-      {:ok, %User{} = user} -> user
-      {:error, changeset} -> handle_insert_error(changeset, email, now)
-    end
-  end
-
-  defp handle_insert_error(changeset, email, now) do
-    case Keyword.get(changeset.errors, :email) do
-      {"has already been taken", _} ->
-        email
-        |> fetch_existing_user()
-        |> ensure_existing_user(now)
-
-      _ ->
-        Repo.rollback(:invalid)
-    end
-  end
-
-  defp fetch_existing_user(email), do: Repo.get_by(User, email: email)
-
-  defp ensure_existing_user(nil, _now), do: Repo.rollback(:invalid)
-
-  defp ensure_existing_user(%User{} = user, now), do: ensure_user_confirmed(user, now)
-
   defp ensure_user_confirmed(%User{confirmed_at: nil} = user, now) do
     user
-    |> User.changeset(%{confirmed_at: now})
+    |> User.magic_link_changeset(%{confirmed_at: now})
     |> Repo.update()
     |> case do
       {:ok, %User{} = updated_user} -> updated_user

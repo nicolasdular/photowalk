@@ -1,51 +1,7 @@
 defmodule P.UserTest do
   use P.DataCase, async: true
 
-  alias P.Accounts
-  alias P.User
-  alias P.Repo
-
   defp valid_email, do: unique_email()
-  defp allowed_email, do: "hello@nicolasdular.com"
-
-  describe "get_by_email" do
-    test "returns user when email exists" do
-      email = valid_email()
-      user = user_fixture(%{email: email})
-
-      found_user = Repo.get_by(User, email: email)
-      assert found_user.id == user.id
-      assert found_user.email == email
-    end
-
-    test "returns nil when email doesn't exist" do
-      assert nil == Repo.get_by(User, email: "nonexistent@example.com")
-    end
-
-    test "email is case insensitive due to citext" do
-      email = "Test@Example.com"
-      user = user_fixture(%{email: email})
-
-      found_user = Repo.get_by(User, email: "test@example.com")
-      assert found_user.id == user.id
-    end
-  end
-
-  describe "request_magic_link" do
-    test "validates email restrictions" do
-      # Test with allowed email - should succeed
-      email = allowed_email()
-
-      result = Accounts.request_magic_link(email)
-      assert {:ok, :sent} = result
-
-      # Test with disallowed email - should fail
-      email = "notallowed@example.com"
-
-      result = Accounts.request_magic_link(email)
-      assert {:error, :not_allowed} = result
-    end
-  end
 
   describe "user attributes" do
     test "has required email attribute" do

@@ -66,6 +66,7 @@ defmodule PWeb.Router do
     pipe_through(:public_api)
 
     post("/auth/request-magic-link", AuthController, :request_magic_link)
+    post("/auth/signup", AuthController, :signup)
   end
 
   scope "/api", PWeb do

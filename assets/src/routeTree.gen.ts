@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SigninRouteImport } from './routes/signin'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppWalksNewRouteImport } from './routes/_app/walks/new'
@@ -19,6 +20,11 @@ import { Route as AppWalksCollectionIdPhotosPhotoIdRouteImport } from './routes/
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SigninRoute = SigninRouteImport.update({
+  id: '/signin',
+  path: '/signin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -48,6 +54,7 @@ const AppWalksCollectionIdPhotosPhotoIdRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/': typeof AppIndexRoute
   '/walks/$collectionId': typeof AppWalksCollectionIdRouteWithChildren
@@ -55,6 +62,7 @@ export interface FileRoutesByFullPath {
   '/walks/$collectionId/photos/$photoId': typeof AppWalksCollectionIdPhotosPhotoIdRoute
 }
 export interface FileRoutesByTo {
+  '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/': typeof AppIndexRoute
   '/walks/$collectionId': typeof AppWalksCollectionIdRouteWithChildren
@@ -64,6 +72,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
+  '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/_app/': typeof AppIndexRoute
   '/_app/walks/$collectionId': typeof AppWalksCollectionIdRouteWithChildren
@@ -73,6 +82,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/signin'
     | '/signup'
     | '/'
     | '/walks/$collectionId'
@@ -80,6 +90,7 @@ export interface FileRouteTypes {
     | '/walks/$collectionId/photos/$photoId'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/signin'
     | '/signup'
     | '/'
     | '/walks/$collectionId'
@@ -88,6 +99,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_app'
+    | '/signin'
     | '/signup'
     | '/_app/'
     | '/_app/walks/$collectionId'
@@ -97,6 +109,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
+  SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
 }
 
@@ -107,6 +120,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signin': {
+      id: '/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app': {
@@ -175,6 +195,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
+  SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
