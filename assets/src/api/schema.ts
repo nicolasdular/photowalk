@@ -208,7 +208,7 @@ export interface components {
                     updated_at?: string;
                 } & {
                     /** User */
-                    user?: {
+                    user: {
                         avatar_url?: string;
                         email: string;
                         id: number;
@@ -495,7 +495,7 @@ export interface operations {
                                 updated_at?: string;
                             } & {
                                 /** User */
-                                user?: {
+                                user: {
                                     avatar_url?: string;
                                     email: string;
                                     id: number;
@@ -563,7 +563,7 @@ export interface operations {
                                 updated_at?: string;
                             } & {
                                 /** User */
-                                user?: {
+                                user: {
                                     avatar_url?: string;
                                     email: string;
                                     id: number;

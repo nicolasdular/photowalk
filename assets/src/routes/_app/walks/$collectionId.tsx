@@ -25,7 +25,9 @@ import { UploadPhotosButton } from '@/components/upload-photos-button';
 import { useCollectionQuery } from '@/lib/hooks/useCollectionQuery';
 
 type Collection = components['schemas']['Collection'];
-type Photo = components['schemas']['Photo'];
+type Photo = NonNullable<
+  components['schemas']['CollectionShowResponse']['data']['photos']
+>[0];
 
 function CollectionDetailPage() {
   const { collectionId } = Route.useParams();
@@ -155,7 +157,7 @@ function CollectionDetailPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+        <div className="columns-1 gap-6 sm:columns-2 md:columns-2 lg:columns-3">
           {photos.map(photo => (
             <Link
               key={photo.id}
@@ -164,14 +166,26 @@ function CollectionDetailPage() {
                 collectionId: collectionId,
                 photoId: String(photo.id),
               }}
-              className="group relative flex flex-col overflow-hidden rounded-2xl "
+              className="group relative mb-6 inline-block w-full overflow-hidden rounded-2xl break-inside-avoid"
             >
-              <div className="relative aspect-[4/5] w-full overflow-hidden">
-                <img
-                  src={photo.thumbnail_url}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
+              <img
+                src={photo.thumbnail_url}
+                className="w-full object-cover"
+                loading="lazy"
+              />
+              <div className="pointer-events-none absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div
+                  className="h-full w-full rounded-2xl"
+                  style={{
+                    background:
+                      'linear-gradient(180deg,rgba(0,0,0,.1),transparent 20%,transparent 80%,rgba(0,0,0,.3)) ',
+                  }}
                 />
+              </div>
+              <div className="absolute inset-0 flex items-end z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div className="w-full px-4 py-2 text-white text-sm rounded-b-2xl relative">
+                  <span className="relative z-10">{photo.user.name}</span>
+                </div>
               </div>
             </Link>
           ))}

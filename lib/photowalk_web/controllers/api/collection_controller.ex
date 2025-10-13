@@ -72,6 +72,7 @@ defmodule PWeb.CollectionController do
                     @photo_resource_schema,
                     %Schema{
                       type: :object,
+                      required: [:user],
                       properties: %{
                         user:
                           EctoSchema.schema_from_fields(P.User,
