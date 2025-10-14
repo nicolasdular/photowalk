@@ -217,6 +217,16 @@ export interface components {
                 })[];
             };
         };
+        /**
+         * Error
+         * @example {
+         *       "error": "Invalid request parameters"
+         *     }
+         */
+        Error: {
+            /** @description Error message */
+            error: string;
+        };
         /** NotFoundError */
         NotFoundError: {
             /** @description Error message */
@@ -272,6 +282,19 @@ export interface components {
             photo: string;
         };
         /**
+         * Success
+         * @example {
+         *       "message": "Request was successful",
+         *       "success": true
+         *     }
+         */
+        Success: {
+            /** @description Success message */
+            message: string;
+            /** @description Indicates if the request was successful */
+            success: boolean;
+        };
+        /**
          * User
          * @description A user account
          */
@@ -319,7 +342,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        /** @description Email */
+        /** @description Input */
         requestBody?: {
             content: {
                 "application/json": {
@@ -332,27 +355,20 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Magic link sent */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        message?: string;
-                        success?: boolean;
-                    };
+                    "application/json": components["schemas"]["Success"];
                 };
             };
-            /** @description Email not authorized */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        error?: string;
-                    };
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
@@ -376,27 +392,20 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Magic link sent */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        message?: string;
-                        success?: boolean;
-                    };
+                    "application/json": components["schemas"]["Success"];
                 };
             };
-            /** @description Email not authorized */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        error?: string;
-                    };
+                    "application/json": components["schemas"]["Error"];
                 };
             };
         };
