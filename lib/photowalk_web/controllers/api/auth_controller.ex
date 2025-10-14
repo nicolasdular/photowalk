@@ -4,12 +4,13 @@ defmodule PWeb.AuthController do
 
   alias P.Accounts
   alias OpenApiSpex.Schema
+  alias PWeb.Api.Docs.{Response, Success}
 
   tags(["auth"])
 
   operation(:request_magic_link,
     request_body: {
-      "Email",
+      "Input",
       "application/json",
       %Schema{
         type: :object,
@@ -20,27 +21,8 @@ defmodule PWeb.AuthController do
       }
     },
     responses: [
-      ok: {
-        "Magic link sent",
-        "application/json",
-        %Schema{
-          type: :object,
-          properties: %{
-            success: %Schema{type: :boolean},
-            message: %Schema{type: :string}
-          }
-        }
-      },
-      forbidden: {
-        "Email not authorized",
-        "application/json",
-        %Schema{
-          type: :object,
-          properties: %{
-            error: %Schema{type: :string}
-          }
-        }
-      }
+      ok: Response.ok(Success),
+      forbidden: Response.forbidden()
     ]
   )
 
@@ -70,27 +52,8 @@ defmodule PWeb.AuthController do
       }
     },
     responses: [
-      ok: {
-        "Magic link sent",
-        "application/json",
-        %Schema{
-          type: :object,
-          properties: %{
-            success: %Schema{type: :boolean},
-            message: %Schema{type: :string}
-          }
-        }
-      },
-      forbidden: {
-        "Email not authorized",
-        "application/json",
-        %Schema{
-          type: :object,
-          properties: %{
-            error: %Schema{type: :string}
-          }
-        }
-      }
+      ok: Response.ok(Success),
+      forbidden: Response.forbidden()
     ]
   )
 

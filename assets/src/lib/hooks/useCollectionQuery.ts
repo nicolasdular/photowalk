@@ -4,15 +4,12 @@ import type { components } from '@/api/schema';
 
 type Collection = components['schemas']['CollectionShowResponse']['data'];
 
-export function useCollectionQuery(collectionId: string | number) {
-  const id =
-    typeof collectionId === 'string' ? Number(collectionId) : collectionId;
-
+export function useCollectionQuery(collectionId: string) {
   return useQuery({
-    queryKey: ['collection', id],
+    queryKey: ['collection', collectionId],
     queryFn: async () => {
       const { data, error } = await client.GET('/api/collections/{id}', {
-        params: { path: { id } },
+        params: { path: { id: collectionId } },
       });
 
       if (error) {
@@ -24,21 +21,16 @@ export function useCollectionQuery(collectionId: string | number) {
   });
 }
 
-export function usePrefetchCollection(collectionId: string | number) {
+export function usePrefetchCollection(collectionId: string) {
   const queryClient = useQueryClient();
 
-  return () =>
-    queryClient.prefetchQuery({
+  return () => {
+    return queryClient.prefetchQuery({
       queryKey: ['collection', collectionId],
       queryFn: async () => {
         const { data, error } = await client.GET('/api/collections/{id}', {
           params: {
-            path: {
-              id:
-                typeof collectionId === 'string'
-                  ? Number(collectionId)
-                  : collectionId,
-            },
+            path: { id: collectionId },
           },
         });
 
@@ -49,4 +41,5 @@ export function usePrefetchCollection(collectionId: string | number) {
         return data?.data as Collection | undefined;
       },
     });
+  };
 }

@@ -89,7 +89,7 @@ defmodule P.CollectionsTest do
     end
 
     test "returns nil when collection doesn't exist" do
-      assert Collections.get_collection(99999) == nil
+      assert Collections.get_collection(Ecto.UUID.generate()) == nil
     end
   end
 
@@ -113,7 +113,8 @@ defmodule P.CollectionsTest do
     test "returns error when collection doesn't exist" do
       user = user_fixture()
 
-      assert {:error, :not_found} = Collections.get_collection_for_user(99999, user)
+      assert {:error, :not_found} =
+               Collections.get_collection_for_user(Ecto.UUID.generate(), user)
     end
   end
 
@@ -136,7 +137,7 @@ defmodule P.CollectionsTest do
     test "returns not_found when collection doesn't exist" do
       user = user_fixture()
 
-      assert {:error, :not_found} = Collections.user_owns_collection?(user, 99999)
+      assert {:error, :not_found} = Collections.user_owns_collection?(user, Ecto.UUID.generate())
     end
   end
 end

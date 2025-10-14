@@ -15,6 +15,13 @@ defmodule PWeb.FallbackController do
     |> render("404.json")
   end
 
+  def call(conn, {:error, :invalid_id}) do
+    conn
+    |> put_status(:bad_request)
+    |> put_view(PWeb.ErrorJSON)
+    |> render("400.json")
+  end
+
   defp translate_errors(changeset) do
     Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
       Enum.reduce(opts, msg, fn {key, value}, acc ->

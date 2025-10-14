@@ -41,7 +41,9 @@ defmodule P.PhotosTest do
       user = user_fixture()
       upload = upload_fixture()
 
-      assert {:error, changeset} = Photos.create_photo(user, upload, %{"collection_id" => 99999})
+      assert {:error, changeset} =
+               Photos.create_photo(user, upload, %{"collection_id" => Ecto.UUID.generate()})
+
       assert %{collection_id: ["does not exist"]} = errors_on(changeset)
     end
 
@@ -94,8 +96,7 @@ defmodule P.PhotosTest do
     test "returns error for unknown photo" do
       user = user_fixture()
 
-      assert {:error, :not_found} = Photos.delete_photo(user, -1)
-      assert {:error, :not_found} = Photos.delete_photo(user, "invalid")
+      assert {:error, :not_found} = Photos.delete_photo(user, Ecto.UUID.generate())
     end
   end
 end

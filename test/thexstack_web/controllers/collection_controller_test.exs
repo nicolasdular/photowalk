@@ -72,7 +72,6 @@ defmodule PWeb.CollectionControllerTest do
 
       assert response["data"]["title"] == "My Vacation Photos"
       assert response["data"]["description"] == "Photos from our summer vacation"
-      assert is_integer(response["data"]["id"])
     end
 
     test "creates a collection without description", %{conn: conn} do
@@ -156,7 +155,7 @@ defmodule PWeb.CollectionControllerTest do
       conn =
         conn
         |> auth_json_conn(user)
-        |> get(~p"/api/collections/99999")
+        |> get(~p"/api/collections/#{Ecto.UUID.generate()}")
 
       response = json_response(conn, 404)
       assert response["error"] == "Not found"

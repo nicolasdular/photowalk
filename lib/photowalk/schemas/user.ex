@@ -1,5 +1,5 @@
 defmodule P.User do
-  use Ecto.Schema
+  use P.Schema
   import Ecto.Changeset
 
   schema "users" do

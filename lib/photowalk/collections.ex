@@ -25,15 +25,14 @@ defmodule P.Collections do
     |> Repo.insert()
   end
 
-  @spec get_collection(integer()) :: Collection.t() | nil
-  def get_collection(id) when is_integer(id) do
+  @spec get_collection(String.t()) :: Collection.t() | nil
+  def get_collection(id) do
     Repo.get(Collection, id)
   end
 
-  @spec get_collection_for_user(integer(), User.t()) ::
+  @spec get_collection_for_user(String.t(), User.t()) ::
           {:ok, Collection.t()} | {:error, :not_found}
-  def get_collection_for_user(id, %User{id: user_id}, opts \\ %{preloads: [:photos]})
-      when is_integer(id) do
+  def get_collection_for_user(id, %User{id: user_id}, opts \\ %{preloads: [:photos]}) do
     # For now, only allow access to owned collections
     # In the future, this will include collections the user is invited to
     case Collection
@@ -45,9 +44,9 @@ defmodule P.Collections do
     end
   end
 
-  @spec user_owns_collection?(User.t(), integer()) ::
+  @spec user_owns_collection?(User.t(), String.t()) ::
           {:ok, true} | {:error, :not_found | :forbidden}
-  def user_owns_collection?(%User{id: user_id}, collection_id) when is_integer(collection_id) do
+  def user_owns_collection?(%User{id: user_id}, collection_id) do
     case get_collection(collection_id) do
       nil ->
         {:error, :not_found}

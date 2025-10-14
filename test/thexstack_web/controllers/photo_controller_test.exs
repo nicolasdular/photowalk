@@ -102,7 +102,7 @@ defmodule PWeb.PhotoControllerTest do
       conn =
         conn
         |> auth_json_conn(user)
-        |> post(~p"/api/photos", %{"photo" => upload, "collection_id" => 99999})
+        |> post(~p"/api/photos", %{"photo" => upload, "collection_id" => Ecto.UUID.generate()})
 
       response = json_response(conn, 422)
       assert response["errors"]["collection_id"] == ["does not exist"]
@@ -165,7 +165,7 @@ defmodule PWeb.PhotoControllerTest do
       conn =
         conn
         |> auth_json_conn(user)
-        |> delete(~p"/api/photos/999999")
+        |> delete(~p"/api/photos/#{Ecto.UUID.generate()}")
 
       assert json_response(conn, 404)
     end

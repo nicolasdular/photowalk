@@ -18,7 +18,7 @@ type PhotoUploadRequest =
   paths['/api/photos']['post']['requestBody']['content']['multipart/form-data'];
 
 interface UploadPhotosButtonProps {
-  collectionId?: number;
+  collectionId?: string;
   onSuccess?: (photos: Photo[]) => void;
   variant?: 'default' | 'outline' | 'ghost' | 'secondary';
   size?: 'default' | 'sm' | 'lg' | 'icon';
