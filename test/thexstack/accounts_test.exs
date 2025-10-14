@@ -135,6 +135,7 @@ defmodule P.Accounts.MagicLinkTest do
       user = user_fixture(%{email: email, confirmed_at: confirmed_at})
       token = request_magic_link_and_capture_token(email)
 
+
       assert {:ok, verified_user} = Accounts.verify_magic_link(token)
       assert verified_user.id == user.id
       assert DateTime.truncate(verified_user.confirmed_at, :second) == confirmed_at

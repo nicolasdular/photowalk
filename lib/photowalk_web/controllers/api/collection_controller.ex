@@ -147,7 +147,7 @@ defmodule PWeb.CollectionController do
   operation :show,
     summary: "Show a collection",
     parameters: [
-      id: [in: :path, description: "Collection ID", type: :integer, required: true]
+      id: [in: :path, description: "Collection ID", type: :string, required: true]
     ],
     responses: [
       ok: {"Collection", "application/json", @collection_show_response_schema},
@@ -177,7 +177,7 @@ defmodule PWeb.CollectionController do
     user = conn.assigns.current_user
 
     with {:ok, collection} <-
-           Collections.get_collection_for_user(String.to_integer(id), user, %{
+           Collections.get_collection_for_user(id, user, %{
              preloads: [photos: :user]
            }) do
       render(conn, :show, collection: collection, current_user: user)

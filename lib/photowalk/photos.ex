@@ -32,10 +32,10 @@ defmodule P.Photos do
 
   def create_photo(_, _, _), do: {:error, :no_file}
 
-  @spec delete_photo(User.t(), integer() | String.t()) ::
+  @spec delete_photo(User.t(), String.t() | String.t()) ::
           {:ok, Photo.t()} | {:error, :not_found | Ecto.Changeset.t()}
   def delete_photo(%User{id: user_id}, photo_id) do
-    with {:ok, id} <- normalize_photo_id(photo_id),
+    with {:ok, id} <- {:ok, photo_id},
          %Photo{} = photo <- fetch_photo_for_user(user_id, id),
          {:ok, deleted_photo} <- Repo.delete(photo) do
       maybe_delete_upload(deleted_photo)
@@ -91,48 +91,17 @@ defmodule P.Photos do
   defp validate_collection_ownership(changeset, user_id, collection_id) do
     user = %User{id: user_id}
 
-    # Convert collection_id to integer if it's a string
-    collection_id_int =
-      case collection_id do
-        id when is_integer(id) ->
-          id
+    case Collections.user_owns_collection?(user, collection_id) do
+      {:ok, true} ->
+        changeset
 
-        id when is_binary(id) ->
-          case Integer.parse(id) do
-            {int, ""} -> int
-            _ -> nil
-          end
+      {:error, :not_found} ->
+        Changeset.add_error(changeset, :collection_id, "does not exist")
 
-        _ ->
-          nil
-      end
-
-    if is_nil(collection_id_int) do
-      Changeset.add_error(changeset, :collection_id, "must be a valid integer")
-    else
-      case Collections.user_owns_collection?(user, collection_id_int) do
-        {:ok, true} ->
-          changeset
-
-        {:error, :not_found} ->
-          Changeset.add_error(changeset, :collection_id, "does not exist")
-
-        {:error, :forbidden} ->
-          Changeset.add_error(changeset, :collection_id, "does not belong to you")
-      end
+      {:error, :forbidden} ->
+        Changeset.add_error(changeset, :collection_id, "does not belong to you")
     end
   end
-
-  defp normalize_photo_id(id) when is_integer(id) and id > 0, do: {:ok, id}
-
-  defp normalize_photo_id(id) when is_binary(id) do
-    case Integer.parse(id) do
-      {int, ""} when int > 0 -> {:ok, int}
-      _ -> {:error, :invalid_id}
-    end
-  end
-
-  defp normalize_photo_id(_), do: {:error, :invalid_id}
 
   defp fetch_photo_for_user(user_id, photo_id) do
     Photo

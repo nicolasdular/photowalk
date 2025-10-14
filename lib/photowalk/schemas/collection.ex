@@ -3,7 +3,7 @@ defmodule P.Collection do
   Represents a collection of photos that can be shared among multiple users.
   """
 
-  use Ecto.Schema
+  use P.Schema
   import Ecto.Changeset
 
   alias P.{Photo, User}

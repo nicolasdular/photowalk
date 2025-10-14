@@ -1,5 +1,5 @@
 defmodule P.MagicLink do
-  use Ecto.Schema
+  use P.Schema
   import Ecto.Changeset
 
   schema "magic_links" do

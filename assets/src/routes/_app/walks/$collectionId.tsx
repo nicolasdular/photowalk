@@ -62,7 +62,7 @@ function CollectionDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['collection', Number(collectionId)],
+        queryKey: ['collection', collectionId],
       });
     },
     onError: error => {
@@ -115,10 +115,7 @@ function CollectionDetailPage() {
             </Link>
           }
         />
-        <EmptyState
-          collectionId={collection.id}
-          onSuccess={refetchCollection}
-        />
+        <EmptyState collectionId={collectionId} onSuccess={refetchCollection} />
       </>
     );
   }
@@ -199,7 +196,7 @@ function EmptyState({
   collectionId,
   onSuccess,
 }: {
-  collectionId: number;
+  collectionId: string;
   onSuccess: () => void;
 }) {
   return (

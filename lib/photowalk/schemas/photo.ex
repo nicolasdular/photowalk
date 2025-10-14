@@ -3,7 +3,7 @@ defmodule P.Photo do
   Represents a processed photo belonging to a user.
   """
 
-  use Ecto.Schema
+  use P.Schema
   use Waffle.Ecto.Schema
 
   import Ecto.Changeset

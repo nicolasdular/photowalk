@@ -133,7 +133,7 @@ export interface components {
          */
         Collection: {
             description?: string;
-            id: number;
+            id: string;
             /** Format: date-time */
             inserted_at?: string;
             title: string;
@@ -157,7 +157,7 @@ export interface components {
         CollectionListResponse: {
             data: ({
                 description?: string;
-                id: number;
+                id: string;
                 /** Format: date-time */
                 inserted_at?: string;
                 title: string;
@@ -169,7 +169,7 @@ export interface components {
                     allowed_to_delete?: boolean;
                     /** Format: uri */
                     full_url: string;
-                    id: number;
+                    id: string;
                     /** Format: date-time */
                     inserted_at?: string;
                     /** Format: uri */
@@ -187,7 +187,7 @@ export interface components {
         CollectionShowResponse: {
             data: {
                 description?: string;
-                id: number;
+                id: string;
                 /** Format: date-time */
                 inserted_at?: string;
                 title: string;
@@ -198,7 +198,7 @@ export interface components {
                     allowed_to_delete?: boolean;
                     /** Format: uri */
                     full_url: string;
-                    id: number;
+                    id: string;
                     /** Format: date-time */
                     inserted_at?: string;
                     /** Format: uri */
@@ -211,7 +211,7 @@ export interface components {
                     user: {
                         avatar_url?: string;
                         email: string;
-                        id: number;
+                        id: string;
                         name?: string;
                     };
                 })[];
@@ -240,7 +240,7 @@ export interface components {
             allowed_to_delete?: boolean;
             /** Format: uri */
             full_url: string;
-            id: number;
+            id: string;
             /** Format: date-time */
             inserted_at?: string;
             /** Format: uri */
@@ -258,7 +258,7 @@ export interface components {
                 allowed_to_delete?: boolean;
                 /** Format: uri */
                 full_url: string;
-                id: number;
+                id: string;
                 /** Format: date-time */
                 inserted_at?: string;
                 /** Format: uri */
@@ -301,7 +301,7 @@ export interface components {
         User: {
             avatar_url?: string;
             email: string;
-            id: number;
+            id: string;
             name?: string;
         };
         /**
@@ -316,7 +316,7 @@ export interface components {
             data: {
                 avatar_url?: string;
                 email: string;
-                id: number;
+                id: string;
                 name?: string;
             };
         };
@@ -428,7 +428,7 @@ export interface operations {
                     "application/json": {
                         data: ({
                             description?: string;
-                            id: number;
+                            id: string;
                             /** Format: date-time */
                             inserted_at?: string;
                             title: string;
@@ -440,7 +440,7 @@ export interface operations {
                                 allowed_to_delete?: boolean;
                                 /** Format: uri */
                                 full_url: string;
-                                id: number;
+                                id: string;
                                 /** Format: date-time */
                                 inserted_at?: string;
                                 /** Format: uri */
@@ -483,7 +483,7 @@ export interface operations {
                     "application/json": {
                         data: {
                             description?: string;
-                            id: number;
+                            id: string;
                             /** Format: date-time */
                             inserted_at?: string;
                             title: string;
@@ -494,7 +494,7 @@ export interface operations {
                                 allowed_to_delete?: boolean;
                                 /** Format: uri */
                                 full_url: string;
-                                id: number;
+                                id: string;
                                 /** Format: date-time */
                                 inserted_at?: string;
                                 /** Format: uri */
@@ -507,7 +507,7 @@ export interface operations {
                                 user: {
                                     avatar_url?: string;
                                     email: string;
-                                    id: number;
+                                    id: string;
                                     name?: string;
                                 };
                             })[];
@@ -536,7 +536,7 @@ export interface operations {
             header?: never;
             path: {
                 /** @description Collection ID */
-                id: number;
+                id: string;
             };
             cookie?: never;
         };
@@ -551,7 +551,7 @@ export interface operations {
                     "application/json": {
                         data: {
                             description?: string;
-                            id: number;
+                            id: string;
                             /** Format: date-time */
                             inserted_at?: string;
                             title: string;
@@ -562,7 +562,7 @@ export interface operations {
                                 allowed_to_delete?: boolean;
                                 /** Format: uri */
                                 full_url: string;
-                                id: number;
+                                id: string;
                                 /** Format: date-time */
                                 inserted_at?: string;
                                 /** Format: uri */
@@ -575,7 +575,7 @@ export interface operations {
                                 user: {
                                     avatar_url?: string;
                                     email: string;
-                                    id: number;
+                                    id: string;
                                     name?: string;
                                 };
                             })[];
@@ -614,7 +614,7 @@ export interface operations {
                             allowed_to_delete?: boolean;
                             /** Format: uri */
                             full_url: string;
-                            id: number;
+                            id: string;
                             /** Format: date-time */
                             inserted_at?: string;
                             /** Format: uri */
@@ -661,7 +661,7 @@ export interface operations {
                             allowed_to_delete?: boolean;
                             /** Format: uri */
                             full_url: string;
-                            id: number;
+                            id: string;
                             /** Format: date-time */
                             inserted_at?: string;
                             /** Format: uri */
@@ -744,7 +744,7 @@ export interface operations {
                         data: {
                             avatar_url?: string;
                             email: string;
-                            id: number;
+                            id: string;
                             name?: string;
                         };
                     };
