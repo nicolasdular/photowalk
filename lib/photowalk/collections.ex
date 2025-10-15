@@ -5,7 +5,7 @@ defmodule P.Collections do
 
   import Ecto.Query, warn: false
 
-  alias P.{Collection, Repo, User}
+  alias P.{Collection, Member, Repo, User}
 
   @spec list_collections_for_user(User.t()) :: [Collection.t()]
   def list_collections_for_user(%User{id: user_id}, opts \\ %{}) do
@@ -20,8 +20,30 @@ defmodule P.Collections do
 
   @spec create_collection(User.t(), map()) :: {:ok, Collection.t()} | {:error, Ecto.Changeset.t()}
   def create_collection(%User{} = user, attrs) do
-    %Collection{}
-    |> Collection.changeset(Map.put(attrs, "owner_id", user.id))
+    Repo.transaction(fn ->
+      with {:ok, collection} <-
+             %Collection{}
+             |> Collection.changeset(Map.put(attrs, "owner_id", user.id))
+             |> Repo.insert(),
+           {:ok, _member} <- create_owner_member(user, collection) do
+        {:ok, collection}
+      else
+        error -> Repo.rollback(error)
+      end
+    end)
+    |> case do
+      {:ok, {:ok, collection}} -> {:ok, collection}
+      {:error, error} -> error
+    end
+  end
+
+  defp create_owner_member(user, collection) do
+    %Member{}
+    |> Member.changeset(%{
+      user_id: user.id,
+      collection_id: collection.id,
+      inviter_id: nil
+    })
     |> Repo.insert()
   end
 
@@ -59,7 +81,50 @@ defmodule P.Collections do
     end
   end
 
+  def add_user(scope, %{collection_id: collection_id, user_id: user_id, inviter_id: inviter_id}) do
+    if can_mutate_collection?(scope, collection_id) do
+      %Member{}
+      |> Member.changeset(%{
+        user_id: user_id,
+        collection_id: collection_id,
+        inviter_id: inviter_id
+      })
+      |> Repo.insert()
+    else
+      {:error, :forbidden}
+    end
+  end
+
+  def list_users(scope, %Collection{id: collection_id} = collection, opts \\ %{}) do
+    if can_read_collection?(scope, collection) do
+      User
+      |> join(:inner, [u], m in Member, on: m.user_id == u.id)
+      |> where([u, m], m.collection_id == ^collection_id)
+      |> maybe_preload(opts[:preloads])
+      |> Repo.all()
+    else
+      {:error, :forbidden}
+    end
+  end
+
   defp maybe_preload(query, nil), do: query
   defp maybe_preload(query, preloads) when is_list(preloads), do: preload(query, ^preloads)
   defp maybe_preload(query, preload) when is_atom(preload), do: preload(query, ^preload)
+
+  def can_read_collection?(%P.Scope{current_user: nil}, _collection), do: false
+
+  def can_read_collection?(%P.Scope{current_user: current_user}, collection) do
+    if current_user.id == collection.owner_id do
+      true
+    else
+      P.Repo.exists?(
+        from m in Member,
+          where: m.collection_id == ^collection.id and m.user_id == ^current_user.id
+      )
+    end
+  end
+
+  def can_mutate_collection?(%P.Scope{current_user: user}, collection)
+      when is_binary(collection),
+      do: user.id == P.Repo.get(Collection, collection).owner_id
 end

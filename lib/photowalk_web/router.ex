@@ -10,14 +10,14 @@ defmodule PWeb.Router do
     plug(:put_root_layout, html: {PWeb.Layouts, :root})
     plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
-    plug(SetScope, :browser)
+    plug(SetScope)
   end
 
   pipeline :api do
     plug(:accepts, ["json", "multipart"])
     plug(:fetch_session)
     plug(:protect_from_forgery)
-    plug(SetScope, :api)
+    plug(SetScope)
     plug(OpenApiSpex.Plug.PutApiSpec, module: PWeb.ApiSpec)
   end
 
@@ -25,7 +25,7 @@ defmodule PWeb.Router do
     plug(:accepts, ["json"])
     plug(:fetch_session)
     plug(:protect_from_forgery)
-    plug(SetScope, :public_api)
+    plug(SetScope)
     plug(OpenApiSpex.Plug.PutApiSpec, module: PWeb.ApiSpec)
   end
 

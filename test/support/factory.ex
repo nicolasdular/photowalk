@@ -20,9 +20,18 @@ defmodule P.Factory do
   def scope_fixture(attrs \\ %{}) do
     attrs = normalize_attrs(attrs)
 
-    name = Map.get(attrs, :name, :test)
     current_user = Map.get(attrs, :current_user) || Map.get(attrs, :user)
-    Scope.new(name: name, current_user: current_user)
+    Scope.new(current_user: current_user)
+  end
+
+  def scope_fixture_with_user(user_or_attrs \\ %{}) do
+    user =
+      case user_or_attrs do
+        %User{} = user -> user
+        attrs -> user_fixture(attrs)
+      end
+
+    scope_fixture(current_user: user)
   end
 
   def photo_fixture(attrs \\ %{}) do

@@ -6,7 +6,7 @@ defmodule P.Collection do
   use P.Schema
   import Ecto.Changeset
 
-  alias P.{Photo, User}
+  alias P.{Member, Photo, User}
 
   schema "collections" do
     field :title, :string
@@ -14,6 +14,8 @@ defmodule P.Collection do
 
     belongs_to :owner, User
     has_many :photos, Photo
+    has_many :members, Member
+    has_many :shared_users, through: [:members, :user]
 
     timestamps()
   end
