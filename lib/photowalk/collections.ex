@@ -125,6 +125,10 @@ defmodule P.Collections do
   end
 
   def can_mutate_collection?(%P.Scope{current_user: user}, collection)
-      when is_binary(collection),
-      do: user.id == P.Repo.get(Collection, collection).owner_id
+      when is_binary(collection) do
+    case P.Repo.get(Collection, collection) do
+      %Collection{owner_id: owner_id} -> user.id == owner_id
+      nil -> false
+    end
+  end
 end
