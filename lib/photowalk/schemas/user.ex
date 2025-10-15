@@ -2,12 +2,17 @@ defmodule P.User do
   use P.Schema
   import Ecto.Changeset
 
+  alias P.Member
+
   schema "users" do
     field(:name, :string)
     field(:email, :string)
     field(:confirmed_at, :utc_datetime_usec)
 
     field :avatar_url, :string, virtual: true
+
+    has_many :collection_memberships, Member, foreign_key: :user_id
+    has_many :sent_collection_invitations, Member, foreign_key: :inviter_id
 
     timestamps()
   end

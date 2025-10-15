@@ -6,18 +6,16 @@ defmodule PWeb.Plugs.SetScope do
   @behaviour Plug
 
   @impl Plug
-  def init(opts) when is_atom(opts), do: %{name: opts}
-
-  def init(opts) when is_list(opts), do: %{name: Keyword.fetch!(opts, :name)}
+  def init(opts), do: opts
 
   @impl Plug
-  def call(conn, %{name: name}) do
+  def call(conn, _opts) do
     {conn, current_user} = fetch_current_user(conn)
 
     scope =
       conn.assigns
       |> Map.get(:current_scope)
-      |> update_or_build_scope(name, current_user)
+      |> update_or_build_scope(current_user)
 
     conn
     |> assign(:current_user, current_user)
@@ -41,13 +39,12 @@ defmodule PWeb.Plugs.SetScope do
     end
   end
 
-  defp update_or_build_scope(%Scope{} = scope, name, current_user) do
+  defp update_or_build_scope(%Scope{} = scope, current_user) do
     scope
-    |> Scope.with_name(name)
     |> Scope.put_current_user(current_user)
   end
 
-  defp update_or_build_scope(nil, name, current_user) do
-    Scope.new(name: name, current_user: current_user)
+  defp update_or_build_scope(nil, current_user) do
+    Scope.new(current_user: current_user)
   end
 end

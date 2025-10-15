@@ -140,4 +140,109 @@ defmodule P.CollectionsTest do
       assert {:error, :not_found} = Collections.user_owns_collection?(user, Ecto.UUID.generate())
     end
   end
+
+  describe "add_user/1" do
+    test "adds a member to a collection" do
+      owner = user_fixture()
+      inviter = user_fixture()
+      new_member = user_fixture()
+      collection = collection_fixture(user: owner)
+
+      assert {:ok, member} =
+               Collections.add_user(scope_fixture_with_user(owner), %{
+                 collection_id: collection.id,
+                 user_id: new_member.id,
+                 inviter_id: inviter.id
+               })
+
+      assert member.collection_id == collection.id
+      assert member.user_id == new_member.id
+      assert member.inviter_id == inviter.id
+    end
+
+    test "returns error changeset when adding the same member twice" do
+      owner = user_fixture()
+      inviter = user_fixture()
+      new_member = user_fixture()
+      collection = collection_fixture(user: owner)
+
+      assert {:ok, _member} =
+               Collections.add_user(scope_fixture_with_user(owner), %{
+                 collection_id: collection.id,
+                 user_id: new_member.id,
+                 inviter_id: inviter.id
+               })
+
+      assert {:error, changeset} =
+               Collections.add_user(scope_fixture_with_user(owner), %{
+                 collection_id: collection.id,
+                 user_id: new_member.id,
+                 inviter_id: inviter.id
+               })
+
+      assert %{user_id: ["is already a member"]} = errors_on(changeset)
+    end
+
+    test "returns error when user has no access to the collection" do
+      owner = user_fixture()
+      other_user = user_fixture()
+      new_member = user_fixture()
+      collection = collection_fixture(user: owner)
+
+      assert {:error, :forbidden} =
+               Collections.add_user(scope_fixture_with_user(other_user), %{
+                 collection_id: collection.id,
+                 user_id: new_member.id,
+                 inviter_id: other_user.id
+               })
+    end
+  end
+
+  describe "list_members/2" do
+    test "returns members of a collection" do
+      owner = user_fixture()
+      collection = collection_fixture(user: owner)
+      member1 = user_fixture()
+      member2 = user_fixture()
+
+      Collections.add_user(scope_fixture_with_user(owner), %{
+        collection_id: collection.id,
+        user_id: member1.id,
+        inviter_id: owner.id
+      })
+
+      Collections.add_user(scope_fixture_with_user(owner), %{
+        collection_id: collection.id,
+        user_id: member2.id,
+        inviter_id: owner.id
+      })
+
+      users = Collections.list_users(P.Scope.new(current_user: owner), collection)
+      assert Enum.map(users, & &1.id) == [owner.id, member1.id, member2.id]
+    end
+
+    test "returns list when is member" do
+      owner = user_fixture()
+      collection = collection_fixture(user: owner)
+      member = user_fixture()
+
+      Collections.add_user(scope_fixture_with_user(owner), %{
+        collection_id: collection.id,
+        user_id: member.id,
+        inviter_id: owner.id
+      })
+
+      users = Collections.list_users(P.Scope.new(current_user: member), collection)
+      assert Enum.map(users, & &1.id) == [owner.id, member.id]
+    end
+
+    test "returns error when the user has no access" do
+      owner = user_fixture()
+      other_user = user_fixture()
+      collection = collection_fixture(user: owner)
+
+      assert {:error, :forbidden} =
+               Collections.list_users(P.Scope.new(current_user: other_user), collection)
+    end
+  end
 end
