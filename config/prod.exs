@@ -19,8 +19,7 @@ config :logger, level: :info
 config :photowalk, P.Mailer, adapter: Resend.Swoosh.Adapter
 
 config :sentry,
-  dsn:
-    "https://1dffe8230e442b17c3c9ae949925a140@o4504192259194880.ingest.us.sentry.io/4510167298539520",
+  dsn: "https://1dffe8230e442b17c3c9ae949925a140@o4504192259194880.ingest.us.sentry.io/4510167298539520",
   environment_name: Mix.env(),
   enable_source_code_context: true,
   root_source_code_paths: [File.cwd!()]

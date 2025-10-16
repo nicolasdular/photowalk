@@ -12,8 +12,7 @@ defmodule P.Collections do
     |> Repo.all()
   end
 
-  @spec create_collection(Scope.t(), map()) ::
-          {:ok, Collection.t()} | {:error, Ecto.Changeset.t()}
+  @spec create_collection(Scope.t(), map()) :: {:ok, Collection.t()} | {:error, Ecto.Changeset.t()}
   def create_collection(%Scope{current_user: user}, attrs) do
     Repo.transaction(fn ->
       with {:ok, collection} <-
@@ -32,8 +31,7 @@ defmodule P.Collections do
     end
   end
 
-  @spec get_collection(Scope.t(), String.t()) ::
-          {:ok, Collection.t()} | {:error, :not_found}
+  @spec get_collection(Scope.t(), String.t()) :: {:ok, Collection.t()} | {:error, :not_found}
   def get_collection(scope, id, opts \\ %{preloads: [:photos]}) do
     case Collection
          |> where([c], c.id == ^id)
