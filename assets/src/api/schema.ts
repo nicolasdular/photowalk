@@ -54,6 +54,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/collections/{collection_id}/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List users in a collection */
+        get: operations["PWeb.CollectionController.list_users"];
+        put?: never;
+        /** Add a user to a collection */
+        post: operations["PWeb.CollectionController.add_user"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/collections/{id}": {
         parameters: {
             query?: never;
@@ -127,6 +145,17 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AddUserToCollectionRequest
+         * @description Parameters for adding a user to a collection
+         */
+        AddUserToCollectionRequest: {
+            /**
+             * Format: email
+             * @description Email of the user to add
+             */
+            email: string;
+        };
         /**
          * Collection
          * @description A collection of photos
@@ -296,13 +325,13 @@ export interface components {
         };
         /**
          * User
-         * @description A user account
+         * @description A user in the system
          */
         User: {
-            avatar_url?: string;
+            avatar_url: string;
             email: string;
             id: string;
-            name?: string;
+            name: string;
         };
         /**
          * UserResponse
@@ -319,6 +348,18 @@ export interface components {
                 id: string;
                 name?: string;
             };
+        };
+        /**
+         * UsersListResponse
+         * @description List of users in a collection
+         */
+        UsersListResponse: {
+            data: {
+                avatar_url: string;
+                email: string;
+                id: string;
+                name: string;
+            }[];
         };
         /** ValidationErrors */
         ValidationErrors: {
@@ -513,6 +554,112 @@ export interface operations {
                             })[];
                         };
                     };
+                };
+            };
+            /** @description Validation errors */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        errors: {
+                            [key: string]: string[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PWeb.CollectionController.list_users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Collection ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Users in collection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            avatar_url: string;
+                            email: string;
+                            id: string;
+                            name: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description Collection not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PWeb.CollectionController.add_user": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Collection ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description AddUserToCollectionRequest */
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: email
+                     * @description Email of the user to add
+                     */
+                    email: string;
+                };
+            };
+        };
+        responses: {
+            /** @description User added to collection */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * User
+                         * @description A user in the system
+                         */
+                        data: {
+                            avatar_url: string;
+                            email: string;
+                            id: string;
+                            name: string;
+                        };
+                    };
+                };
+            };
+            /** @description Collection not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
             /** @description Validation errors */

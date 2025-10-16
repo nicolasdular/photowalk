@@ -135,7 +135,6 @@ defmodule P.Accounts.MagicLinkTest do
       user = user_fixture(%{email: email, confirmed_at: confirmed_at})
       token = request_magic_link_and_capture_token(email)
 
-
       assert {:ok, verified_user} = Accounts.verify_magic_link(token)
       assert verified_user.id == user.id
       assert DateTime.truncate(verified_user.confirmed_at, :second) == confirmed_at
@@ -172,9 +171,7 @@ defmodule P.Accounts.MagicLinkTest do
       email = "token_expired@example.com"
 
       expired_token =
-        Phoenix.Token.sign(PWeb.Endpoint, "magic_link_salt", email,
-          signed_at: System.system_time(:second) - 4_000
-        )
+        Phoenix.Token.sign(PWeb.Endpoint, "magic_link_salt", email, signed_at: System.system_time(:second) - 4_000)
 
       assert {:error, :invalid} = Accounts.verify_magic_link(expired_token)
       # User should not be created if token is expired
