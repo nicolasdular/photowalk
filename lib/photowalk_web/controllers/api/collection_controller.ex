@@ -295,7 +295,7 @@ defmodule PWeb.CollectionController do
     end
   end
 
-  def add_user(conn, %{"id" => collection_id, "email" => email}) do
+  def add_user(conn, %{"collection_id" => collection_id, "email" => email}) do
     inviter_id = conn.assigns.current_user.id
 
     with {:ok, _member} <-
@@ -304,15 +304,18 @@ defmodule PWeb.CollectionController do
              email: email,
              inviter_id: inviter_id
            }),
-         {:ok, user} <- P.Accounts.get_user_by_email(scope(conn), email) do
+         user when not is_nil(user) <- P.Accounts.get_user_by_email(scope(conn), email) do
       conn
       |> put_status(:created)
       |> put_view(UserJSON)
       |> render(:show, user: user)
+    else
+      nil -> {:error, :user_not_found}
+      error -> error
     end
   end
 
-  def list_users(conn, %{"id" => collection_id}) do
+  def list_users(conn, %{"collection_id" => collection_id}) do
     scope = conn.assigns.current_scope
 
     with {:ok, collection} <- Collections.get_collection(scope, collection_id),

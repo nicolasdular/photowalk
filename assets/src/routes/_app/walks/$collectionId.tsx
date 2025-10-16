@@ -24,7 +24,6 @@ import {
 import { UploadPhotosButton } from '@/components/upload-photos-button';
 import { useCollectionQuery } from '@/lib/hooks/useCollectionQuery';
 
-type Collection = components['schemas']['Collection'];
 type Photo = NonNullable<
   components['schemas']['CollectionShowResponse']['data']['photos']
 >[0];
@@ -44,6 +43,10 @@ function CollectionDetailPage() {
 
   const isViewingPhoto = matches.some(
     match => match.routeId === '/_app/walks/$collectionId/photos/$photoId'
+  );
+
+  const isEditingCollection = matches.some(
+    match => match.routeId === '/_app/walks/$collectionId/edit'
   );
 
   const deletePhotoMutation = useMutation({
@@ -103,6 +106,11 @@ function CollectionDetailPage() {
     );
   }
 
+  // Check for child routes first
+  if (isViewingPhoto || isEditingCollection) {
+    return <Outlet />;
+  }
+
   if (collection?.photos?.length === 0) {
     return (
       <>
@@ -114,14 +122,17 @@ function CollectionDetailPage() {
               Back to walks
             </Link>
           }
+          actions={
+            <Link to="/walks/$collectionId/edit" params={{ collectionId }}>
+              <Button variant="outline" size="sm">
+                Edit
+              </Button>
+            </Link>
+          }
         />
         <EmptyState collectionId={collectionId} onSuccess={refetchCollection} />
       </>
     );
-  }
-
-  if (isViewingPhoto) {
-    return <Outlet />;
   }
 
   return (
@@ -134,10 +145,17 @@ function CollectionDetailPage() {
           </Link>
         }
         actions={
-          <UploadPhotosButton
-            collectionId={collection.id}
-            onSuccess={refetchCollection}
-          />
+          <div className="flex items-center gap-4">
+            <Link to="/walks/$collectionId/edit" params={{ collectionId }}>
+              <Button variant="outline" size="sm">
+                Edit
+              </Button>
+            </Link>
+            <UploadPhotosButton
+              collectionId={collection.id}
+              onSuccess={refetchCollection}
+            />
+          </div>
         }
         title={collection.title}
         subTitle={

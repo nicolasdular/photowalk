@@ -29,6 +29,13 @@ defmodule PWeb.FallbackController do
     |> render("400.json")
   end
 
+  def call(conn, {:error, :user_not_found}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> put_view(PWeb.ErrorJSON)
+    |> render("422.json", errors: %{email: ["not foundl"]})
+  end
+
   defp translate_errors(changeset) do
     Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
       Enum.reduce(opts, msg, fn {key, value}, acc ->
