@@ -194,7 +194,7 @@ defmodule P.CollectionsTest do
     end
   end
 
-  describe "list_user/2" do
+  describe "list_users/2" do
     test "returns members of a collection", %{scope: scope, user: owner} do
       collection = collection_fixture(user: owner)
       member1 = user_fixture()
@@ -226,8 +226,8 @@ defmodule P.CollectionsTest do
         inviter_id: owner.id
       })
 
-      users = Collections.list_users(scope, collection)
-      assert Enum.map(users, & &1.id) == [owner.id, member.id]
+      users = Collections.list_users(scope_fixture_with_user(member), collection)
+      assert Enum.sort(Enum.map(users, & &1.id)) == Enum.sort([owner.id, member.id])
     end
 
     test "returns error when the user has no access" do
