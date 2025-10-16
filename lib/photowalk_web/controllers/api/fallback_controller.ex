@@ -15,6 +15,13 @@ defmodule PWeb.FallbackController do
     |> render("404.json")
   end
 
+  def call(conn, {:error, :forbidden}) do
+    conn
+    |> put_status(:not_found)
+    |> put_view(PWeb.ErrorJSON)
+    |> render("404.json")
+  end
+
   def call(conn, {:error, :invalid_id}) do
     conn
     |> put_status(:bad_request)

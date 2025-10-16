@@ -155,18 +155,16 @@ defmodule PWeb.CollectionController do
     ]
 
   def index(conn, _params) do
-    user = conn.assigns.current_user
-
     render(conn, :index,
-      collections: Collections.list_collections_for_user(user),
-      current_user: user
+      collections: Collections.list_collections(conn.assigns.current_scope),
+      current_user: conn.assigns.current_user
     )
   end
 
   def create(conn, params) do
     user = conn.assigns.current_user
 
-    with {:ok, collection} <- Collections.create_collection(user, params) do
+    with {:ok, collection} <- Collections.create_collection(conn.assigns.current_scope, params) do
       conn
       |> put_status(:created)
       |> render(:show, collection: collection, current_user: user)
@@ -177,7 +175,7 @@ defmodule PWeb.CollectionController do
     user = conn.assigns.current_user
 
     with {:ok, collection} <-
-           Collections.get_collection_for_user(id, user, %{
+           Collections.get_collection(conn.assigns.current_scope, id, %{
              preloads: [photos: :user]
            }) do
       render(conn, :show, collection: collection, current_user: user)

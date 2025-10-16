@@ -59,7 +59,9 @@ defmodule P.Factory do
       "description" => Map.get(attrs, :description, "A test collection")
     }
 
-    {:ok, collection} = P.Collections.create_collection(user, collection_attrs)
+    {:ok, collection} =
+      P.Collections.create_collection(scope_fixture_with_user(user), collection_attrs)
+
     collection
   end
 

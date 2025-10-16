@@ -1,31 +1,26 @@
 defmodule P.Collections do
-  @moduledoc """
-  The Collections context for managing photo collections.
-  """
+  import Ecto.Query
 
-  import Ecto.Query, warn: false
+  alias P.{Collection, Member, Repo, User, Scope}
 
-  alias P.{Collection, Member, Repo, User}
-
-  @spec list_collections_for_user(User.t()) :: [Collection.t()]
-  def list_collections_for_user(%User{id: user_id}, opts \\ %{}) do
-    # For now, only show collections owned by the user
-    # In the future, this will include collections the user is invited to
+  @spec list_collections(Scope.t()) :: [Collection.t()]
+  def list_collections(%Scope{current_user: %User{id: user_id}}, opts \\ %{}) do
     Collection
-    |> where([c], c.owner_id == ^user_id)
-    |> order_by([c], desc: c.inserted_at)
+    |> join(:inner, [c], m in Member, on: m.collection_id == c.id)
+    |> where([c, m], m.user_id == ^user_id)
     |> maybe_preload(opts[:preloads])
     |> Repo.all()
   end
 
-  @spec create_collection(User.t(), map()) :: {:ok, Collection.t()} | {:error, Ecto.Changeset.t()}
-  def create_collection(%User{} = user, attrs) do
+  @spec create_collection(Scope.t(), map()) ::
+          {:ok, Collection.t()} | {:error, Ecto.Changeset.t()}
+  def create_collection(%Scope{current_user: user}, attrs) do
     Repo.transaction(fn ->
       with {:ok, collection} <-
              %Collection{}
              |> Collection.changeset(Map.put(attrs, "owner_id", user.id))
              |> Repo.insert(),
-           {:ok, _member} <- create_owner_member(user, collection) do
+           {:ok, _member} <- insert_member(%{user_id: user.id, collection_id: collection.id}) do
         {:ok, collection}
       else
         error -> Repo.rollback(error)
@@ -37,39 +32,28 @@ defmodule P.Collections do
     end
   end
 
-  defp create_owner_member(user, collection) do
-    %Member{}
-    |> Member.changeset(%{
-      user_id: user.id,
-      collection_id: collection.id,
-      inviter_id: nil
-    })
-    |> Repo.insert()
-  end
-
-  @spec get_collection(String.t()) :: Collection.t() | nil
-  def get_collection(id) do
-    Repo.get(Collection, id)
-  end
-
-  @spec get_collection_for_user(String.t(), User.t()) ::
+  @spec get_collection(Scope.t(), String.t()) ::
           {:ok, Collection.t()} | {:error, :not_found}
-  def get_collection_for_user(id, %User{id: user_id}, opts \\ %{preloads: [:photos]}) do
-    # For now, only allow access to owned collections
-    # In the future, this will include collections the user is invited to
+  def get_collection(scope, id, opts \\ %{preloads: [:photos]}) do
     case Collection
-         |> where([c], c.id == ^id and c.owner_id == ^user_id)
+         |> where([c], c.id == ^id)
          |> maybe_preload(opts[:preloads])
          |> Repo.one() do
-      nil -> {:error, :not_found}
-      collection -> {:ok, collection}
+      nil ->
+        {:error, :not_found}
+
+      collection ->
+        case can_read_collection?(scope, collection) do
+          true -> {:ok, collection}
+          false -> {:error, :forbidden}
+        end
     end
   end
 
   @spec user_owns_collection?(User.t(), String.t()) ::
           {:ok, true} | {:error, :not_found | :forbidden}
   def user_owns_collection?(%User{id: user_id}, collection_id) do
-    case get_collection(collection_id) do
+    case Repo.get(Collection, collection_id) do
       nil ->
         {:error, :not_found}
 
@@ -81,15 +65,19 @@ defmodule P.Collections do
     end
   end
 
+  def add_user(scope, %{collection_id: collection_id, email: email, inviter_id: inviter_id}) do
+    case P.Accounts.get_user_by_email(scope, email) do
+      nil ->
+        {:error, :user_not_found}
+
+      %User{id: user_id} ->
+        add_user(scope, %{collection_id: collection_id, user_id: user_id, inviter_id: inviter_id})
+    end
+  end
+
   def add_user(scope, %{collection_id: collection_id, user_id: user_id, inviter_id: inviter_id}) do
     if can_mutate_collection?(scope, collection_id) do
-      %Member{}
-      |> Member.changeset(%{
-        user_id: user_id,
-        collection_id: collection_id,
-        inviter_id: inviter_id
-      })
-      |> Repo.insert()
+      insert_member(%{user_id: user_id, collection_id: collection_id, inviter_id: inviter_id})
     else
       {:error, :forbidden}
     end
@@ -130,5 +118,15 @@ defmodule P.Collections do
       %Collection{owner_id: owner_id} -> user.id == owner_id
       nil -> false
     end
+  end
+
+  defp insert_member(params) do
+    %Member{}
+    |> Member.changeset(%{
+      user_id: params[:user_id],
+      collection_id: params[:collection_id],
+      inviter_id: params[:inviter_id]
+    })
+    |> Repo.insert()
   end
 end

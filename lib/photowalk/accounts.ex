@@ -9,20 +9,15 @@ defmodule P.Accounts do
   @allowed_emails ~w(hello@nicolasdular.com hello@philippspiess.com)
   @signature_salt "magic_link_salt"
 
-  @spec get_user(Scope.t(), term()) :: User.t() | nil
-  def get_user(%Scope{} = _scope, id) do
-    Repo.get(User, id)
-  end
-
   @spec get_user_by_email(Scope.t(), String.t()) :: User.t() | nil
-  def get_user_by_email(%Scope{} = _scope, email) when is_binary(email) do
-    Repo.get_by(User, email: email)
+  def get_user_by_email(%Scope{} = _scope, email) do
+    Repo.get_by(User, email: normalize_email(email))
   end
 
   @spec signup(String.t(), String.t()) ::
           {:ok, :sent} | {:error, Ecto.Changeset.t() | :not_allowed}
   def signup(email, name) do
-    email = email |> String.trim() |> String.downcase()
+    email = normalize_email(email)
     name = String.trim(name)
 
     if email in @allowed_emails do
@@ -139,4 +134,10 @@ defmodule P.Accounts do
   end
 
   defp token_hash(token), do: :crypto.hash(:sha256, token)
+
+  defp normalize_email(email) do
+    email
+    |> String.trim()
+    |> String.downcase()
+  end
 end
