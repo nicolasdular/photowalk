@@ -15,6 +15,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppWalksNewRouteImport } from './routes/_app/walks/new'
 import { Route as AppWalksCollectionIdRouteImport } from './routes/_app/walks/$collectionId'
+import { Route as AppWalksCollectionIdEditRouteImport } from './routes/_app/walks/$collectionId/edit'
 import { Route as AppWalksCollectionIdPhotosPhotoIdRouteImport } from './routes/_app/walks/$collectionId/photos/$photoId'
 
 const SignupRoute = SignupRouteImport.update({
@@ -46,6 +47,12 @@ const AppWalksCollectionIdRoute = AppWalksCollectionIdRouteImport.update({
   path: '/walks/$collectionId',
   getParentRoute: () => AppRoute,
 } as any)
+const AppWalksCollectionIdEditRoute =
+  AppWalksCollectionIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AppWalksCollectionIdRoute,
+  } as any)
 const AppWalksCollectionIdPhotosPhotoIdRoute =
   AppWalksCollectionIdPhotosPhotoIdRouteImport.update({
     id: '/photos/$photoId',
@@ -59,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/walks/$collectionId': typeof AppWalksCollectionIdRouteWithChildren
   '/walks/new': typeof AppWalksNewRoute
+  '/walks/$collectionId/edit': typeof AppWalksCollectionIdEditRoute
   '/walks/$collectionId/photos/$photoId': typeof AppWalksCollectionIdPhotosPhotoIdRoute
 }
 export interface FileRoutesByTo {
@@ -67,6 +75,7 @@ export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/walks/$collectionId': typeof AppWalksCollectionIdRouteWithChildren
   '/walks/new': typeof AppWalksNewRoute
+  '/walks/$collectionId/edit': typeof AppWalksCollectionIdEditRoute
   '/walks/$collectionId/photos/$photoId': typeof AppWalksCollectionIdPhotosPhotoIdRoute
 }
 export interface FileRoutesById {
@@ -77,6 +86,7 @@ export interface FileRoutesById {
   '/_app/': typeof AppIndexRoute
   '/_app/walks/$collectionId': typeof AppWalksCollectionIdRouteWithChildren
   '/_app/walks/new': typeof AppWalksNewRoute
+  '/_app/walks/$collectionId/edit': typeof AppWalksCollectionIdEditRoute
   '/_app/walks/$collectionId/photos/$photoId': typeof AppWalksCollectionIdPhotosPhotoIdRoute
 }
 export interface FileRouteTypes {
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/'
     | '/walks/$collectionId'
     | '/walks/new'
+    | '/walks/$collectionId/edit'
     | '/walks/$collectionId/photos/$photoId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/walks/$collectionId'
     | '/walks/new'
+    | '/walks/$collectionId/edit'
     | '/walks/$collectionId/photos/$photoId'
   id:
     | '__root__'
@@ -104,6 +116,7 @@ export interface FileRouteTypes {
     | '/_app/'
     | '/_app/walks/$collectionId'
     | '/_app/walks/new'
+    | '/_app/walks/$collectionId/edit'
     | '/_app/walks/$collectionId/photos/$photoId'
   fileRoutesById: FileRoutesById
 }
@@ -157,6 +170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWalksCollectionIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/walks/$collectionId/edit': {
+      id: '/_app/walks/$collectionId/edit'
+      path: '/edit'
+      fullPath: '/walks/$collectionId/edit'
+      preLoaderRoute: typeof AppWalksCollectionIdEditRouteImport
+      parentRoute: typeof AppWalksCollectionIdRoute
+    }
     '/_app/walks/$collectionId/photos/$photoId': {
       id: '/_app/walks/$collectionId/photos/$photoId'
       path: '/photos/$photoId'
@@ -168,10 +188,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppWalksCollectionIdRouteChildren {
+  AppWalksCollectionIdEditRoute: typeof AppWalksCollectionIdEditRoute
   AppWalksCollectionIdPhotosPhotoIdRoute: typeof AppWalksCollectionIdPhotosPhotoIdRoute
 }
 
 const AppWalksCollectionIdRouteChildren: AppWalksCollectionIdRouteChildren = {
+  AppWalksCollectionIdEditRoute: AppWalksCollectionIdEditRoute,
   AppWalksCollectionIdPhotosPhotoIdRoute:
     AppWalksCollectionIdPhotosPhotoIdRoute,
 }

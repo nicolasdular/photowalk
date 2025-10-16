@@ -3,12 +3,8 @@ import type { FormEvent } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import client from '../../../api/client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
 import { PageTitle } from '@/components/ui/page-title';
+import { CollectionForm } from '@/components/collection-form';
 
 function NewCollectionPage() {
   const navigate = useNavigate();
@@ -61,54 +57,18 @@ function NewCollectionPage() {
         </div>
       </header>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="title">Title</Label>
-          <Input
-            id="title"
-            name="title"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            placeholder="e.g., Autumn Prater Walk"
-            aria-invalid={!!errors.title}
-          />
-          {errors.title && (
-            <p className="text-sm text-destructive">{errors.title[0]}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="description">Description (optional)</Label>
-          <Textarea
-            id="description"
-            name="description"
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            placeholder="Add a description to remember the context..."
-            rows={8}
-          />
-          {errors.description && (
-            <p className="text-sm text-destructive">{errors.description[0]}</p>
-          )}
-        </div>
-
-        <div className="flex items-center gap-4 pt-4">
-          <Button
-            type="submit"
-            disabled={createMutation.isPending || !title.trim()}
-          >
-            {createMutation.isPending && <Spinner className="mr-2" />}
-            {createMutation.isPending ? 'Creating...' : 'Create Collection'}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => navigate({ to: '/' })}
-          >
-            Cancel
-          </Button>
-        </div>
-      </form>
+      <CollectionForm
+        title={title}
+        description={description}
+        onTitleChange={setTitle}
+        onDescriptionChange={setDescription}
+        onSubmit={handleSubmit}
+        onCancel={() => navigate({ to: '/' })}
+        errors={errors}
+        isPending={createMutation.isPending}
+        submitLabel="Create Collection"
+        submitPendingLabel="Creating..."
+      />
     </div>
   );
 }

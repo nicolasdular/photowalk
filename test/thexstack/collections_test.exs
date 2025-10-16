@@ -64,6 +64,49 @@ defmodule P.CollectionsTest do
     end
   end
 
+  describe "update_collection/2" do
+    test "updates title and description when user owns the collection", %{scope: scope, user: user} do
+      collection =
+        collection_fixture(
+          user: user,
+          title: "Original title",
+          description: "Original description"
+        )
+
+      assert {:ok, updated_collection} =
+               Collections.update_collection(scope, %{
+                 "id" => collection.id,
+                 "title" => "Updated title",
+                 "description" => "Updated description"
+               })
+
+      assert updated_collection.title == "Updated title"
+      assert updated_collection.description == "Updated description"
+    end
+
+    test "returns forbidden when user cannot mutate the collection", %{scope: scope} do
+      owner = user_fixture()
+
+      collection =
+        collection_fixture(
+          user: owner,
+          title: "Original title",
+          description: "Original description"
+        )
+
+      assert {:error, :forbidden} =
+               Collections.update_collection(scope, %{
+                 "id" => collection.id,
+                 "title" => "Updated title",
+                 "description" => "Updated description"
+               })
+
+      reloaded_collection = P.Repo.get!(P.Collection, collection.id)
+      assert reloaded_collection.title == "Original title"
+      assert reloaded_collection.description == "Original description"
+    end
+  end
+
   describe "get_collection/2" do
     test "returns collection when user owns it", %{scope: scope, user: user} do
       collection = collection_fixture(user: user)
@@ -216,7 +259,7 @@ defmodule P.CollectionsTest do
       assert Enum.map(users, & &1.id) == [owner.id, member1.id, member2.id]
     end
 
-    test "returns list when is member", %{scope: scope, user: owner} do
+    test "returns list when is member", %{user: owner} do
       collection = collection_fixture(user: owner)
       member = user_fixture()
 
