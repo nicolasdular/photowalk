@@ -9,6 +9,10 @@ defmodule PWeb.UserJSON do
     %{data: serialize(user)}
   end
 
+  def index(%{users: users}) do
+    %{data: Enum.map(users, &serialize/1)}
+  end
+
   def summary(%User{} = user), do: serialize(user)
 
   def serialize(%User{} = user) do

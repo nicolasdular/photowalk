@@ -4,8 +4,8 @@ defmodule PWeb.CollectionController do
 
   alias OpenApiSpex.Schema
   alias P.Collections
-  alias P.{Collection, Photo}
-  alias PWeb.{CollectionJSON, PhotoJSON}
+  alias P.{Collection, Photo, User}
+  alias PWeb.{CollectionJSON, PhotoJSON, UserJSON}
   alias PWeb.Schemas.EctoSchema
 
   action_fallback PWeb.FallbackController
@@ -26,6 +26,12 @@ defmodule PWeb.CollectionController do
                                 fields: CollectionJSON.fields(),
                                 required: CollectionJSON.required_fields()
                               )
+
+  @user_resource_schema EctoSchema.schema_from_fields(User,
+                          description: "A user in the system",
+                          fields: UserJSON.fields(),
+                          required: [:id, :email, :name, :avatar_url]
+                        )
 
   @collection_list_response_schema %Schema{
     title: "CollectionListResponse",
@@ -115,6 +121,39 @@ defmodule PWeb.CollectionController do
     required: [:errors]
   }
 
+  @add_user_request_schema %Schema{
+    title: "AddUserToCollectionRequest",
+    description: "Parameters for adding a user to a collection",
+    type: :object,
+    properties: %{
+      email: %Schema{type: :string, format: :email, description: "Email of the user to add"}
+    },
+    required: [:email]
+  }
+
+  @user_response_schema %Schema{
+    title: "UserResponse",
+    description: "Response containing user data",
+    type: :object,
+    properties: %{
+      data: @user_resource_schema
+    },
+    required: [:data]
+  }
+
+  @users_list_response_schema %Schema{
+    title: "UsersListResponse",
+    description: "List of users in a collection",
+    type: :object,
+    properties: %{
+      data: %Schema{
+        type: :array,
+        items: @user_resource_schema
+      }
+    },
+    required: [:data]
+  }
+
   tags(["collections"])
 
   operation :index,
@@ -154,6 +193,41 @@ defmodule PWeb.CollectionController do
       not_found: {"Collection not found", "application/json", %Schema{type: :object}}
     ]
 
+  operation :add_user,
+    summary: "Add a user to a collection",
+    parameters: [
+      id: [in: :path, description: "Collection ID", type: :string, required: true]
+    ],
+    request_body: {
+      "AddUserToCollectionRequest",
+      "application/json",
+      @add_user_request_schema,
+      required: true
+    },
+    responses: [
+      created: {
+        "User added to collection",
+        "application/json",
+        @user_response_schema
+      },
+      not_found: {"Collection not found", "application/json", %Schema{type: :object}},
+      unprocessable_entity: {
+        "Validation errors",
+        "application/json",
+        @collection_validation_error_schema
+      }
+    ]
+
+  operation :list_users,
+    summary: "List users in a collection",
+    parameters: [
+      id: [in: :path, description: "Collection ID", type: :string, required: true]
+    ],
+    responses: [
+      ok: {"Users in collection", "application/json", @users_list_response_schema},
+      not_found: {"Collection not found", "application/json", %Schema{type: :object}}
+    ]
+
   def index(conn, _params) do
     render(conn, :index,
       collections: Collections.list_collections(conn.assigns.current_scope),
@@ -179,6 +253,35 @@ defmodule PWeb.CollectionController do
              preloads: [photos: :user]
            }) do
       render(conn, :show, collection: collection, current_user: user)
+    end
+  end
+
+  def add_user(conn, %{"id" => collection_id, "email" => email}) do
+    scope = conn.assigns.current_scope
+    inviter_id = conn.assigns.current_user.id
+
+    with {:ok, _member} <-
+           Collections.add_user(scope, %{
+             collection_id: collection_id,
+             email: email,
+             inviter_id: inviter_id
+           }),
+         {:ok, user} <- P.Accounts.get_user_by_email(scope, email) do
+      conn
+      |> put_status(:created)
+      |> put_view(UserJSON)
+      |> render(:show, user: user)
+    end
+  end
+
+  def list_users(conn, %{"id" => collection_id}) do
+    scope = conn.assigns.current_scope
+
+    with {:ok, collection} <- Collections.get_collection(scope, collection_id),
+         users <- Collections.list_users(scope, collection) do
+      conn
+      |> put_view(UserJSON)
+      |> render(:index, users: users)
     end
   end
 end
