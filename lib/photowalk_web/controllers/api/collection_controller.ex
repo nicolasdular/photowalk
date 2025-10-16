@@ -109,6 +109,16 @@ defmodule PWeb.CollectionController do
     required: [:title]
   }
 
+  @collection_update_request_schema %Schema{
+    title: "CollectionUpdateRequest",
+    description: "Parameters for updating a collection",
+    type: :object,
+    properties: %{
+      title: %Schema{type: :string, description: "New title for the collection"},
+      description: %Schema{type: :string, description: "New description for the collection"}
+    }
+  }
+
   @collection_validation_error_schema %Schema{
     title: "ValidationErrors",
     type: :object,
@@ -183,6 +193,31 @@ defmodule PWeb.CollectionController do
       }
     ]
 
+  operation :update,
+    summary: "Update a collection",
+    parameters: [
+      id: [in: :path, description: "Collection ID", type: :string, required: true]
+    ],
+    request_body: {
+      "CollectionUpdateRequest",
+      "application/json",
+      @collection_update_request_schema,
+      required: true
+    },
+    responses: [
+      ok: {
+        "Updated collection",
+        "application/json",
+        @collection_show_response_schema
+      },
+      not_found: {"Collection not found", "application/json", %Schema{type: :object}},
+      unprocessable_entity: {
+        "Validation errors",
+        "application/json",
+        @collection_validation_error_schema
+      }
+    ]
+
   operation :show,
     summary: "Show a collection",
     parameters: [
@@ -245,28 +280,31 @@ defmodule PWeb.CollectionController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    user = conn.assigns.current_user
+  def update(conn, params) do
+    with {:ok, collection} <- Collections.update_collection(scope(conn), params) do
+      render(conn, :show, collection: collection, current_user: current_user(conn))
+    end
+  end
 
+  def show(conn, %{"id" => id}) do
     with {:ok, collection} <-
-           Collections.get_collection(conn.assigns.current_scope, id, %{
+           Collections.get_collection(scope(conn), id, %{
              preloads: [photos: :user]
            }) do
-      render(conn, :show, collection: collection, current_user: user)
+      render(conn, :show, collection: collection, current_user: current_user(conn))
     end
   end
 
   def add_user(conn, %{"id" => collection_id, "email" => email}) do
-    scope = conn.assigns.current_scope
     inviter_id = conn.assigns.current_user.id
 
     with {:ok, _member} <-
-           Collections.add_user(scope, %{
+           Collections.add_user(scope(conn), %{
              collection_id: collection_id,
              email: email,
              inviter_id: inviter_id
            }),
-         {:ok, user} <- P.Accounts.get_user_by_email(scope, email) do
+         {:ok, user} <- P.Accounts.get_user_by_email(scope(conn), email) do
       conn
       |> put_status(:created)
       |> put_view(UserJSON)

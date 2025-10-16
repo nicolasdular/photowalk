@@ -108,6 +108,48 @@ defmodule PWeb.CollectionControllerTest do
     end
   end
 
+  describe "PUT /api/collections/:id" do
+    test "updates a collection when user owns it", %{conn: conn} do
+      user = user_fixture()
+      collection = collection_fixture(user: user)
+
+      params = %{
+        "title" => "Updated title",
+        "description" => "Updated description"
+      }
+
+      conn =
+        conn
+        |> auth_json_conn(user)
+        |> put(~p"/api/collections/#{collection.id}", params)
+
+      response = json_response(conn, 200)
+      api_spec = PWeb.ApiSpec.spec()
+      assert_schema(response, "CollectionShowResponse", api_spec)
+
+      assert response["data"]["title"] == "Updated title"
+      assert response["data"]["description"] == "Updated description"
+    end
+
+    test "returns not found when user cannot mutate collection", %{conn: conn} do
+      owner = user_fixture()
+      other_user = user_fixture()
+      collection = collection_fixture(user: owner)
+
+      params = %{
+        "title" => "Updated title"
+      }
+
+      conn =
+        conn
+        |> auth_json_conn(other_user)
+        |> put(~p"/api/collections/#{collection.id}", params)
+
+      response = json_response(conn, 404)
+      assert response["error"] == "Not found"
+    end
+  end
+
   describe "GET /api/collections/:id" do
     test "shows a collection owned by the user", %{conn: conn} do
       user = user_fixture()

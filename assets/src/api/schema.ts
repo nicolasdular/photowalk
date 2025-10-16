@@ -81,12 +81,14 @@ export interface paths {
         };
         /** Show a collection */
         get: operations["PWeb.CollectionController.show"];
-        put?: never;
+        /** Update a collection */
+        put: operations["PWeb.CollectionController.update"];
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /** Update a collection */
+        patch: operations["PWeb.CollectionController.update (2)"];
         trace?: never;
     };
     "/api/photos": {
@@ -245,6 +247,16 @@ export interface components {
                     };
                 })[];
             };
+        };
+        /**
+         * CollectionUpdateRequest
+         * @description Parameters for updating a collection
+         */
+        CollectionUpdateRequest: {
+            /** @description New description for the collection */
+            description?: string;
+            /** @description New title for the collection */
+            title?: string;
         };
         /**
          * Error
@@ -737,6 +749,180 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PWeb.CollectionController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Collection ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description CollectionUpdateRequest */
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description New description for the collection */
+                    description?: string;
+                    /** @description New title for the collection */
+                    title?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Updated collection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            description?: string;
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            title: string;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        } & {
+                            photos?: ({
+                                allowed_to_delete?: boolean;
+                                /** Format: uri */
+                                full_url: string;
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                /** Format: uri */
+                                thumbnail_url: string;
+                                title: string;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } & {
+                                /** User */
+                                user: {
+                                    avatar_url?: string;
+                                    email: string;
+                                    id: string;
+                                    name?: string;
+                                };
+                            })[];
+                        };
+                    };
+                };
+            };
+            /** @description Collection not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Validation errors */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        errors: {
+                            [key: string]: string[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PWeb.CollectionController.update (2)": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Collection ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description CollectionUpdateRequest */
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description New description for the collection */
+                    description?: string;
+                    /** @description New title for the collection */
+                    title?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Updated collection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            description?: string;
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            title: string;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        } & {
+                            photos?: ({
+                                allowed_to_delete?: boolean;
+                                /** Format: uri */
+                                full_url: string;
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                /** Format: uri */
+                                thumbnail_url: string;
+                                title: string;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } & {
+                                /** User */
+                                user: {
+                                    avatar_url?: string;
+                                    email: string;
+                                    id: string;
+                                    name?: string;
+                                };
+                            })[];
+                        };
+                    };
+                };
+            };
+            /** @description Collection not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Validation errors */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        errors: {
+                            [key: string]: string[];
+                        };
+                    };
                 };
             };
         };

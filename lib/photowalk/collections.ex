@@ -81,6 +81,26 @@ defmodule P.Collections do
     end
   end
 
+  @spec update_collection(Scope.t(), map()) ::
+          {:ok, Collection.t()} | {:error, :forbidden | :invalid_params | :not_found | Ecto.Changeset.t()}
+  def update_collection(%Scope{} = scope, params) when is_map(params) do
+    id = Map.get(params, "id") || Map.get(params, :id)
+
+    with id when not is_nil(id) <- id,
+         %Collection{} = collection <- Repo.get(Collection, id),
+         true <- can_mutate_collection?(scope, collection) do
+      attrs = Map.take(params, ["title", "description", :title, :description])
+
+      collection
+      |> Collection.changeset(attrs)
+      |> Repo.update()
+    else
+      nil -> {:error, :invalid_params}
+      false -> {:error, :forbidden}
+      {:error, _} = error -> error
+    end
+  end
+
   def list_users(scope, %Collection{id: collection_id} = collection, opts \\ %{}) do
     if can_read_collection?(scope, collection) do
       User
@@ -116,6 +136,10 @@ defmodule P.Collections do
       %Collection{owner_id: owner_id} -> user.id == owner_id
       nil -> false
     end
+  end
+
+  def can_mutate_collection?(%P.Scope{current_user: %User{id: user_id}}, %Collection{owner_id: owner_id}) do
+    user_id == owner_id
   end
 
   defp insert_member(params) do
