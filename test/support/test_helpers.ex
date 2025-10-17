@@ -2,6 +2,7 @@ defmodule PWeb.TestHelpers do
   @moduledoc "Shared helpers for web connection tests."
 
   import Plug.Conn
+  import OpenApiSpex.TestAssertions
 
   alias Phoenix.ConnTest
   alias P.User
@@ -36,6 +37,13 @@ defmodule PWeb.TestHelpers do
     conn
     |> log_in_user(user)
     |> json_conn()
+  end
+
+  def assert_api_spec(response, schema_name) do
+    api_spec = PWeb.ApiSpec.spec()
+    assert_schema(response, schema_name, api_spec)
+
+    response
   end
 
   defp ensure_test_session(%Plug.Conn{private: %{plug_session: _}} = conn), do: conn

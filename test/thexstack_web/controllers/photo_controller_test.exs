@@ -29,10 +29,9 @@ defmodule PWeb.PhotoControllerTest do
       response = json_response(conn, 201)
       api_spec = PWeb.ApiSpec.spec()
 
-      assert_schema(response, "PhotoListResponse", api_spec)
+      assert_schema(response, "PhotoCreateResponse", api_spec)
 
-      [%{"thumbnail_url" => thumb_url, "full_url" => full_url, "allowed_to_delete" => allowed?}] =
-        response["data"]
+      %{"thumbnail_url" => thumb_url, "full_url" => full_url, "allowed_to_delete" => allowed?} = response["data"]
 
       assert thumb_url =~ "/uploads/"
       assert full_url =~ "/uploads/"
@@ -69,14 +68,9 @@ defmodule PWeb.PhotoControllerTest do
         |> auth_json_conn(user)
         |> post(~p"/api/photos", %{"photo" => upload, "collection_id" => collection.id})
 
-      response = json_response(conn, 201)
-      api_spec = PWeb.ApiSpec.spec()
+      response = json_response(conn, 201) |> assert_api_spec("PhotoCreateResponse")
 
-      assert_schema(response, "PhotoListResponse", api_spec)
-      assert length(response["data"]) == 1
-
-      # Verify the photo was added to the collection
-      photo = P.Repo.get(P.Photo, List.first(response["data"])["id"])
+      photo = P.Repo.get(P.Photo, response["data"]["id"])
       assert photo.collection_id == collection.id
     end
 
@@ -91,7 +85,10 @@ defmodule PWeb.PhotoControllerTest do
         |> auth_json_conn(user)
         |> post(~p"/api/photos", %{"photo" => upload, "collection_id" => other_collection.id})
 
-      response = json_response(conn, 422)
+      response =
+        json_response(conn, 422)
+        |> assert_api_spec("ValidationErrors")
+
       assert response["errors"]["collection_id"] == ["does not belong to you"]
     end
 
@@ -177,7 +174,7 @@ defmodule PWeb.PhotoControllerTest do
       other_user = user_fixture()
       photo = photo_fixture(user: owner)
 
-      summary = PhotoSummary.from_photo(photo, current_user: other_user)
+      summary = PhotoSummary.serialize(photo, current_user: other_user)
       refute summary.allowed_to_delete
     end
   end

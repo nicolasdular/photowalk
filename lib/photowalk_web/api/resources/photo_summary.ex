@@ -1,24 +1,9 @@
 defmodule PWeb.API.Resources.PhotoSummary do
-  @moduledoc """
-  API transport representation for a photo when embedded as a summary.
-  """
-
-  alias Ecto.UUID
   alias OpenApiSpex.Schema
   alias P.Photo
   alias PWeb.API.Resources.Helpers
 
-  @derive {Jason.Encoder, only: [:id, :title, :thumbnail_url, :full_url, :inserted_at, :updated_at, :allowed_to_delete]}
-  @enforce_keys [
-    :id,
-    :title,
-    :thumbnail_url,
-    :full_url,
-    :inserted_at,
-    :updated_at,
-    :allowed_to_delete
-  ]
-  defstruct [
+  @fields [
     :id,
     :title,
     :thumbnail_url,
@@ -28,29 +13,17 @@ defmodule PWeb.API.Resources.PhotoSummary do
     :allowed_to_delete
   ]
 
-  @type t :: %__MODULE__{
-          id: UUID.t(),
-          title: String.t() | nil,
-          thumbnail_url: String.t(),
-          full_url: String.t(),
-          inserted_at: String.t(),
-          updated_at: String.t(),
-          allowed_to_delete: boolean()
-        }
-
-  @spec from_photo(Photo.t(), keyword()) :: t()
-  def from_photo(%Photo{} = photo, opts \\ []) do
+  def serialize(%Photo{} = photo, opts \\ []) do
     current_user = Keyword.get(opts, :current_user)
 
-    %__MODULE__{
-      id: photo.id,
-      title: photo.title,
+    Map.take(photo, [:id, :title])
+    |> Map.merge(%{
       thumbnail_url: Photo.url(photo, :thumb),
       full_url: Photo.url(photo, :full),
       inserted_at: Helpers.datetime_to_iso!(photo.inserted_at),
       updated_at: Helpers.datetime_to_iso!(photo.updated_at),
       allowed_to_delete: allowed_to_delete?(photo, current_user)
-    }
+    })
   end
 
   defp allowed_to_delete?(%Photo{user_id: user_id}, %{id: user_id}), do: true
@@ -59,9 +32,8 @@ defmodule PWeb.API.Resources.PhotoSummary do
   def schema do
     %Schema{
       title: "PhotoSummary",
-      description: "Summary representation of a photo",
       type: :object,
-      required: [:id, :title, :thumbnail_url, :full_url, :inserted_at, :updated_at, :allowed_to_delete],
+      required: @fields,
       properties: %{
         id: %Schema{type: :string, format: :uuid},
         title: %Schema{type: :string},

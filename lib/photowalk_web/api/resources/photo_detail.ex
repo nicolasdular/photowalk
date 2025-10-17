@@ -52,10 +52,10 @@ defmodule PWeb.API.Resources.PhotoDetail do
           user: UserResource.t()
         }
 
-  @spec from_photo(Photo.t(), keyword()) :: t()
-  def from_photo(%Photo{} = photo, opts \\ []) do
+  @spec serialize(Photo.t(), keyword()) :: t()
+  def serialize(%Photo{} = photo, opts \\ []) do
     %User{} = user = ensure_user_preloaded(photo)
-    summary = PhotoSummary.from_photo(photo, opts)
+    summary = PhotoSummary.serialize(photo, opts)
 
     %__MODULE__{
       id: summary.id,

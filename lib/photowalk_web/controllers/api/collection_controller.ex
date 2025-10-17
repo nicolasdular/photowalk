@@ -3,198 +3,19 @@ defmodule PWeb.CollectionController do
   use OpenApiSpex.ControllerSpecs
 
   alias OpenApiSpex.Schema
+  alias PWeb.Api.Docs.Response
   alias P.Collections
   alias PWeb.API.Resources.{CollectionDetail, CollectionSummary}
   alias PWeb.API.Resources.User, as: UserResource
 
   action_fallback PWeb.FallbackController
 
-  @collection_list_response_schema %Schema{
-    title: "CollectionListResponse",
-    description: "List of collections for the current user",
-    type: :object,
-    properties: %{
-      data: %Schema{
-        type: :array,
-        items: CollectionSummary.schema()
-      }
-    },
-    required: [:data]
-  }
-
-  @collection_show_response_schema %Schema{
-    title: "CollectionShowResponse",
-    description: "A single collection with its photos",
-    type: :object,
-    properties: %{
-      data: CollectionDetail.schema()
-    },
-    required: [:data]
-  }
-
-  @collection_create_request_schema %Schema{
-    title: "CollectionCreateRequest",
-    description: "Parameters for creating a collection",
-    type: :object,
-    properties: %{
-      title: %Schema{type: :string, description: "Title of the collection"},
-      description: %Schema{type: :string, description: "Description of the collection"}
-    },
-    required: [:title]
-  }
-
-  @collection_update_request_schema %Schema{
-    title: "CollectionUpdateRequest",
-    description: "Parameters for updating a collection",
-    type: :object,
-    properties: %{
-      title: %Schema{type: :string, description: "New title for the collection"},
-      description: %Schema{type: :string, description: "New description for the collection"}
-    }
-  }
-
-  @collection_validation_error_schema %Schema{
-    title: "ValidationErrors",
-    type: :object,
-    properties: %{
-      errors: %Schema{
-        type: :object,
-        additionalProperties: %Schema{type: :array, items: %Schema{type: :string}}
-      }
-    },
-    required: [:errors]
-  }
-
-  @add_user_request_schema %Schema{
-    title: "AddUserToCollectionRequest",
-    description: "Parameters for adding a user to a collection",
-    type: :object,
-    properties: %{
-      email: %Schema{type: :string, format: :email, description: "Email of the user to add"}
-    },
-    required: [:email]
-  }
-
-  @user_response_schema %Schema{
-    title: "UserResponse",
-    description: "Response containing user data",
-    type: :object,
-    properties: %{
-      data: UserResource.schema()
-    },
-    required: [:data]
-  }
-
-  @users_list_response_schema %Schema{
-    title: "UsersListResponse",
-    description: "List of users in a collection",
-    type: :object,
-    properties: %{
-      data: %Schema{
-        type: :array,
-        items: UserResource.schema()
-      }
-    },
-    required: [:data]
-  }
-
   tags(["collections"])
 
   operation :index,
     summary: "List collections",
     responses: [
-      ok: {"Collections", "application/json", @collection_list_response_schema}
-    ]
-
-  operation :create,
-    summary: "Create a collection",
-    request_body: {
-      "CollectionCreateRequest",
-      "application/json",
-      @collection_create_request_schema,
-      required: true
-    },
-    responses: [
-      created: {
-        "Created collection",
-        "application/json",
-        @collection_show_response_schema
-      },
-      unprocessable_entity: {
-        "Validation errors",
-        "application/json",
-        @collection_validation_error_schema
-      }
-    ]
-
-  operation :update,
-    summary: "Update a collection",
-    parameters: [
-      id: [in: :path, description: "Collection ID", type: :string, required: true]
-    ],
-    request_body: {
-      "CollectionUpdateRequest",
-      "application/json",
-      @collection_update_request_schema,
-      required: true
-    },
-    responses: [
-      ok: {
-        "Updated collection",
-        "application/json",
-        @collection_show_response_schema
-      },
-      not_found: {"Collection not found", "application/json", %Schema{type: :object}},
-      unprocessable_entity: {
-        "Validation errors",
-        "application/json",
-        @collection_validation_error_schema
-      }
-    ]
-
-  operation :show,
-    summary: "Show a collection",
-    parameters: [
-      id: [in: :path, description: "Collection ID", type: :string, required: true]
-    ],
-    responses: [
-      ok: {"Collection", "application/json", @collection_show_response_schema},
-      not_found: {"Collection not found", "application/json", %Schema{type: :object}}
-    ]
-
-  operation :add_user,
-    summary: "Add a user to a collection",
-    parameters: [
-      id: [in: :path, description: "Collection ID", type: :string, required: true]
-    ],
-    request_body: {
-      "AddUserToCollectionRequest",
-      "application/json",
-      @add_user_request_schema,
-      required: true
-    },
-    responses: [
-      created: {
-        "User added to collection",
-        "application/json",
-        @user_response_schema
-      },
-      not_found: {"Collection not found", "application/json", %Schema{type: :object}},
-      unprocessable_entity: {
-        "Validation errors",
-        "application/json",
-        @collection_validation_error_schema
-      }
-    ]
-
-  operation :list_users,
-    summary: "List users in a collection",
-    parameters: [
-      id: [in: :path, description: "Collection ID", type: :string, required: true]
-    ],
-    responses: [
-      ok: {"Users in collection", "application/json", @users_list_response_schema},
-      not_found: {"Collection not found", "application/json", %Schema{type: :object}}
+      ok: Response.data_list(CollectionSummary.schema(), "CollectionListResponse")
     ]
 
   def index(conn, _params) do
@@ -208,6 +29,27 @@ defmodule PWeb.CollectionController do
 
     json(conn, %{data: collections})
   end
+
+  operation :create,
+    request_body: {
+      "CollectionCreateRequest",
+      "application/json",
+      %Schema{
+        title: "CollectionCreateRequest",
+        description: "Parameters for creating a collection",
+        type: :object,
+        properties: %{
+          title: %Schema{type: :string, description: "Title of the collection"},
+          description: %Schema{type: :string, description: "Description of the collection"}
+        },
+        required: [:title]
+      },
+      required: true
+    },
+    responses: [
+      created: Response.data(CollectionDetail.schema(), "CollectionCreateResponse"),
+      unprocessable_entity: Response.validation_error()
+    ]
 
   def create(conn, params) do
     scope = conn.assigns.current_scope
@@ -224,6 +66,31 @@ defmodule PWeb.CollectionController do
     end
   end
 
+  operation :update,
+    summary: "Update a collection",
+    parameters: [
+      id: [in: :path, description: "Collection ID", type: :string, required: true]
+    ],
+    request_body: {
+      "CollectionUpdateRequest",
+      "application/json",
+      %Schema{
+        title: "CollectionUpdateRequest",
+        description: "Parameters for updating a collection",
+        type: :object,
+        properties: %{
+          title: %Schema{type: :string, description: "New title for the collection"},
+          description: %Schema{type: :string, description: "New description for the collection"}
+        }
+      },
+      required: true
+    },
+    responses: [
+      ok: Response.data(CollectionDetail.schema(), "CollectionUpdateResponse"),
+      not_found: Response.not_found(),
+      unprocessable_entity: Response.validation_error()
+    ]
+
   def update(conn, params) do
     scope = scope(conn)
     current_user = current_user(conn)
@@ -237,6 +104,15 @@ defmodule PWeb.CollectionController do
     end
   end
 
+  operation :show,
+    parameters: [
+      id: [in: :path, description: "Collection ID", type: :string, required: true]
+    ],
+    responses: [
+      ok: Response.data(CollectionDetail.schema(), "CollectionShowResponse"),
+      not_found: Response.not_found()
+    ]
+
   def show(conn, %{"id" => id}) do
     current_user = current_user(conn)
 
@@ -247,6 +123,31 @@ defmodule PWeb.CollectionController do
       json(conn, %{data: CollectionDetail.from_collection(collection, current_user: current_user)})
     end
   end
+
+  operation :add_user,
+    summary: "Add a user to a collection",
+    parameters: [
+      id: [in: :path, description: "Collection ID", type: :string, required: true]
+    ],
+    request_body: {
+      "AddUserToCollectionRequest",
+      "application/json",
+      %Schema{
+        title: "AddUserToCollectionRequest",
+        description: "Parameters for adding a user to a collection",
+        type: :object,
+        properties: %{
+          email: %Schema{type: :string, format: :email, description: "Email of the user to add"}
+        },
+        required: [:email]
+      },
+      required: true
+    },
+    responses: [
+      created: Response.data(UserResource.schema(), "AddUserToCollectionResponse"),
+      not_found: {"Collection not found", "application/json", %Schema{type: :object}},
+      unprocessable_entity: Response.validation_error()
+    ]
 
   def add_user(conn, %{"collection_id" => collection_id, "email" => email}) do
     inviter_id = conn.assigns.current_user.id
@@ -266,6 +167,16 @@ defmodule PWeb.CollectionController do
       error -> error
     end
   end
+
+  operation :list_users,
+    summary: "List users in a collection",
+    parameters: [
+      id: [in: :path, description: "Collection ID", type: :string, required: true]
+    ],
+    responses: [
+      ok: Response.data_list(UserResource.schema(), "CollectionUsersListResponse"),
+      not_found: Response.not_found()
+    ]
 
   def list_users(conn, %{"collection_id" => collection_id}) do
     scope = conn.assigns.current_scope

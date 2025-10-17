@@ -4,10 +4,6 @@ defmodule PWeb.API.Resources.User do
 
   @fields [:id, :email, :name, :avatar_url]
 
-  @derive {Jason.Encoder, only: @fields}
-  @enforce_keys @fields
-  defstruct @fields
-
   def serialize(%User{} = user) do
     Map.take(user, @fields) |> Map.put(:avatar_url, User.avatar_url(user))
   end

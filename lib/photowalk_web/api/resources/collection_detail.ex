@@ -29,7 +29,7 @@ defmodule PWeb.API.Resources.CollectionDetail do
     photos =
       collection
       |> fetch_loaded_photos!()
-      |> Enum.map(&PhotoDetail.from_photo(&1, current_user: current_user))
+      |> Enum.map(&PhotoDetail.serialize(&1, current_user: current_user))
 
     struct!(__MODULE__, Map.put(base, :photos, photos))
   end

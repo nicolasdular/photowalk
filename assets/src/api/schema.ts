@@ -101,7 +101,6 @@ export interface paths {
         /** List photos */
         get: operations["PWeb.PhotoController.index"];
         put?: never;
-        /** Upload a photo */
         post: operations["PWeb.PhotoController.create"];
         delete?: never;
         options?: never;
@@ -119,7 +118,6 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** Delete photo */
         delete: operations["PWeb.PhotoController.delete"];
         options?: never;
         head?: never;
@@ -342,6 +340,24 @@ export interface components {
             /** @description Error message */
             error: string;
         };
+        /** PhotoCreateResponse */
+        PhotoCreateResponse: {
+            /** PhotoSummary */
+            data: {
+                allowed_to_delete: boolean;
+                /** Format: uri */
+                full_url: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                /** Format: uri */
+                thumbnail_url: string;
+                title: string;
+                /** Format: date-time */
+                updated_at: string;
+            };
+        };
         /**
          * PhotoDetail
          * @description Detailed representation of a photo including author information
@@ -374,10 +390,7 @@ export interface components {
                 name: string;
             };
         };
-        /**
-         * PhotoListResponse
-         * @description List of photos for the current user
-         */
+        /** PhotoListResponse */
         PhotoListResponse: {
             data: {
                 allowed_to_delete: boolean;
@@ -394,10 +407,7 @@ export interface components {
                 updated_at: string;
             }[];
         };
-        /**
-         * PhotoSummary
-         * @description Summary representation of a photo
-         */
+        /** PhotoSummary */
         PhotoSummary: {
             allowed_to_delete: boolean;
             /** Format: uri */
@@ -412,10 +422,7 @@ export interface components {
             /** Format: date-time */
             updated_at: string;
         };
-        /**
-         * PhotoUploadRequest
-         * @description Multipart payload accepting a single photo
-         */
+        /** PhotoUploadRequest */
         PhotoUploadRequest: {
             /**
              * Format: uuid
@@ -1118,7 +1125,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Photos */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1169,13 +1175,13 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Uploaded photos */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
+                        /** PhotoSummary */
                         data: {
                             allowed_to_delete: boolean;
                             /** Format: uri */
@@ -1189,11 +1195,10 @@ export interface operations {
                             title: string;
                             /** Format: date-time */
                             updated_at: string;
-                        }[];
+                        };
                     };
                 };
             };
-            /** @description Validation errors */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -1213,7 +1218,6 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Photo ID */
                 id: string;
             };
             cookie?: never;
@@ -1227,7 +1231,6 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Not found */
             404: {
                 headers: {
                     [name: string]: unknown;

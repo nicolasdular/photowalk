@@ -29,7 +29,7 @@ defmodule PWeb.API.Resources.CollectionSummary do
     thumbnails =
       collection
       |> Photos.thumnbnails_for()
-      |> Enum.map(&PhotoSummary.from_photo(&1, current_user: current_user))
+      |> Enum.map(&PhotoSummary.serialize(&1, current_user: current_user))
 
     struct!(__MODULE__, Map.put(base, :thumbnails, thumbnails))
   end
