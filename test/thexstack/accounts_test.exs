@@ -48,7 +48,7 @@ defmodule P.Accounts.MagicLinkTest do
     end
 
     test "trims name" do
-      email = "hello@philippspiess.com"
+      email = "hello@nicolasdular.com"
       name = "  John Doe  "
 
       assert {:ok, :sent} = Accounts.signup(email, name)
@@ -130,7 +130,7 @@ defmodule P.Accounts.MagicLinkTest do
     end
 
     test "returns confirmed user without changing confirmation timestamp" do
-      email = "hello@philippspiess.com"
+      email = "hello@nicolasdular.com"
       confirmed_at = DateTime.utc_now() |> DateTime.truncate(:second)
       user = user_fixture(%{email: email, confirmed_at: confirmed_at})
       token = request_magic_link_and_capture_token(email)
