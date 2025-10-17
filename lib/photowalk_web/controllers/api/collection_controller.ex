@@ -106,7 +106,7 @@ defmodule PWeb.CollectionController do
 
   operation :show,
     parameters: [
-      id: [in: :path, description: "Collection ID", type: :string, required: true]
+      id: [in: :path, description: "Collection ID", schema: %Schema{type: :string, format: :uuid}, required: true]
     ],
     responses: [
       ok: Response.data(CollectionDetail.schema(), "CollectionShowResponse"),
@@ -150,7 +150,7 @@ defmodule PWeb.CollectionController do
     },
     responses: [
       created: Response.data(UserResource.schema(), "AddUserToCollectionResponse"),
-      not_found: {"Collection not found", "application/json", %Schema{type: :object}},
+      not_found: Response.not_found(),
       unprocessable_entity: Response.validation_error()
     ]
 

@@ -110,7 +110,7 @@ defmodule PWeb.CollectionControllerTest do
       response = json_response(conn, 200)
 
       api_spec = PWeb.ApiSpec.spec()
-      assert_schema(response, "CollectionShowResponse", api_spec)
+      assert_schema(response, "CollectionUpdateResponse", api_spec)
 
       assert response["data"]["title"] == "Updated title"
       assert response["data"]["description"] == "Updated description"
