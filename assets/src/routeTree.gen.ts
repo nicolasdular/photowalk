@@ -13,6 +13,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as ConfirmTokenRouteImport } from './routes/confirm.$token'
 import { Route as AppWalksNewRouteImport } from './routes/_app/walks/new'
 import { Route as AppWalksCollectionIdRouteImport } from './routes/_app/walks/$collectionId'
 import { Route as AppWalksCollectionIdEditRouteImport } from './routes/_app/walks/$collectionId/edit'
@@ -36,6 +37,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
+} as any)
+const ConfirmTokenRoute = ConfirmTokenRouteImport.update({
+  id: '/confirm/$token',
+  path: '/confirm/$token',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AppWalksNewRoute = AppWalksNewRouteImport.update({
   id: '/walks/new',
@@ -63,6 +69,7 @@ const AppWalksCollectionIdPhotosPhotoIdRoute =
 export interface FileRoutesByFullPath {
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/confirm/$token': typeof ConfirmTokenRoute
   '/': typeof AppIndexRoute
   '/walks/$collectionId': typeof AppWalksCollectionIdRouteWithChildren
   '/walks/new': typeof AppWalksNewRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/confirm/$token': typeof ConfirmTokenRoute
   '/': typeof AppIndexRoute
   '/walks/$collectionId': typeof AppWalksCollectionIdRouteWithChildren
   '/walks/new': typeof AppWalksNewRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/confirm/$token': typeof ConfirmTokenRoute
   '/_app/': typeof AppIndexRoute
   '/_app/walks/$collectionId': typeof AppWalksCollectionIdRouteWithChildren
   '/_app/walks/new': typeof AppWalksNewRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/signin'
     | '/signup'
+    | '/confirm/$token'
     | '/'
     | '/walks/$collectionId'
     | '/walks/new'
@@ -103,6 +113,7 @@ export interface FileRouteTypes {
   to:
     | '/signin'
     | '/signup'
+    | '/confirm/$token'
     | '/'
     | '/walks/$collectionId'
     | '/walks/new'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/signin'
     | '/signup'
+    | '/confirm/$token'
     | '/_app/'
     | '/_app/walks/$collectionId'
     | '/_app/walks/new'
@@ -124,6 +136,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
+  ConfirmTokenRoute: typeof ConfirmTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -155,6 +168,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/confirm/$token': {
+      id: '/confirm/$token'
+      path: '/confirm/$token'
+      fullPath: '/confirm/$token'
+      preLoaderRoute: typeof ConfirmTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_app/walks/new': {
       id: '/_app/walks/new'
@@ -219,6 +239,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
+  ConfirmTokenRoute: ConfirmTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

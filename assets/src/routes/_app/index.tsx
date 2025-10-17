@@ -4,7 +4,6 @@ import client from '../../api/client';
 import type { components } from '../../api/schema';
 import { Button } from '@/components/ui/button';
 import { PageTitle } from '@/components/ui/page-title';
-import { Spinner } from '@/components/ui/spinner';
 import { Plus, CameraIcon } from 'lucide-react';
 import {
   Empty,

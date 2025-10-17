@@ -29,8 +29,12 @@ function SignUp() {
       return null;
     }
 
-    if (searchError === 'invalid_token') {
-      return 'The magic link is invalid or has expired. Request a new one.';
+    if (typeof searchError === 'string') {
+      if (searchError === 'invalid_token') {
+        return 'The magic link is invalid or has expired. Request a new one.';
+      }
+
+      return searchError;
     }
 
     return 'Something went wrong. Please try again.';
