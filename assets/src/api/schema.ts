@@ -46,7 +46,6 @@ export interface paths {
         /** List collections */
         get: operations["PWeb.CollectionController.index"];
         put?: never;
-        /** Create a collection */
         post: operations["PWeb.CollectionController.create"];
         delete?: never;
         options?: never;
@@ -79,7 +78,6 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Show a collection */
         get: operations["PWeb.CollectionController.show"];
         /** Update a collection */
         put: operations["PWeb.CollectionController.update"];
@@ -155,6 +153,22 @@ export interface components {
              */
             email: string;
         };
+        /** AddUserToCollectionResponse */
+        AddUserToCollectionResponse: {
+            /**
+             * User
+             * @description A user in the system
+             */
+            data: {
+                /** Format: uri */
+                avatar_url: string | null;
+                /** Format: email */
+                email: string;
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+        };
         /**
          * CollectionCreateRequest
          * @description Parameters for creating a collection
@@ -164,6 +178,51 @@ export interface components {
             description?: string;
             /** @description Title of the collection */
             title: string;
+        };
+        /** CollectionCreateResponse */
+        CollectionCreateResponse: {
+            /**
+             * CollectionDetail
+             * @description Collection data returned from show/create/update endpoints
+             */
+            data: {
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                photos: ({
+                    allowed_to_delete: boolean;
+                    /** Format: uri */
+                    full_url: string;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    inserted_at: string;
+                    /** Format: uri */
+                    thumbnail_url: string;
+                    title: string;
+                    /** Format: date-time */
+                    updated_at: string;
+                } & {
+                    /**
+                     * User
+                     * @description A user in the system
+                     */
+                    user: {
+                        /** Format: uri */
+                        avatar_url: string | null;
+                        /** Format: email */
+                        email: string;
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                    };
+                })[];
+                title: string;
+                /** Format: date-time */
+                updated_at: string;
+            };
         };
         /**
          * CollectionDetail
@@ -207,10 +266,7 @@ export interface components {
             /** Format: date-time */
             updated_at: string;
         };
-        /**
-         * CollectionListResponse
-         * @description List of collections for the current user
-         */
+        /** CollectionListResponse */
         CollectionListResponse: {
             data: {
                 description?: string | null;
@@ -238,10 +294,7 @@ export interface components {
                 updated_at: string;
             }[];
         };
-        /**
-         * CollectionShowResponse
-         * @description A single collection with its photos
-         */
+        /** CollectionShowResponse */
         CollectionShowResponse: {
             /**
              * CollectionDetail
@@ -324,6 +377,63 @@ export interface components {
             description?: string;
             /** @description New title for the collection */
             title?: string;
+        };
+        /** CollectionUpdateResponse */
+        CollectionUpdateResponse: {
+            /**
+             * CollectionDetail
+             * @description Collection data returned from show/create/update endpoints
+             */
+            data: {
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                photos: ({
+                    allowed_to_delete: boolean;
+                    /** Format: uri */
+                    full_url: string;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    inserted_at: string;
+                    /** Format: uri */
+                    thumbnail_url: string;
+                    title: string;
+                    /** Format: date-time */
+                    updated_at: string;
+                } & {
+                    /**
+                     * User
+                     * @description A user in the system
+                     */
+                    user: {
+                        /** Format: uri */
+                        avatar_url: string | null;
+                        /** Format: email */
+                        email: string;
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                    };
+                })[];
+                title: string;
+                /** Format: date-time */
+                updated_at: string;
+            };
+        };
+        /** CollectionUsersListResponse */
+        CollectionUsersListResponse: {
+            data: {
+                /** Format: uri */
+                avatar_url: string | null;
+                /** Format: email */
+                email: string;
+                /** Format: uuid */
+                id: string;
+                name: string;
+            }[];
         };
         /**
          * Error
@@ -477,40 +587,6 @@ export interface components {
             id: string;
             name: string;
         };
-        /**
-         * UserResponse
-         * @description Response containing user data
-         */
-        UserResponse: {
-            /**
-             * User
-             * @description A user in the system
-             */
-            data: {
-                /** Format: uri */
-                avatar_url: string | null;
-                /** Format: email */
-                email: string;
-                /** Format: uuid */
-                id: string;
-                name: string;
-            };
-        };
-        /**
-         * UsersListResponse
-         * @description List of users in a collection
-         */
-        UsersListResponse: {
-            data: {
-                /** Format: uri */
-                avatar_url: string | null;
-                /** Format: email */
-                email: string;
-                /** Format: uuid */
-                id: string;
-                name: string;
-            }[];
-        };
         /** ValidationErrors */
         ValidationErrors: {
             errors: {
@@ -599,6 +675,14 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     "PWeb.CollectionController.index": {
@@ -610,7 +694,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Collections */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -666,7 +749,6 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Created collection */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -718,7 +800,6 @@ export interface operations {
                     };
                 };
             };
-            /** @description Validation errors */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -739,13 +820,12 @@ export interface operations {
             header?: never;
             path: {
                 /** @description Collection ID */
-                id: string;
+                collection_id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Users in collection */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -764,13 +844,15 @@ export interface operations {
                     };
                 };
             };
-            /** @description Collection not found */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        /** @description Error message */
+                        error: string;
+                    };
                 };
             };
         };
@@ -781,7 +863,7 @@ export interface operations {
             header?: never;
             path: {
                 /** @description Collection ID */
-                id: string;
+                collection_id: string;
             };
             cookie?: never;
         };
@@ -798,7 +880,6 @@ export interface operations {
             };
         };
         responses: {
-            /** @description User added to collection */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -830,7 +911,6 @@ export interface operations {
                     "application/json": Record<string, never>;
                 };
             };
-            /** @description Validation errors */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -857,7 +937,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Collection */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -909,13 +988,15 @@ export interface operations {
                     };
                 };
             };
-            /** @description Collection not found */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        /** @description Error message */
+                        error: string;
+                    };
                 };
             };
         };
@@ -942,7 +1023,6 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Updated collection */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -994,16 +1074,17 @@ export interface operations {
                     };
                 };
             };
-            /** @description Collection not found */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        /** @description Error message */
+                        error: string;
+                    };
                 };
             };
-            /** @description Validation errors */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -1040,7 +1121,6 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Updated collection */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1092,16 +1172,17 @@ export interface operations {
                     };
                 };
             };
-            /** @description Collection not found */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        /** @description Error message */
+                        error: string;
+                    };
                 };
             };
-            /** @description Validation errors */
             422: {
                 headers: {
                     [name: string]: unknown;

@@ -127,7 +127,12 @@ defmodule PWeb.CollectionController do
   operation :add_user,
     summary: "Add a user to a collection",
     parameters: [
-      id: [in: :path, description: "Collection ID", type: :string, required: true]
+      collection_id: [
+        in: :path,
+        description: "Collection ID",
+        type: :string,
+        required: true
+      ]
     ],
     request_body: {
       "AddUserToCollectionRequest",
@@ -171,7 +176,12 @@ defmodule PWeb.CollectionController do
   operation :list_users,
     summary: "List users in a collection",
     parameters: [
-      id: [in: :path, description: "Collection ID", type: :string, required: true]
+      collection_id: [
+        in: :path,
+        description: "Collection ID",
+        type: :string,
+        required: true
+      ]
     ],
     responses: [
       ok: Response.data_list(UserResource.schema(), "CollectionUsersListResponse"),

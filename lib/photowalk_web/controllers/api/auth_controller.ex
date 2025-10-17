@@ -53,7 +53,8 @@ defmodule PWeb.AuthController do
     },
     responses: [
       ok: Response.ok(Success),
-      forbidden: Response.forbidden()
+      forbidden: Response.forbidden(),
+      conflict: Response.conflict()
     ]
   )
 

@@ -4,6 +4,8 @@ defmodule PWeb.Api.Docs.Response do
 
   def forbidden(message \\ nil), do: {message, "application/json", Docs.Error}
 
+  def conflict(message \\ nil), do: {message, "application/json", Docs.Error}
+
   def ok(schema, message \\ nil), do: {message, "application/json", schema}
 
   def not_found(message \\ nil),
