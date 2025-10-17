@@ -25,7 +25,7 @@ defmodule PWeb.CollectionController do
     collections =
       scope
       |> Collections.list_collections()
-      |> Enum.map(&CollectionSummary.from_collection(&1, current_user: current_user))
+      |> Enum.map(&CollectionSummary.build(&1, current_user: current_user))
 
     json(conn, %{data: collections})
   end
@@ -61,7 +61,7 @@ defmodule PWeb.CollectionController do
       conn
       |> put_status(:created)
       |> json(%{
-        data: CollectionDetail.from_collection(detailed_collection, current_user: current_user)
+        data: CollectionDetail.build(detailed_collection, current_user: current_user)
       })
     end
   end
@@ -99,7 +99,7 @@ defmodule PWeb.CollectionController do
          {:ok, detailed_collection} <-
            Collections.get_collection(scope, collection.id, %{preloads: [photos: :user]}) do
       json(conn, %{
-        data: CollectionDetail.from_collection(detailed_collection, current_user: current_user)
+        data: CollectionDetail.build(detailed_collection, current_user: current_user)
       })
     end
   end
@@ -120,7 +120,7 @@ defmodule PWeb.CollectionController do
            Collections.get_collection(scope(conn), id, %{
              preloads: [photos: :user]
            }) do
-      json(conn, %{data: CollectionDetail.from_collection(collection, current_user: current_user)})
+      json(conn, %{data: CollectionDetail.build(collection, current_user: current_user)})
     end
   end
 
@@ -166,7 +166,7 @@ defmodule PWeb.CollectionController do
          user when not is_nil(user) <- P.Accounts.get_user_by_email(scope(conn), email) do
       conn
       |> put_status(:created)
-      |> json(%{data: UserResource.serialize(user)})
+      |> json(%{data: UserResource.build(user)})
     else
       nil -> {:error, :user_not_found}
       error -> error
@@ -193,7 +193,7 @@ defmodule PWeb.CollectionController do
 
     with {:ok, collection} <- Collections.get_collection(scope, collection_id),
          users <- Collections.list_users(scope, collection) do
-      json(conn, %{data: Enum.map(users, &UserResource.serialize/1)})
+      json(conn, %{data: Enum.map(users, &UserResource.build/1)})
     end
   end
 end

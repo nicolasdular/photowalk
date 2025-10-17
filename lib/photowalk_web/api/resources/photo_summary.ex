@@ -13,7 +13,7 @@ defmodule PWeb.API.Resources.PhotoSummary do
     :allowed_to_delete
   ]
 
-  def serialize(%Photo{} = photo, opts \\ []) do
+  def build(%Photo{} = photo, opts \\ []) do
     current_user = Keyword.get(opts, :current_user)
 
     Map.take(photo, [:id, :title])

@@ -23,7 +23,7 @@ defmodule PWeb.PhotoController do
     photos =
       user
       |> Photos.list_photos_for_user()
-      |> Enum.map(&PhotoSummary.serialize(&1, current_user: user))
+      |> Enum.map(&PhotoSummary.build(&1, current_user: user))
 
     json(conn, %{data: photos})
   end
@@ -62,7 +62,7 @@ defmodule PWeb.PhotoController do
     with {:ok, photo} <- Photos.create_photo(user, params["photo"], params) do
       conn
       |> put_status(:created)
-      |> json(%{data: PhotoSummary.serialize(photo, current_user: user)})
+      |> json(%{data: PhotoSummary.build(photo, current_user: user)})
     end
   end
 

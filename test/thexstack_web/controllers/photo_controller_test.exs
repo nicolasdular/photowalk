@@ -174,7 +174,7 @@ defmodule PWeb.PhotoControllerTest do
       other_user = user_fixture()
       photo = photo_fixture(user: owner)
 
-      summary = PhotoSummary.serialize(photo, current_user: other_user)
+      summary = PhotoSummary.build(photo, current_user: other_user)
       refute summary.allowed_to_delete
     end
   end

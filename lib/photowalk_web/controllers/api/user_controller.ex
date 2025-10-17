@@ -10,6 +10,6 @@ defmodule PWeb.UserController do
   operation(:me, responses: [ok: Response.data(UserResource.schema(), "SignedInUserResponse")])
 
   def me(conn, _params) do
-    json(conn, %{data: UserResource.serialize(current_user(conn))})
+    json(conn, %{data: UserResource.build(current_user(conn))})
   end
 end

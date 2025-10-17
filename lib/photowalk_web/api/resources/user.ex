@@ -4,7 +4,7 @@ defmodule PWeb.API.Resources.User do
 
   @fields [:id, :email, :name, :avatar_url]
 
-  def serialize(%User{} = user) do
+  def build(%User{} = user) do
     Map.take(user, @fields) |> Map.put(:avatar_url, User.avatar_url(user))
   end
 
