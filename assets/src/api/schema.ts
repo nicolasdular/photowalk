@@ -36,6 +36,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify magic link token */
+        post: operations["PWeb.AuthController.magic_link_verify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/collections": {
         parameters: {
             query?: never;
@@ -130,6 +147,40 @@ export interface paths {
             cookie?: never;
         };
         get: operations["PWeb.UserController.me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/sign_out": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Sign out the current user */
+        delete: operations["PWeb.SessionController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Handle inbound magic link redirect */
+        get: operations["PWeb.SessionController.magic_link_landing"];
         put?: never;
         post?: never;
         delete?: never;
@@ -449,6 +500,14 @@ export interface components {
             /** @description Error message */
             error: string;
         };
+        /**
+         * MagicLinkVerifyRequest
+         * @description Parameters for verifying a magic link
+         */
+        MagicLinkVerifyRequest: {
+            /** @description The magic link token */
+            token: string;
+        };
         /** NotFoundError */
         NotFoundError: {
             /** @description Error message */
@@ -677,6 +736,40 @@ export interface operations {
                 };
             };
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "PWeb.AuthController.magic_link_verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Magic link verification payload */
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["MagicLinkVerifyRequest"];
+            };
+        };
+        responses: {
+            /** @description Magic link verified */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Success"];
+                };
+            };
+            /** @description Invalid token */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1362,6 +1455,47 @@ export interface operations {
                         };
                     };
                 };
+            };
+        };
+    };
+    "PWeb.SessionController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signed out */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Success"];
+                };
+            };
+        };
+    };
+    "PWeb.SessionController.magic_link_landing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Magic link token extracted from email URL */
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Redirect to sign-in with token */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

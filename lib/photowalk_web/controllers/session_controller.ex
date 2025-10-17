@@ -1,21 +1,38 @@
 defmodule PWeb.SessionController do
   use PWeb, :controller
+  use OpenApiSpex.ControllerSpecs
 
-  alias P.Accounts
+  alias OpenApiSpex.Schema
+  alias PWeb.Api.Docs.{Response, Success}
 
-  def magic_link(conn, %{"token" => token}) do
-    case Accounts.verify_magic_link(token) do
-      {:ok, user} ->
-        conn
-        |> configure_session(renew: true)
-        |> put_session(:user_id, user.id)
-        |> redirect(to: "/")
+  tags(["auth"])
 
-      {:error, :invalid} ->
-        conn
-        |> redirect(to: "/signup?error=invalid_token")
-    end
+  operation(:magic_link_landing,
+    summary: "Handle inbound magic link redirect",
+    parameters: [
+      token: [
+        in: :path,
+        description: "Magic link token extracted from email URL",
+        required: true,
+        schema: %Schema{type: :string}
+      ]
+    ],
+    responses: [
+      found: {"Redirect to sign-in with token", nil, nil}
+    ]
+  )
+
+  def magic_link_landing(conn, %{"token" => token}) do
+    conn
+    |> redirect(to: ~p"/confirm/#{token}")
   end
+
+  operation(:delete,
+    summary: "Sign out the current user",
+    responses: [
+      ok: Response.ok(Success, "Signed out")
+    ]
+  )
 
   def delete(conn, _params) do
     conn

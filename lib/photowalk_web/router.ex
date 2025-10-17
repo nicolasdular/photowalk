@@ -67,6 +67,7 @@ defmodule PWeb.Router do
 
     post("/auth/request-magic-link", AuthController, :request_magic_link)
     post("/auth/signup", AuthController, :signup)
+    post("/auth/verify", AuthController, :magic_link_verify)
   end
 
   scope "/api", PWeb do
@@ -90,7 +91,7 @@ defmodule PWeb.Router do
   scope "/", PWeb do
     pipe_through(:browser)
 
-    get("/auth/:token", SessionController, :magic_link)
+    get("/auth/:token", SessionController, :magic_link_landing)
     delete("/auth/sign_out", SessionController, :delete)
 
     get("/*path", PageController, :home)
