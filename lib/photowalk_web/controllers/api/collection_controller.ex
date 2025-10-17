@@ -4,34 +4,10 @@ defmodule PWeb.CollectionController do
 
   alias OpenApiSpex.Schema
   alias P.Collections
-  alias P.{Collection, Photo, User}
-  alias PWeb.{CollectionJSON, PhotoJSON, UserJSON}
-  alias PWeb.Schemas.EctoSchema
+  alias PWeb.API.Resources.{CollectionDetail, CollectionSummary}
+  alias PWeb.API.Resources.User, as: UserResource
 
   action_fallback PWeb.FallbackController
-
-  @photo_resource_schema EctoSchema.schema_from_fields(Photo,
-                           description: "A processed photo with accessible variants",
-                           fields: PhotoJSON.fields(),
-                           required: PhotoJSON.required_fields(),
-                           additional_properties: %{
-                             thumbnail_url: %Schema{type: :string, format: :uri},
-                             full_url: %Schema{type: :string, format: :uri},
-                             allowed_to_delete: %Schema{type: :boolean}
-                           }
-                         )
-
-  @collection_resource_schema EctoSchema.schema_from_fields(Collection,
-                                description: "A collection of photos",
-                                fields: CollectionJSON.fields(),
-                                required: CollectionJSON.required_fields()
-                              )
-
-  @user_resource_schema EctoSchema.schema_from_fields(User,
-                          description: "A user in the system",
-                          fields: UserJSON.fields(),
-                          required: [:id, :email, :name, :avatar_url]
-                        )
 
   @collection_list_response_schema %Schema{
     title: "CollectionListResponse",
@@ -40,21 +16,7 @@ defmodule PWeb.CollectionController do
     properties: %{
       data: %Schema{
         type: :array,
-        items: %Schema{
-          allOf: [
-            @collection_resource_schema,
-            %Schema{
-              type: :object,
-              properties: %{
-                thumbnails: %Schema{
-                  type: :array,
-                  items: @photo_resource_schema,
-                  description: "Array of photo thumbnails for the collection"
-                }
-              }
-            }
-          ]
-        }
+        items: CollectionSummary.schema()
       }
     },
     required: [:data]
@@ -65,35 +27,7 @@ defmodule PWeb.CollectionController do
     description: "A single collection with its photos",
     type: :object,
     properties: %{
-      data: %Schema{
-        allOf: [
-          @collection_resource_schema,
-          %Schema{
-            type: :object,
-            properties: %{
-              photos: %Schema{
-                type: :array,
-                items: %Schema{
-                  allOf: [
-                    @photo_resource_schema,
-                    %Schema{
-                      type: :object,
-                      required: [:user],
-                      properties: %{
-                        user:
-                          EctoSchema.schema_from_fields(P.User,
-                            required: [:id, :email],
-                            fields: PWeb.UserJSON.fields()
-                          )
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        ]
-      }
+      data: CollectionDetail.schema()
     },
     required: [:data]
   }
@@ -146,7 +80,7 @@ defmodule PWeb.CollectionController do
     description: "Response containing user data",
     type: :object,
     properties: %{
-      data: @user_resource_schema
+      data: UserResource.schema()
     },
     required: [:data]
   }
@@ -158,7 +92,7 @@ defmodule PWeb.CollectionController do
     properties: %{
       data: %Schema{
         type: :array,
-        items: @user_resource_schema
+        items: UserResource.schema()
       }
     },
     required: [:data]
@@ -264,34 +198,53 @@ defmodule PWeb.CollectionController do
     ]
 
   def index(conn, _params) do
-    render(conn, :index,
-      collections: Collections.list_collections(conn.assigns.current_scope),
-      current_user: conn.assigns.current_user
-    )
+    scope = conn.assigns.current_scope
+    current_user = conn.assigns.current_user
+
+    collections =
+      scope
+      |> Collections.list_collections()
+      |> Enum.map(&CollectionSummary.from_collection(&1, current_user: current_user))
+
+    json(conn, %{data: collections})
   end
 
   def create(conn, params) do
-    user = conn.assigns.current_user
+    scope = conn.assigns.current_scope
+    current_user = conn.assigns.current_user
 
-    with {:ok, collection} <- Collections.create_collection(conn.assigns.current_scope, params) do
+    with {:ok, collection} <- Collections.create_collection(scope, params),
+         {:ok, detailed_collection} <-
+           Collections.get_collection(scope, collection.id, %{preloads: [photos: :user]}) do
       conn
       |> put_status(:created)
-      |> render(:show, collection: collection, current_user: user)
+      |> json(%{
+        data: CollectionDetail.from_collection(detailed_collection, current_user: current_user)
+      })
     end
   end
 
   def update(conn, params) do
-    with {:ok, collection} <- Collections.update_collection(scope(conn), params) do
-      render(conn, :show, collection: collection, current_user: current_user(conn))
+    scope = scope(conn)
+    current_user = current_user(conn)
+
+    with {:ok, collection} <- Collections.update_collection(scope, params),
+         {:ok, detailed_collection} <-
+           Collections.get_collection(scope, collection.id, %{preloads: [photos: :user]}) do
+      json(conn, %{
+        data: CollectionDetail.from_collection(detailed_collection, current_user: current_user)
+      })
     end
   end
 
   def show(conn, %{"id" => id}) do
+    current_user = current_user(conn)
+
     with {:ok, collection} <-
            Collections.get_collection(scope(conn), id, %{
              preloads: [photos: :user]
            }) do
-      render(conn, :show, collection: collection, current_user: current_user(conn))
+      json(conn, %{data: CollectionDetail.from_collection(collection, current_user: current_user)})
     end
   end
 
@@ -307,8 +260,7 @@ defmodule PWeb.CollectionController do
          user when not is_nil(user) <- P.Accounts.get_user_by_email(scope(conn), email) do
       conn
       |> put_status(:created)
-      |> put_view(UserJSON)
-      |> render(:show, user: user)
+      |> json(%{data: UserResource.serialize(user)})
     else
       nil -> {:error, :user_not_found}
       error -> error
@@ -320,9 +272,7 @@ defmodule PWeb.CollectionController do
 
     with {:ok, collection} <- Collections.get_collection(scope, collection_id),
          users <- Collections.list_users(scope, collection) do
-      conn
-      |> put_view(UserJSON)
-      |> render(:index, users: users)
+      json(conn, %{data: Enum.map(users, &UserResource.serialize/1)})
     end
   end
 end

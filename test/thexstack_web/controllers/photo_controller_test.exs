@@ -4,7 +4,7 @@ defmodule PWeb.PhotoControllerTest do
   import P.Factory
   import PWeb.TestHelpers
   import OpenApiSpex.TestAssertions
-  alias PWeb.PhotoJSON
+  alias PWeb.API.Resources.PhotoSummary
 
   setup do
     File.rm_rf!(Path.expand("../../priv/waffle/test/uploads", __DIR__))
@@ -177,9 +177,8 @@ defmodule PWeb.PhotoControllerTest do
       other_user = user_fixture()
       photo = photo_fixture(user: owner)
 
-      %{data: [serialized_photo]} = PhotoJSON.index(%{photos: [photo], current_user: other_user})
-
-      refute serialized_photo[:allowed_to_delete]
+      summary = PhotoSummary.from_photo(photo, current_user: other_user)
+      refute summary.allowed_to_delete
     end
   end
 

@@ -133,7 +133,6 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get current user */
         get: operations["PWeb.UserController.me"];
         put?: never;
         post?: never;
@@ -159,19 +158,6 @@ export interface components {
             email: string;
         };
         /**
-         * Collection
-         * @description A collection of photos
-         */
-        Collection: {
-            description?: string;
-            id: string;
-            /** Format: date-time */
-            inserted_at?: string;
-            title: string;
-            /** Format: date-time */
-            updated_at?: string;
-        };
-        /**
          * CollectionCreateRequest
          * @description Parameters for creating a collection
          */
@@ -182,71 +168,154 @@ export interface components {
             title: string;
         };
         /**
+         * CollectionDetail
+         * @description Collection data returned from show/create/update endpoints
+         */
+        CollectionDetail: {
+            description?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at: string;
+            photos: ({
+                allowed_to_delete: boolean;
+                /** Format: uri */
+                full_url: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                /** Format: uri */
+                thumbnail_url: string;
+                title: string;
+                /** Format: date-time */
+                updated_at: string;
+            } & {
+                /**
+                 * User
+                 * @description A user in the system
+                 */
+                user: {
+                    /** Format: uri */
+                    avatar_url: string | null;
+                    /** Format: email */
+                    email: string;
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                };
+            })[];
+            title: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        /**
          * CollectionListResponse
          * @description List of collections for the current user
          */
         CollectionListResponse: {
-            data: ({
-                description?: string;
+            data: {
+                description?: string | null;
+                /** Format: uuid */
                 id: string;
                 /** Format: date-time */
-                inserted_at?: string;
-                title: string;
-                /** Format: date-time */
-                updated_at?: string;
-            } & {
-                /** @description Array of photo thumbnails for the collection */
-                thumbnails?: {
-                    allowed_to_delete?: boolean;
+                inserted_at: string;
+                /** @description Up to four most recent photos in the collection */
+                thumbnails: {
+                    allowed_to_delete: boolean;
                     /** Format: uri */
                     full_url: string;
+                    /** Format: uuid */
                     id: string;
                     /** Format: date-time */
-                    inserted_at?: string;
+                    inserted_at: string;
                     /** Format: uri */
                     thumbnail_url: string;
                     title: string;
                     /** Format: date-time */
-                    updated_at?: string;
+                    updated_at: string;
                 }[];
-            })[];
+                title: string;
+                /** Format: date-time */
+                updated_at: string;
+            }[];
         };
         /**
          * CollectionShowResponse
          * @description A single collection with its photos
          */
         CollectionShowResponse: {
+            /**
+             * CollectionDetail
+             * @description Collection data returned from show/create/update endpoints
+             */
             data: {
-                description?: string;
+                description?: string | null;
+                /** Format: uuid */
                 id: string;
                 /** Format: date-time */
-                inserted_at?: string;
-                title: string;
-                /** Format: date-time */
-                updated_at?: string;
-            } & {
-                photos?: ({
-                    allowed_to_delete?: boolean;
+                inserted_at: string;
+                photos: ({
+                    allowed_to_delete: boolean;
                     /** Format: uri */
                     full_url: string;
+                    /** Format: uuid */
                     id: string;
                     /** Format: date-time */
-                    inserted_at?: string;
+                    inserted_at: string;
                     /** Format: uri */
                     thumbnail_url: string;
                     title: string;
                     /** Format: date-time */
-                    updated_at?: string;
+                    updated_at: string;
                 } & {
-                    /** User */
+                    /**
+                     * User
+                     * @description A user in the system
+                     */
                     user: {
-                        avatar_url?: string;
+                        /** Format: uri */
+                        avatar_url: string | null;
+                        /** Format: email */
                         email: string;
+                        /** Format: uuid */
                         id: string;
-                        name?: string;
+                        name: string;
                     };
                 })[];
+                title: string;
+                /** Format: date-time */
+                updated_at: string;
             };
+        };
+        /**
+         * CollectionSummary
+         * @description Collection data used in list endpoints
+         */
+        CollectionSummary: {
+            description?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at: string;
+            /** @description Up to four most recent photos in the collection */
+            thumbnails: {
+                allowed_to_delete: boolean;
+                /** Format: uri */
+                full_url: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                /** Format: uri */
+                thumbnail_url: string;
+                title: string;
+                /** Format: date-time */
+                updated_at: string;
+            }[];
+            title: string;
+            /** Format: date-time */
+            updated_at: string;
         };
         /**
          * CollectionUpdateRequest
@@ -274,21 +343,36 @@ export interface components {
             error: string;
         };
         /**
-         * Photo
-         * @description A processed photo with accessible variants
+         * PhotoDetail
+         * @description Detailed representation of a photo including author information
          */
-        Photo: {
-            allowed_to_delete?: boolean;
+        PhotoDetail: {
+            allowed_to_delete: boolean;
             /** Format: uri */
             full_url: string;
+            /** Format: uuid */
             id: string;
             /** Format: date-time */
-            inserted_at?: string;
+            inserted_at: string;
             /** Format: uri */
             thumbnail_url: string;
             title: string;
             /** Format: date-time */
-            updated_at?: string;
+            updated_at: string;
+        } & {
+            /**
+             * User
+             * @description A user in the system
+             */
+            user: {
+                /** Format: uri */
+                avatar_url: string | null;
+                /** Format: email */
+                email: string;
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
         };
         /**
          * PhotoListResponse
@@ -296,31 +380,69 @@ export interface components {
          */
         PhotoListResponse: {
             data: {
-                allowed_to_delete?: boolean;
+                allowed_to_delete: boolean;
                 /** Format: uri */
                 full_url: string;
+                /** Format: uuid */
                 id: string;
                 /** Format: date-time */
-                inserted_at?: string;
+                inserted_at: string;
                 /** Format: uri */
                 thumbnail_url: string;
                 title: string;
                 /** Format: date-time */
-                updated_at?: string;
+                updated_at: string;
             }[];
+        };
+        /**
+         * PhotoSummary
+         * @description Summary representation of a photo
+         */
+        PhotoSummary: {
+            allowed_to_delete: boolean;
+            /** Format: uri */
+            full_url: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at: string;
+            /** Format: uri */
+            thumbnail_url: string;
+            title: string;
+            /** Format: date-time */
+            updated_at: string;
         };
         /**
          * PhotoUploadRequest
          * @description Multipart payload accepting a single photo
          */
         PhotoUploadRequest: {
-            /** @description Optional ID of the collection to add the photo to */
-            collection_id?: number;
+            /**
+             * Format: uuid
+             * @description Optional ID of the collection to add the photo to
+             */
+            collection_id?: string;
             /**
              * Format: binary
              * @description Image file to process
              */
             photo: string;
+        };
+        /** SignedInUserResponse */
+        SignedInUserResponse: {
+            /**
+             * User
+             * @description A user in the system
+             */
+            data: {
+                /** Format: uri */
+                avatar_url: string | null;
+                /** Format: email */
+                email: string;
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
         };
         /**
          * Success
@@ -340,25 +462,31 @@ export interface components {
          * @description A user in the system
          */
         User: {
-            avatar_url: string;
+            /** Format: uri */
+            avatar_url: string | null;
+            /** Format: email */
             email: string;
+            /** Format: uuid */
             id: string;
             name: string;
         };
         /**
          * UserResponse
-         * @description Response schema for a single user
+         * @description Response containing user data
          */
         UserResponse: {
             /**
              * User
-             * @description A user account
+             * @description A user in the system
              */
             data: {
-                avatar_url?: string;
+                /** Format: uri */
+                avatar_url: string | null;
+                /** Format: email */
                 email: string;
+                /** Format: uuid */
                 id: string;
-                name?: string;
+                name: string;
             };
         };
         /**
@@ -367,8 +495,11 @@ export interface components {
          */
         UsersListResponse: {
             data: {
-                avatar_url: string;
+                /** Format: uri */
+                avatar_url: string | null;
+                /** Format: email */
                 email: string;
+                /** Format: uuid */
                 id: string;
                 name: string;
             }[];
@@ -479,30 +610,31 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data: ({
-                            description?: string;
+                        data: {
+                            description?: string | null;
+                            /** Format: uuid */
                             id: string;
                             /** Format: date-time */
-                            inserted_at?: string;
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                        } & {
-                            /** @description Array of photo thumbnails for the collection */
-                            thumbnails?: {
-                                allowed_to_delete?: boolean;
+                            inserted_at: string;
+                            /** @description Up to four most recent photos in the collection */
+                            thumbnails: {
+                                allowed_to_delete: boolean;
                                 /** Format: uri */
                                 full_url: string;
+                                /** Format: uuid */
                                 id: string;
                                 /** Format: date-time */
-                                inserted_at?: string;
+                                inserted_at: string;
                                 /** Format: uri */
                                 thumbnail_url: string;
                                 title: string;
                                 /** Format: date-time */
-                                updated_at?: string;
+                                updated_at: string;
                             }[];
-                        })[];
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                        }[];
                     };
                 };
             };
@@ -534,36 +666,47 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * CollectionDetail
+                         * @description Collection data returned from show/create/update endpoints
+                         */
                         data: {
-                            description?: string;
+                            description?: string | null;
+                            /** Format: uuid */
                             id: string;
                             /** Format: date-time */
-                            inserted_at?: string;
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                        } & {
-                            photos?: ({
-                                allowed_to_delete?: boolean;
+                            inserted_at: string;
+                            photos: ({
+                                allowed_to_delete: boolean;
                                 /** Format: uri */
                                 full_url: string;
+                                /** Format: uuid */
                                 id: string;
                                 /** Format: date-time */
-                                inserted_at?: string;
+                                inserted_at: string;
                                 /** Format: uri */
                                 thumbnail_url: string;
                                 title: string;
                                 /** Format: date-time */
-                                updated_at?: string;
+                                updated_at: string;
                             } & {
-                                /** User */
+                                /**
+                                 * User
+                                 * @description A user in the system
+                                 */
                                 user: {
-                                    avatar_url?: string;
+                                    /** Format: uri */
+                                    avatar_url: string | null;
+                                    /** Format: email */
                                     email: string;
+                                    /** Format: uuid */
                                     id: string;
-                                    name?: string;
+                                    name: string;
                                 };
                             })[];
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
                         };
                     };
                 };
@@ -603,8 +746,11 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: {
-                            avatar_url: string;
+                            /** Format: uri */
+                            avatar_url: string | null;
+                            /** Format: email */
                             email: string;
+                            /** Format: uuid */
                             id: string;
                             name: string;
                         }[];
@@ -657,8 +803,11 @@ export interface operations {
                          * @description A user in the system
                          */
                         data: {
-                            avatar_url: string;
+                            /** Format: uri */
+                            avatar_url: string | null;
+                            /** Format: email */
                             email: string;
+                            /** Format: uuid */
                             id: string;
                             name: string;
                         };
@@ -708,36 +857,47 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * CollectionDetail
+                         * @description Collection data returned from show/create/update endpoints
+                         */
                         data: {
-                            description?: string;
+                            description?: string | null;
+                            /** Format: uuid */
                             id: string;
                             /** Format: date-time */
-                            inserted_at?: string;
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                        } & {
-                            photos?: ({
-                                allowed_to_delete?: boolean;
+                            inserted_at: string;
+                            photos: ({
+                                allowed_to_delete: boolean;
                                 /** Format: uri */
                                 full_url: string;
+                                /** Format: uuid */
                                 id: string;
                                 /** Format: date-time */
-                                inserted_at?: string;
+                                inserted_at: string;
                                 /** Format: uri */
                                 thumbnail_url: string;
                                 title: string;
                                 /** Format: date-time */
-                                updated_at?: string;
+                                updated_at: string;
                             } & {
-                                /** User */
+                                /**
+                                 * User
+                                 * @description A user in the system
+                                 */
                                 user: {
-                                    avatar_url?: string;
+                                    /** Format: uri */
+                                    avatar_url: string | null;
+                                    /** Format: email */
                                     email: string;
+                                    /** Format: uuid */
                                     id: string;
-                                    name?: string;
+                                    name: string;
                                 };
                             })[];
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
                         };
                     };
                 };
@@ -782,36 +942,47 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * CollectionDetail
+                         * @description Collection data returned from show/create/update endpoints
+                         */
                         data: {
-                            description?: string;
+                            description?: string | null;
+                            /** Format: uuid */
                             id: string;
                             /** Format: date-time */
-                            inserted_at?: string;
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                        } & {
-                            photos?: ({
-                                allowed_to_delete?: boolean;
+                            inserted_at: string;
+                            photos: ({
+                                allowed_to_delete: boolean;
                                 /** Format: uri */
                                 full_url: string;
+                                /** Format: uuid */
                                 id: string;
                                 /** Format: date-time */
-                                inserted_at?: string;
+                                inserted_at: string;
                                 /** Format: uri */
                                 thumbnail_url: string;
                                 title: string;
                                 /** Format: date-time */
-                                updated_at?: string;
+                                updated_at: string;
                             } & {
-                                /** User */
+                                /**
+                                 * User
+                                 * @description A user in the system
+                                 */
                                 user: {
-                                    avatar_url?: string;
+                                    /** Format: uri */
+                                    avatar_url: string | null;
+                                    /** Format: email */
                                     email: string;
+                                    /** Format: uuid */
                                     id: string;
-                                    name?: string;
+                                    name: string;
                                 };
                             })[];
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
                         };
                     };
                 };
@@ -869,36 +1040,47 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * CollectionDetail
+                         * @description Collection data returned from show/create/update endpoints
+                         */
                         data: {
-                            description?: string;
+                            description?: string | null;
+                            /** Format: uuid */
                             id: string;
                             /** Format: date-time */
-                            inserted_at?: string;
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                        } & {
-                            photos?: ({
-                                allowed_to_delete?: boolean;
+                            inserted_at: string;
+                            photos: ({
+                                allowed_to_delete: boolean;
                                 /** Format: uri */
                                 full_url: string;
+                                /** Format: uuid */
                                 id: string;
                                 /** Format: date-time */
-                                inserted_at?: string;
+                                inserted_at: string;
                                 /** Format: uri */
                                 thumbnail_url: string;
                                 title: string;
                                 /** Format: date-time */
-                                updated_at?: string;
+                                updated_at: string;
                             } & {
-                                /** User */
+                                /**
+                                 * User
+                                 * @description A user in the system
+                                 */
                                 user: {
-                                    avatar_url?: string;
+                                    /** Format: uri */
+                                    avatar_url: string | null;
+                                    /** Format: email */
                                     email: string;
+                                    /** Format: uuid */
                                     id: string;
-                                    name?: string;
+                                    name: string;
                                 };
                             })[];
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
                         };
                     };
                 };
@@ -944,17 +1126,18 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: {
-                            allowed_to_delete?: boolean;
+                            allowed_to_delete: boolean;
                             /** Format: uri */
                             full_url: string;
+                            /** Format: uuid */
                             id: string;
                             /** Format: date-time */
-                            inserted_at?: string;
+                            inserted_at: string;
                             /** Format: uri */
                             thumbnail_url: string;
                             title: string;
                             /** Format: date-time */
-                            updated_at?: string;
+                            updated_at: string;
                         }[];
                     };
                 };
@@ -972,8 +1155,11 @@ export interface operations {
         requestBody: {
             content: {
                 "multipart/form-data": {
-                    /** @description Optional ID of the collection to add the photo to */
-                    collection_id?: number;
+                    /**
+                     * Format: uuid
+                     * @description Optional ID of the collection to add the photo to
+                     */
+                    collection_id?: string;
                     /**
                      * Format: binary
                      * @description Image file to process
@@ -991,17 +1177,18 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: {
-                            allowed_to_delete?: boolean;
+                            allowed_to_delete: boolean;
                             /** Format: uri */
                             full_url: string;
+                            /** Format: uuid */
                             id: string;
                             /** Format: date-time */
-                            inserted_at?: string;
+                            inserted_at: string;
                             /** Format: uri */
                             thumbnail_url: string;
                             title: string;
                             /** Format: date-time */
-                            updated_at?: string;
+                            updated_at: string;
                         }[];
                     };
                 };
@@ -1027,7 +1214,7 @@ export interface operations {
             header?: never;
             path: {
                 /** @description Photo ID */
-                id: number;
+                id: string;
             };
             cookie?: never;
         };
@@ -1063,7 +1250,6 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Current user */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1072,13 +1258,16 @@ export interface operations {
                     "application/json": {
                         /**
                          * User
-                         * @description A user account
+                         * @description A user in the system
                          */
                         data: {
-                            avatar_url?: string;
+                            /** Format: uri */
+                            avatar_url: string | null;
+                            /** Format: email */
                             email: string;
+                            /** Format: uuid */
                             id: string;
-                            name?: string;
+                            name: string;
                         };
                     };
                 };

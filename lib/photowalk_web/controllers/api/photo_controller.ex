@@ -4,29 +4,16 @@ defmodule PWeb.PhotoController do
 
   alias OpenApiSpex.Schema
   alias P.Photos
-  alias P.Photo
-  alias PWeb.PhotoJSON
-  alias PWeb.Schemas.EctoSchema
+  alias PWeb.API.Resources.PhotoSummary
 
   action_fallback PWeb.FallbackController
-
-  @photo_resource_schema EctoSchema.schema_from_fields(Photo,
-                           description: "A processed photo with accessible variants",
-                           fields: PhotoJSON.fields(),
-                           required: PhotoJSON.required_fields(),
-                           additional_properties: %{
-                             thumbnail_url: %Schema{type: :string, format: :uri},
-                             full_url: %Schema{type: :string, format: :uri},
-                             allowed_to_delete: %Schema{type: :boolean}
-                           }
-                         )
 
   @photo_list_response_schema %Schema{
     title: "PhotoListResponse",
     description: "List of photos for the current user",
     type: :object,
     properties: %{
-      data: %Schema{type: :array, items: @photo_resource_schema}
+      data: %Schema{type: :array, items: PhotoSummary.schema()}
     },
     required: [:data]
   }
@@ -42,7 +29,8 @@ defmodule PWeb.PhotoController do
         description: "Image file to process"
       },
       collection_id: %Schema{
-        type: :integer,
+        type: :string,
+        format: :uuid,
         description: "Optional ID of the collection to add the photo to"
       }
     },
@@ -78,6 +66,32 @@ defmodule PWeb.PhotoController do
       ok: {"Photos", "application/json", @photo_list_response_schema}
     ]
 
+  operation :delete,
+    summary: "Delete photo",
+    parameters: [
+      id: [
+        in: :path,
+        description: "Photo ID",
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      ]
+    ],
+    responses: [
+      no_content: {"Photo deleted", nil, nil},
+      not_found: {"Not found", "application/json", @not_found_schema}
+    ]
+
+  def index(conn, _params) do
+    user = conn.assigns.current_user
+
+    photos =
+      user
+      |> Photos.list_photos_for_user()
+      |> Enum.map(&PhotoSummary.from_photo(&1, current_user: user))
+
+    json(conn, %{data: photos})
+  end
+
   operation :create,
     summary: "Upload a photo",
     request_body: {
@@ -99,34 +113,13 @@ defmodule PWeb.PhotoController do
       }
     ]
 
-  operation :delete,
-    summary: "Delete photo",
-    parameters: [
-      id: [
-        in: :path,
-        description: "Photo ID",
-        type: :integer,
-        required: true
-      ]
-    ],
-    responses: [
-      no_content: {"Photo deleted", nil, nil},
-      not_found: {"Not found", "application/json", @not_found_schema}
-    ]
-
-  def index(conn, _params) do
-    user = conn.assigns.current_user
-
-    render(conn, :index, photos: Photos.list_photos_for_user(user), current_user: user)
-  end
-
   def create(conn, params) do
     user = conn.assigns.current_user
 
     with {:ok, photo} <- Photos.create_photo(user, params["photo"], params) do
       conn
       |> put_status(:created)
-      |> render(:index, photos: [photo], current_user: user)
+      |> json(%{data: [PhotoSummary.from_photo(photo, current_user: user)]})
     end
   end
 
