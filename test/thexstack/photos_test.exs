@@ -8,51 +8,82 @@ defmodule P.PhotosTest do
   describe "create_photo/3" do
     test "creates a photo with a collection_id" do
       user = user_fixture()
+      scope = scope_fixture(current_user: user)
       collection = collection_fixture(user: user)
       upload = upload_fixture()
 
-      assert {:ok, photo} = Photos.create_photo(user, upload, %{"collection_id" => collection.id})
+      assert {:ok, photo} = Photos.create_photo(scope, upload, %{"collection_id" => collection.id})
       assert photo.collection_id == collection.id
       assert photo.user_id == user.id
     end
 
     test "creates a photo without a collection_id" do
       user = user_fixture()
+      scope = scope_fixture(current_user: user)
       upload = upload_fixture()
 
-      assert {:ok, photo} = Photos.create_photo(user, upload, %{})
+      assert {:ok, photo} = Photos.create_photo(scope, upload, %{})
       assert photo.collection_id == nil
       assert photo.user_id == user.id
     end
 
-    test "validates collection belongs to user" do
+    test "allows collection members to add photos" do
+      owner = user_fixture()
+      member = user_fixture()
+      collection = collection_fixture(user: owner)
+      upload = upload_fixture()
+
+      # Add member to collection
+      owner_scope = scope_fixture(current_user: owner)
+
+      {:ok, _} =
+        P.Collections.add_user(owner_scope, %{
+          collection_id: collection.id,
+          user_id: member.id,
+          inviter_id: owner.id
+        })
+
+      # Member should be able to add photos
+      member_scope = scope_fixture(current_user: member)
+
+      assert {:ok, photo} =
+               Photos.create_photo(member_scope, upload, %{"collection_id" => collection.id})
+
+      assert photo.collection_id == collection.id
+      assert photo.user_id == member.id
+    end
+
+    test "rejects photo creation for non-members" do
       user = user_fixture()
+      scope = scope_fixture(current_user: user)
       other_user = user_fixture()
       other_collection = collection_fixture(user: other_user)
       upload = upload_fixture()
 
       assert {:error, changeset} =
-               Photos.create_photo(user, upload, %{"collection_id" => other_collection.id})
+               Photos.create_photo(scope, upload, %{"collection_id" => other_collection.id})
 
-      assert %{collection_id: ["does not belong to you"]} = errors_on(changeset)
+      assert %{collection_id: ["you don't have access to this collection"]} = errors_on(changeset)
     end
 
     test "validates collection exists" do
       user = user_fixture()
+      scope = scope_fixture(current_user: user)
       upload = upload_fixture()
 
       assert {:error, changeset} =
-               Photos.create_photo(user, upload, %{"collection_id" => Ecto.UUID.generate()})
+               Photos.create_photo(scope, upload, %{"collection_id" => Ecto.UUID.generate()})
 
       assert %{collection_id: ["does not exist"]} = errors_on(changeset)
     end
 
     test "accepts collection_id as atom key" do
       user = user_fixture()
+      scope = scope_fixture(current_user: user)
       collection = collection_fixture(user: user)
       upload = upload_fixture()
 
-      assert {:ok, photo} = Photos.create_photo(user, upload, %{collection_id: collection.id})
+      assert {:ok, photo} = Photos.create_photo(scope, upload, %{collection_id: collection.id})
       assert photo.collection_id == collection.id
     end
   end

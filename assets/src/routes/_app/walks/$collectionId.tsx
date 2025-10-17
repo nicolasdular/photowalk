@@ -50,7 +50,7 @@ function CollectionDetailPage() {
   );
 
   const deletePhotoMutation = useMutation({
-    mutationFn: async (photoId: number) => {
+    mutationFn: async (photoId: string) => {
       const { error } = await client.DELETE('/api/photos/{id}', {
         params: { path: { id: photoId } },
       });
@@ -77,7 +77,7 @@ function CollectionDetailPage() {
     },
   });
 
-  const handleDeletePhoto = (photoId: number) => {
+  const handleDeletePhoto = (photoId: string) => {
     deletePhotoMutation.mutate(photoId);
   };
 
@@ -123,11 +123,15 @@ function CollectionDetailPage() {
             </Link>
           }
           actions={
-            <Link to="/walks/$collectionId/edit" params={{ collectionId }}>
-              <Button variant="outline" size="sm">
-                Edit
-              </Button>
-            </Link>
+            <>
+              {collection.can_edit ? (
+                <Link to="/walks/$collectionId/edit" params={{ collectionId }}>
+                  <Button variant="outline" size="sm">
+                    Edit
+                  </Button>
+                </Link>
+              ) : null}
+            </>
           }
         />
         <EmptyState collectionId={collectionId} onSuccess={refetchCollection} />
@@ -146,11 +150,13 @@ function CollectionDetailPage() {
         }
         actions={
           <div className="flex items-center gap-4">
-            <Link to="/walks/$collectionId/edit" params={{ collectionId }}>
-              <Button variant="outline" size="sm">
-                Edit
-              </Button>
-            </Link>
+            {collection.can_edit ? (
+              <Link to="/walks/$collectionId/edit" params={{ collectionId }}>
+                <Button variant="outline" size="sm">
+                  Edit
+                </Button>
+              </Link>
+            ) : null}
             <UploadPhotosButton
               collectionId={collection.id}
               onSuccess={refetchCollection}

@@ -159,10 +159,11 @@ defmodule PWeb.CollectionControllerTest do
 
     test "includes deletion permissions for photos", %{conn: conn} do
       user = user_fixture()
+      scope = scope_fixture(current_user: user)
       collection = collection_fixture(user: user)
       upload = upload_fixture()
 
-      {:ok, photo} = P.Photos.create_photo(user, upload, %{"collection_id" => collection.id})
+      {:ok, photo} = P.Photos.create_photo(scope, upload, %{"collection_id" => collection.id})
 
       conn =
         conn

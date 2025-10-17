@@ -186,6 +186,7 @@ export interface components {
              * @description Collection data returned from show/create/update endpoints
              */
             data: {
+                can_edit?: boolean;
                 description?: string | null;
                 /** Format: uuid */
                 id: string;
@@ -229,6 +230,7 @@ export interface components {
          * @description Collection data returned from show/create/update endpoints
          */
         CollectionDetail: {
+            can_edit?: boolean;
             description?: string | null;
             /** Format: uuid */
             id: string;
@@ -301,6 +303,7 @@ export interface components {
              * @description Collection data returned from show/create/update endpoints
              */
             data: {
+                can_edit?: boolean;
                 description?: string | null;
                 /** Format: uuid */
                 id: string;
@@ -385,6 +388,7 @@ export interface components {
              * @description Collection data returned from show/create/update endpoints
              */
             data: {
+                can_edit?: boolean;
                 description?: string | null;
                 /** Format: uuid */
                 id: string;
@@ -468,10 +472,7 @@ export interface components {
                 updated_at: string;
             };
         };
-        /**
-         * PhotoDetail
-         * @description Detailed representation of a photo including author information
-         */
+        /** PhotoDetail */
         PhotoDetail: {
             allowed_to_delete: boolean;
             /** Format: uri */
@@ -760,6 +761,7 @@ export interface operations {
                          * @description Collection data returned from show/create/update endpoints
                          */
                         data: {
+                            can_edit?: boolean;
                             description?: string | null;
                             /** Format: uuid */
                             id: string;
@@ -902,13 +904,15 @@ export interface operations {
                     };
                 };
             };
-            /** @description Collection not found */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        /** @description Error message */
+                        error: string;
+                    };
                 };
             };
             422: {
@@ -948,6 +952,7 @@ export interface operations {
                          * @description Collection data returned from show/create/update endpoints
                          */
                         data: {
+                            can_edit?: boolean;
                             description?: string | null;
                             /** Format: uuid */
                             id: string;
@@ -1034,6 +1039,7 @@ export interface operations {
                          * @description Collection data returned from show/create/update endpoints
                          */
                         data: {
+                            can_edit?: boolean;
                             description?: string | null;
                             /** Format: uuid */
                             id: string;
@@ -1132,6 +1138,7 @@ export interface operations {
                          * @description Collection data returned from show/create/update endpoints
                          */
                         data: {
+                            can_edit?: boolean;
                             description?: string | null;
                             /** Format: uuid */
                             id: string;

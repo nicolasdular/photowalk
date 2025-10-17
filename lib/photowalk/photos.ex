@@ -2,7 +2,7 @@ defmodule P.Photos do
   import Ecto.Query, warn: false
 
   alias Ecto.Changeset
-  alias P.{Collections, Collection, Photo, Repo, User}
+  alias P.{Collections, Collection, Photo, Repo, Scope, User}
   alias P.Photos.Uploader
 
   @type upload_param :: Plug.Upload.t()
@@ -16,21 +16,34 @@ defmodule P.Photos do
     |> Repo.all()
   end
 
-  @spec create_photo(User.t(), upload_param() | nil, photo_params()) ::
-          {:ok, Photo.t()} | {:error, term()}
-  def create_photo(user, upload, params \\ %{})
+  @spec create_photo(Scope.t(), upload_param() | nil, photo_params()) ::
+          {:ok, Photo.t()} | {:error, Changeset.t()}
+  def create_photo(scope, upload, params \\ %{})
 
-  def create_photo(%User{} = user, %Plug.Upload{} = upload, params) do
-    insert_photo(user, upload, params)
+  def create_photo(%Scope{current_user: user} = scope, %Plug.Upload{} = upload, params) do
+    collection_id = params["collection_id"] || params[:collection_id]
+
+    with :ok <- validate_collection_access(scope, collection_id) do
+      %Photo{}
+      |> Photo.changeset(%{
+        image: upload,
+        source_filename: upload.filename,
+        content_type: upload.content_type,
+        title: upload.filename,
+        user_id: user.id,
+        collection_id: collection_id
+      })
+      |> Repo.insert()
+    end
   end
 
-  def create_photo(%User{}, nil, _params),
-    do: {:error, Ecto.Changeset.add_error(%Changeset{}, :photo, "must include a file")}
+  def create_photo(%Scope{}, nil, _params) do
+    {:error, Changeset.add_error(%Changeset{}, :photo, "must include a file")}
+  end
 
-  def create_photo(%User{}, _, _params),
-    do: {:error, Ecto.Changeset.add_error(%Changeset{}, :photo, "invalid file")}
-
-  def create_photo(_, _, _), do: {:error, :no_file}
+  def create_photo(%Scope{}, _invalid_upload, _params) do
+    {:error, Changeset.add_error(%Changeset{}, :photo, "invalid file")}
+  end
 
   @spec delete_photo(User.t(), String.t() | String.t()) ::
           {:ok, Photo.t()} | {:error, :not_found | Ecto.Changeset.t()}
@@ -55,51 +68,21 @@ defmodule P.Photos do
     |> Repo.all()
   end
 
-  @spec insert_photo(User.t(), Plug.Upload.t(), photo_params()) ::
-          {:ok, Photo.t()} | {:error, Changeset.t()}
-  defp insert_photo(%User{} = user, %Plug.Upload{} = upload, params) do
-    collection_id = Map.get(params, "collection_id") || Map.get(params, :collection_id)
+  defp validate_collection_access(_scope, nil), do: :ok
 
-    attrs = %{
-      image: upload,
-      source_filename: upload.filename,
-      content_type: upload.content_type,
-      title: upload.filename,
-      user_id: user.id
-    }
+  defp validate_collection_access(scope, collection_id) do
+    case Repo.get(Collection, collection_id) do
+      nil ->
+        changeset = Changeset.add_error(%Changeset{}, :collection_id, "does not exist")
+        {:error, changeset}
 
-    attrs =
-      if collection_id do
-        Map.put(attrs, :collection_id, collection_id)
-      else
-        attrs
-      end
-
-    changeset = Photo.changeset(%Photo{}, attrs)
-
-    # Validate collection ownership if collection_id is provided
-    changeset =
-      if collection_id do
-        validate_collection_ownership(changeset, user.id, collection_id)
-      else
-        changeset
-      end
-
-    Repo.insert(changeset)
-  end
-
-  defp validate_collection_ownership(changeset, user_id, collection_id) do
-    user = %User{id: user_id}
-
-    case Collections.user_owns_collection?(user, collection_id) do
-      {:ok, true} ->
-        changeset
-
-      {:error, :not_found} ->
-        Changeset.add_error(changeset, :collection_id, "does not exist")
-
-      {:error, :forbidden} ->
-        Changeset.add_error(changeset, :collection_id, "does not belong to you")
+      collection ->
+        if Collections.can_read_collection?(scope, collection) do
+          :ok
+        else
+          changeset = Changeset.add_error(%Changeset{}, :collection_id, "you don't have access to this collection")
+          {:error, changeset}
+        end
     end
   end
 

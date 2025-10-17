@@ -89,7 +89,7 @@ defmodule PWeb.PhotoControllerTest do
         json_response(conn, 422)
         |> assert_api_spec("ValidationErrors")
 
-      assert response["errors"]["collection_id"] == ["does not belong to you"]
+      assert response["errors"]["collection_id"] == ["you don't have access to this collection"]
     end
 
     test "validates collection exists", %{conn: conn} do

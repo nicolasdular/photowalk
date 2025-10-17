@@ -16,6 +16,7 @@ defmodule PWeb.API.Resources.CollectionDetail do
         description: %Schema{type: :string, nullable: true},
         inserted_at: %Schema{type: :string, format: :"date-time"},
         updated_at: %Schema{type: :string, format: :"date-time"},
+        can_edit: %Schema{type: :boolean},
         photos: %Schema{
           type: :array,
           items: PhotoDetail.schema()
@@ -25,12 +26,15 @@ defmodule PWeb.API.Resources.CollectionDetail do
   end
 
   def build(%Collection{} = collection, opts \\ []) do
+    current_user = Keyword.get(opts, :current_user)
+
     photos =
       collection
       |> fetch_loaded_photos!()
-      |> Enum.map(&PhotoDetail.build(&1, current_user: Keyword.get(opts, :current_user)))
+      |> Enum.map(&PhotoDetail.build(&1, current_user: current_user))
 
     CollectionBase.build(collection)
+    |> Map.put(:can_edit, collection.owner_id == current_user.id)
     |> Map.put(:photos, photos)
   end
 

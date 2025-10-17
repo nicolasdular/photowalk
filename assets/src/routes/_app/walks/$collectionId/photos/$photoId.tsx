@@ -14,7 +14,7 @@ export const Route = createFileRoute(
   component: PhotoDetailRoute,
 });
 
-type Photo = components['schemas']['Photo'];
+type Photo = components['schemas']['CollectionDetail']['photos'][0];
 
 function PhotoDetailRoute() {
   const params = Route.useParams();

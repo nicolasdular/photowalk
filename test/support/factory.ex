@@ -37,6 +37,7 @@ defmodule P.Factory do
   def photo_fixture(attrs \\ %{}) do
     attrs = normalize_attrs(attrs)
     user = Map.get(attrs, :user) || user_fixture()
+    scope = scope_fixture(current_user: user)
     upload = Map.get(attrs, :upload) || build_upload()
     collection = Map.get(attrs, :collection)
 
@@ -46,7 +47,7 @@ defmodule P.Factory do
         collection -> %{"collection_id" => collection.id}
       end
 
-    {:ok, photo} = P.Photos.create_photo(user, upload, photo_attrs)
+    {:ok, photo} = P.Photos.create_photo(scope, upload, photo_attrs)
     photo
   end
 
