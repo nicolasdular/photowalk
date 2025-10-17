@@ -7,19 +7,14 @@ import { Plus } from 'lucide-react';
 import { getCsrfToken } from '../api/client';
 import type { components, paths } from '../api/schema';
 
-type Photo = components['schemas']['Photo'];
+type Photo = components['schemas']['PhotoCreateResponse']['data'];
 
-// Extract response type from OpenAPI schema
 type PhotoUploadResponse =
   paths['/api/photos']['post']['responses']['201']['content']['application/json'];
 
-// Extract request body type from OpenAPI schema
-type PhotoUploadRequest =
-  paths['/api/photos']['post']['requestBody']['content']['multipart/form-data'];
-
 interface UploadPhotosButtonProps {
   collectionId?: string;
-  onSuccess?: (photos: Photo[]) => void;
+  onSuccess?: (photo: Photo) => void;
   variant?: 'default' | 'outline' | 'ghost' | 'secondary';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   className?: string;
@@ -37,10 +32,6 @@ export function UploadPhotosButton({
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
-      // Note: We use raw fetch instead of the OpenAPI client because
-      // openapi-fetch doesn't handle multipart/form-data well.
-      // We still use the OpenAPI types for type safety.
-
       const csrf = getCsrfToken();
       const headers = new Headers();
       if (csrf) {
@@ -62,24 +53,19 @@ export function UploadPhotosButton({
       });
 
       if (!response.ok) {
-        const details = await response.json().catch(() => ({}));
-        const message =
-          details?.errors?.photo?.[0] ||
-          'We could not upload your photo. Please ensure the image is smaller than 30MB.';
-        throw new Error(message);
+        throw new Error(
+          'We could not upload your photo. Please ensure the image is smaller than 30MB.'
+        );
       }
 
       const payload = (await response.json()) as PhotoUploadResponse;
-      if (payload.data && Array.isArray(payload.data)) {
+      if (payload.data) {
         return payload.data;
       }
-
-      return [] as Photo[];
     },
-    onSuccess: photos => {
-      setError(null);
-      if (onSuccess && photos.length > 0) {
-        onSuccess(photos);
+    onSuccess: photo => {
+      if (onSuccess && photo) {
+        onSuccess(photo);
       }
     },
     onError: (err: Error) => {
@@ -100,17 +86,14 @@ export function UploadPhotosButton({
       return;
     }
 
-    // Upload files sequentially
     for (const image of images) {
       try {
         await uploadMutation.mutateAsync(image);
       } catch (err) {
-        // Error is already handled in onError
         break;
       }
     }
 
-    // Reset input so the same file can be selected again
     event.target.value = '';
   };
 

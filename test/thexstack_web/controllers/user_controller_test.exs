@@ -17,7 +17,7 @@ defmodule PWeb.UserControllerTest do
       response = json_response(conn, 200)
 
       api_spec = PWeb.ApiSpec.spec()
-      assert_schema(response, "UserResponse", api_spec)
+      assert_schema(response, "SignedInUserResponse", api_spec)
     end
 
     test "requires authentication", %{conn: conn} do

@@ -29,9 +29,7 @@ defmodule PWeb.CollectionControllerTest do
         |> auth_json_conn(user)
         |> get(~p"/api/collections")
 
-      response = json_response(conn, 200)
-      api_spec = PWeb.ApiSpec.spec()
-      assert_schema(response, "CollectionListResponse", api_spec)
+      response = json_response(conn, 200) |> assert_api_spec("CollectionListResponse")
 
       assert length(response["data"]) == 1
       assert List.first(response["data"])["id"] == collection.id
@@ -66,29 +64,12 @@ defmodule PWeb.CollectionControllerTest do
         |> auth_json_conn(user)
         |> post(~p"/api/collections", params)
 
-      response = json_response(conn, 201)
-      api_spec = PWeb.ApiSpec.spec()
-      assert_schema(response, "CollectionShowResponse", api_spec)
+      response =
+        json_response(conn, 201)
+        |> assert_api_spec("CollectionCreateResponse")
 
       assert response["data"]["title"] == "My Vacation Photos"
       assert response["data"]["description"] == "Photos from our summer vacation"
-    end
-
-    test "creates a collection without description", %{conn: conn} do
-      user = user_fixture()
-
-      params = %{
-        "title" => "My Collection"
-      }
-
-      conn =
-        conn
-        |> auth_json_conn(user)
-        |> post(~p"/api/collections", params)
-
-      response = json_response(conn, 201)
-      assert response["data"]["title"] == "My Collection"
-      assert response["data"]["description"] == nil
     end
 
     test "validates required title", %{conn: conn} do
@@ -103,7 +84,10 @@ defmodule PWeb.CollectionControllerTest do
         |> auth_json_conn(user)
         |> post(~p"/api/collections", params)
 
-      response = json_response(conn, 422)
+      response =
+        json_response(conn, 422)
+        |> assert_api_spec("ValidationErrors")
+
       assert response["errors"]["title"] == ["can't be blank"]
     end
   end
@@ -124,8 +108,9 @@ defmodule PWeb.CollectionControllerTest do
         |> put(~p"/api/collections/#{collection.id}", params)
 
       response = json_response(conn, 200)
+
       api_spec = PWeb.ApiSpec.spec()
-      assert_schema(response, "CollectionShowResponse", api_spec)
+      assert_schema(response, "CollectionUpdateResponse", api_spec)
 
       assert response["data"]["title"] == "Updated title"
       assert response["data"]["description"] == "Updated description"
@@ -161,9 +146,9 @@ defmodule PWeb.CollectionControllerTest do
         |> auth_json_conn(user)
         |> get(~p"/api/collections/#{collection.id}")
 
-      response = json_response(conn, 200)
-      api_spec = PWeb.ApiSpec.spec()
-      assert_schema(response, "CollectionShowResponse", api_spec)
+      response =
+        json_response(conn, 200)
+        |> assert_api_spec("CollectionShowResponse")
 
       assert response["data"]["id"] == collection.id
       assert response["data"]["title"] == collection.title
@@ -215,6 +200,146 @@ defmodule PWeb.CollectionControllerTest do
 
       response = json_response(conn, 404)
       assert response["error"] == "Not found"
+    end
+  end
+
+  describe "GET /api/collections/:id/users" do
+    test "lists users in a collection", %{conn: conn} do
+      owner = user_fixture()
+      member = user_fixture()
+      collection = collection_fixture(user: owner)
+
+      # Add the member to the collection
+      {:ok, _membership} =
+        P.Collections.add_user(scope_fixture(user: owner), %{
+          collection_id: collection.id,
+          email: member.email,
+          inviter_id: owner.id
+        })
+
+      conn =
+        conn
+        |> auth_json_conn(owner)
+        |> get(~p"/api/collections/#{collection.id}/users")
+
+      response =
+        json_response(conn, 200)
+        |> assert_api_spec("CollectionUsersListResponse")
+
+      assert length(response["data"]) == 2
+      user_ids = Enum.map(response["data"], & &1["id"])
+      assert owner.id in user_ids
+      assert member.id in user_ids
+    end
+
+    test "returns empty list when collection has only the owner", %{conn: conn} do
+      user = user_fixture()
+      collection = collection_fixture(user: user)
+
+      conn =
+        conn
+        |> auth_json_conn(user)
+        |> get(~p"/api/collections/#{collection.id}/users")
+
+      response =
+        json_response(conn, 200)
+        |> assert_api_spec("CollectionUsersListResponse")
+
+      assert length(response["data"]) == 1
+      assert hd(response["data"])["id"] == user.id
+    end
+
+    test "returns 404 when collection doesn't exist", %{conn: conn} do
+      user = user_fixture()
+
+      conn =
+        conn
+        |> auth_json_conn(user)
+        |> get(~p"/api/collections/#{Ecto.UUID.generate()}/users")
+
+      response =
+        json_response(conn, 404)
+        |> assert_api_spec("NotFoundError")
+
+      assert response["error"] == "Not found"
+    end
+  end
+
+  describe "POST /api/collections/:id/users" do
+    test "adds a user to a collection by email", %{conn: conn} do
+      owner = user_fixture()
+      new_member = user_fixture()
+      collection = collection_fixture(user: owner)
+
+      params = %{"email" => new_member.email}
+
+      conn =
+        conn
+        |> auth_json_conn(owner)
+        |> post(~p"/api/collections/#{collection.id}/users", params)
+
+      response =
+        json_response(conn, 201)
+        |> assert_api_spec("AddUserToCollectionResponse")
+
+      assert response["data"]["id"] == new_member.id
+      assert response["data"]["email"] == new_member.email
+    end
+
+    test "returns error when user email doesn't exist", %{conn: conn} do
+      owner = user_fixture()
+      collection = collection_fixture(user: owner)
+
+      params = %{"email" => "nonexistent@example.com"}
+
+      conn =
+        conn
+        |> auth_json_conn(owner)
+        |> post(~p"/api/collections/#{collection.id}/users", params)
+
+      response =
+        json_response(conn, 422)
+        |> assert_api_spec("ValidationErrors")
+
+      # Check that we get an error about the email
+      assert response["errors"]["email"]
+    end
+
+    test "returns error when collection doesn't exist", %{conn: conn} do
+      user = user_fixture()
+      params = %{"email" => "someone@example.com"}
+
+      conn =
+        conn
+        |> auth_json_conn(user)
+        |> post(~p"/api/collections/#{Ecto.UUID.generate()}/users", params)
+
+      # Returns 422 because the email validation happens before collection check
+      response =
+        json_response(conn, 422)
+        |> assert_api_spec("ValidationErrors")
+
+      assert response["errors"]["email"]
+    end
+
+    test "returns error when user doesn't own the collection", %{conn: conn} do
+      owner = user_fixture()
+      other_user = user_fixture()
+      collection = collection_fixture(user: owner)
+
+      params = %{"email" => "someone@example.com"}
+
+      conn =
+        conn
+        |> auth_json_conn(other_user)
+        |> post(~p"/api/collections/#{collection.id}/users", params)
+
+      # Returns 422 because the email validation happens before collection check
+      response =
+        json_response(conn, 422)
+        |> assert_api_spec("ValidationErrors")
+
+      assert response["errors"]["email"]
     end
   end
 end

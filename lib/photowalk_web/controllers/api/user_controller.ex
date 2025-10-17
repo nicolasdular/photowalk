@@ -2,39 +2,14 @@ defmodule PWeb.UserController do
   use PWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias OpenApiSpex.Schema
-  alias P.User
-  alias PWeb.{Schemas.EctoSchema, UserJSON}
+  alias PWeb.API.Resources.User, as: UserResource
+  alias PWeb.Api.Docs.Response
 
   tags(["user"])
 
-  operation(:me,
-    summary: "Get current user",
-    responses: [
-      ok: {
-        "Current user",
-        "application/json",
-        %Schema{
-          title: "UserResponse",
-          description: "Response schema for a single user",
-          type: :object,
-          properties: %{
-            data:
-              EctoSchema.schema_from_fields(User,
-                description: "A user account",
-                required: [:id, :email],
-                fields: UserJSON.fields()
-              )
-          },
-          required: [:data]
-        }
-      }
-    ]
-  )
+  operation(:me, responses: [ok: Response.data(UserResource.schema(), "SignedInUserResponse")])
 
   def me(conn, _params) do
-    user = conn.assigns.current_user
-
-    render(conn, :show, user: user)
+    json(conn, %{data: UserResource.build(current_user(conn))})
   end
 end
