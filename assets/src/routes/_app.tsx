@@ -9,12 +9,21 @@ import { SignedInLayout } from '../layouts/SignedInLayout';
 import client from '../api/client';
 
 export const Route = createFileRoute('/_app')({
-  loader: async () => {
-    const currentUser = await client.GET('/api/user/me');
-    if (!currentUser.data) {
-      throw redirect({ to: '/signin' });
-    }
-    return { currentUser: currentUser.data.data } as const;
+  loader: async ({ context }) => {
+    const currentUser = await context.queryClient.ensureQueryData({
+      queryKey: ['currentUser'],
+      staleTime: Infinity,
+      queryFn: async () => {
+        const response = await client.GET('/api/user/me');
+        if (!response.data) {
+          throw redirect({ to: '/signin' });
+        }
+
+        return response.data.data;
+      },
+    });
+
+    return { currentUser } as const;
   },
   component: () => {
     const { currentUser } = useLoaderData({ from: Route.id });
