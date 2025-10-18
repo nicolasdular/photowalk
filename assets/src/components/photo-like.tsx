@@ -98,13 +98,9 @@ export function PhotoLikeButton({ likes, photoId, onOptimisticUpdate }: PhotoLik
         disabled={isLoading}
         className={cn('transition-colors', likes.current_user_liked && 'text-red-500 hover:text-red-600')}
       >
-        {likes.current_user_liked ? (
-          <Heart className="size-5 fill-current" />
-        ) : (
-          <Heart className="size-5 stroke-white" />
-        )}
+        {likes.current_user_liked ? <Heart className="size-5 fill-current" /> : <Heart className="size-5 " />}
       </Button>
-      <span className="text-sm text-white min-w-[1ch] text-center">{likes.count}</span>
+      <span className="text-sm min-w-[1ch] text-center">{likes.count}</span>
     </div>
   );
 }

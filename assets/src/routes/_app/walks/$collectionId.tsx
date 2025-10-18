@@ -165,26 +165,15 @@ function CollectionDetailPage() {
                 collectionId: collectionId,
                 photoId: String(photo.id),
               }}
-              className="group relative mb-6 inline-block w-full overflow-hidden rounded-2xl break-inside-avoid"
+              className=" mb-6 inline-block w-full"
             >
-              <img src={photo.thumbnail_url} className="w-full object-cover" loading="lazy" />
-              <div className="pointer-events-none absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <div
-                  className="h-full w-full rounded-2xl"
-                  style={{
-                    background:
-                      'linear-gradient(180deg,rgba(0,0,0,.1),transparent 20%,transparent 80%,rgba(0,0,0,.3)) ',
-                  }}
-                />
-              </div>
-              <div className="absolute inset-0 flex items-end z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <div className="flex w-full items-center justify-between p-4">
-                  <div className="flex items-center gap-2 text-white">
-                    <UserAvatar user={photo.user} />
-                    <span className="relative z-10">{photo.user.name}</span>
-                  </div>
-                  <PhotoLikeButton likes={photo.likes} photoId={photo.id} />
+              <img src={photo.thumbnail_url} className="w-full object-cover rounded-2xl " loading="lazy" />
+              <div className="flex w-full items-center justify-between p-4">
+                <div className="flex items-center gap-2">
+                  <UserAvatar user={photo.user} />
+                  <span className="relative z-10">{photo.user.name}</span>
                 </div>
+                <PhotoLikeButton likes={photo.likes} photoId={photo.id} />
               </div>
             </Link>
           ))}
