@@ -291,6 +291,15 @@ export interface components {
                     /** Format: date-time */
                     updated_at: string;
                 } & {
+                    likes: {
+                        /** Format: uri */
+                        avatar_url: string | null;
+                        /** Format: email */
+                        email: string;
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                    }[];
                     /**
                      * User
                      * @description A user in the system
@@ -335,6 +344,15 @@ export interface components {
                 /** Format: date-time */
                 updated_at: string;
             } & {
+                likes: {
+                    /** Format: uri */
+                    avatar_url: string | null;
+                    /** Format: email */
+                    email: string;
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                }[];
                 /**
                  * User
                  * @description A user in the system
@@ -408,6 +426,15 @@ export interface components {
                     /** Format: date-time */
                     updated_at: string;
                 } & {
+                    likes: {
+                        /** Format: uri */
+                        avatar_url: string | null;
+                        /** Format: email */
+                        email: string;
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                    }[];
                     /**
                      * User
                      * @description A user in the system
@@ -493,6 +520,15 @@ export interface components {
                     /** Format: date-time */
                     updated_at: string;
                 } & {
+                    likes: {
+                        /** Format: uri */
+                        avatar_url: string | null;
+                        /** Format: email */
+                        email: string;
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                    }[];
                     /**
                      * User
                      * @description A user in the system
@@ -580,6 +616,15 @@ export interface components {
             /** Format: date-time */
             updated_at: string;
         } & {
+            likes: {
+                /** Format: uri */
+                avatar_url: string | null;
+                /** Format: email */
+                email: string;
+                /** Format: uuid */
+                id: string;
+                name: string;
+            }[];
             /**
              * User
              * @description A user in the system
@@ -908,6 +953,15 @@ export interface operations {
                                 /** Format: date-time */
                                 updated_at: string;
                             } & {
+                                likes: {
+                                    /** Format: uri */
+                                    avatar_url: string | null;
+                                    /** Format: email */
+                                    email: string;
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string;
+                                }[];
                                 /**
                                  * User
                                  * @description A user in the system
@@ -1099,6 +1153,15 @@ export interface operations {
                                 /** Format: date-time */
                                 updated_at: string;
                             } & {
+                                likes: {
+                                    /** Format: uri */
+                                    avatar_url: string | null;
+                                    /** Format: email */
+                                    email: string;
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string;
+                                }[];
                                 /**
                                  * User
                                  * @description A user in the system
@@ -1186,6 +1249,15 @@ export interface operations {
                                 /** Format: date-time */
                                 updated_at: string;
                             } & {
+                                likes: {
+                                    /** Format: uri */
+                                    avatar_url: string | null;
+                                    /** Format: email */
+                                    email: string;
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string;
+                                }[];
                                 /**
                                  * User
                                  * @description A user in the system
@@ -1285,6 +1357,15 @@ export interface operations {
                                 /** Format: date-time */
                                 updated_at: string;
                             } & {
+                                likes: {
+                                    /** Format: uri */
+                                    avatar_url: string | null;
+                                    /** Format: email */
+                                    email: string;
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string;
+                                }[];
                                 /**
                                  * User
                                  * @description A user in the system

@@ -11,9 +11,13 @@ defmodule PWeb.API.Resources.PhotoDetail do
         PhotoSummary.schema(),
         %Schema{
           type: :object,
-          required: [:user],
+          required: [:user, :likes],
           properties: %{
-            user: UserResource.schema()
+            user: UserResource.schema(),
+            likes: %Schema{
+              type: :array,
+              items: UserResource.schema()
+            }
           }
         }
       ]
@@ -22,9 +26,11 @@ defmodule PWeb.API.Resources.PhotoDetail do
 
   def build(%Photo{} = photo, opts \\ []) do
     %User{} = user = ensure_user_preloaded(photo)
-    photo = PhotoSummary.build(photo, opts)
+    likes = Enum.map(photo.likes, &UserResource.build/1)
 
-    Map.put(photo, :user, UserResource.build(user))
+    PhotoSummary.build(photo, opts)
+    |> Map.put(:user, UserResource.build(user))
+    |> Map.put(:likes, likes)
   end
 
   defp ensure_user_preloaded(%Photo{user: %User{} = user}), do: user

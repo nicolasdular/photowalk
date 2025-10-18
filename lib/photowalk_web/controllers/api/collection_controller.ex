@@ -118,7 +118,7 @@ defmodule PWeb.CollectionController do
 
     with {:ok, collection} <-
            Collections.get_collection(scope(conn), id, %{
-             preloads: [photos: :user]
+             preloads: [photos: [:user, likes: :user]]
            }) do
       json(conn, %{data: CollectionDetail.build(collection, current_user: current_user)})
     end
