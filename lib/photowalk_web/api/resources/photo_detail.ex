@@ -3,6 +3,7 @@ defmodule PWeb.API.Resources.PhotoDetail do
   alias P.{Photo, User}
   alias PWeb.API.Resources.PhotoSummary
   alias PWeb.API.Resources.User, as: UserResource
+  alias PWeb.Api.Resources.PhotoLike
 
   def schema do
     %Schema{
@@ -14,10 +15,7 @@ defmodule PWeb.API.Resources.PhotoDetail do
           required: [:user, :likes],
           properties: %{
             user: UserResource.schema(),
-            likes: %Schema{
-              type: :array,
-              items: UserResource.schema()
-            }
+            likes: PhotoLike.schema()
           }
         }
       ]
@@ -26,11 +24,10 @@ defmodule PWeb.API.Resources.PhotoDetail do
 
   def build(%Photo{} = photo, opts \\ []) do
     %User{} = user = ensure_user_preloaded(photo)
-    likes = Enum.map(photo.likes, &UserResource.build/1)
 
     PhotoSummary.build(photo, opts)
     |> Map.put(:user, UserResource.build(user))
-    |> Map.put(:likes, likes)
+    |> Map.put(:likes, PhotoLike.build(photo, opts[:current_user]))
   end
 
   defp ensure_user_preloaded(%Photo{user: %User{} = user}), do: user

@@ -1,10 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  createFileRoute,
-  Link,
-  Outlet,
-  useMatches,
-} from '@tanstack/react-router';
+import { createFileRoute, Link, Outlet, useMatches } from '@tanstack/react-router';
 import type { components } from '../../../api/schema';
 import { useState } from 'react';
 import client from '../../../api/client';
@@ -13,20 +8,13 @@ import { Spinner } from '@/components/ui/spinner';
 import { ArrowLeft, CameraIcon, ExternalLink } from 'lucide-react';
 import { PageTitle } from '@/components/ui/page-title';
 import { PageLoading } from '@/components/ui/page-loading';
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/components/ui/empty';
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
 import { UploadPhotosButton } from '@/components/upload-photos-button';
 import { useCollectionQuery } from '@/lib/hooks/useCollectionQuery';
+import { UserAvatar } from '@/components/user-avatar';
+import { PhotoLikeButton } from '@/components/photo-like';
 
-type Photo = NonNullable<
-  components['schemas']['CollectionShowResponse']['data']['photos']
->[0];
+type Photo = NonNullable<components['schemas']['CollectionShowResponse']['data']['photos']>[0];
 
 function CollectionDetailPage() {
   const { collectionId } = Route.useParams();
@@ -41,13 +29,9 @@ function CollectionDetailPage() {
   const photos = (collection?.photos as Photo[] | undefined) ?? [];
   const isLoading = collectionQuery.isLoading;
 
-  const isViewingPhoto = matches.some(
-    match => match.routeId === '/_app/walks/$collectionId/photos/$photoId'
-  );
+  const isViewingPhoto = matches.some(match => match.routeId === '/_app/walks/$collectionId/photos/$photoId');
 
-  const isEditingCollection = matches.some(
-    match => match.routeId === '/_app/walks/$collectionId/edit'
-  );
+  const isEditingCollection = matches.some(match => match.routeId === '/_app/walks/$collectionId/edit');
 
   const deletePhotoMutation = useMutation({
     mutationFn: async (photoId: string) => {
@@ -94,10 +78,7 @@ function CollectionDetailPage() {
       <div className="container mx-auto max-w-6xl py-8 px-4">
         <div className="text-center py-12">
           <h2 className="text-2xl font-semibold mb-4">Walk not found</h2>
-          <Link
-            to="/"
-            className="text-primary hover:underline inline-flex items-center gap-2"
-          >
+          <Link to="/" className="text-primary hover:underline inline-flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
             Back to walks
           </Link>
@@ -157,10 +138,7 @@ function CollectionDetailPage() {
                 </Button>
               </Link>
             ) : null}
-            <UploadPhotosButton
-              collectionId={collection.id}
-              onSuccess={refetchCollection}
-            />
+            <UploadPhotosButton collectionId={collection.id} onSuccess={refetchCollection} />
           </div>
         }
         title={collection.title}
@@ -189,11 +167,7 @@ function CollectionDetailPage() {
               }}
               className="group relative mb-6 inline-block w-full overflow-hidden rounded-2xl break-inside-avoid"
             >
-              <img
-                src={photo.thumbnail_url}
-                className="w-full object-cover"
-                loading="lazy"
-              />
+              <img src={photo.thumbnail_url} className="w-full object-cover" loading="lazy" />
               <div className="pointer-events-none absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 <div
                   className="h-full w-full rounded-2xl"
@@ -204,8 +178,12 @@ function CollectionDetailPage() {
                 />
               </div>
               <div className="absolute inset-0 flex items-end z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <div className="w-full px-4 py-2 text-white text-sm rounded-b-2xl relative">
-                  <span className="relative z-10">{photo.user.name}</span>
+                <div className="flex w-full items-center justify-between p-4">
+                  <div className="flex items-center gap-2 text-white">
+                    <UserAvatar user={photo.user} />
+                    <span className="relative z-10">{photo.user.name}</span>
+                  </div>
+                  <PhotoLikeButton likes={photo.likes} photoId={photo.id} />
                 </div>
               </div>
             </Link>
@@ -216,13 +194,7 @@ function CollectionDetailPage() {
   );
 }
 
-function EmptyState({
-  collectionId,
-  onSuccess,
-}: {
-  collectionId: string;
-  onSuccess: () => void;
-}) {
+function EmptyState({ collectionId, onSuccess }: { collectionId: string; onSuccess: () => void }) {
   return (
     <Empty>
       <EmptyHeader>

@@ -18,7 +18,7 @@ defmodule PWeb.API.Resources.User do
         id: %Schema{type: :string, format: :uuid},
         email: %Schema{type: :string, format: :email},
         name: %Schema{type: :string},
-        avatar_url: %Schema{type: :string, format: :uri, nullable: true}
+        avatar_url: %Schema{type: :string, format: :uri}
       }
     }
   end

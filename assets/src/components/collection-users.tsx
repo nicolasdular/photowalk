@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { UserPlus } from 'lucide-react';
+import { UserAvatar } from './user-avatar';
 
 type User = components['schemas']['User'];
 
@@ -136,9 +137,7 @@ export function CollectionUsers({ collectionId }: CollectionUsersProps) {
                 className="flex items-center justify-between p-3 rounded-lg border bg-card"
               >
                 <div className="flex items-center gap-3">
-                  <Avatar>
-                    <AvatarImage src={user.avatar_url} alt={user.name} />
-                  </Avatar>
+                  <UserAvatar user={user} />
                   <div>
                     <p className="text-sm font-medium">{user.name}</p>
                     <p className="text-xs text-muted-foreground">
