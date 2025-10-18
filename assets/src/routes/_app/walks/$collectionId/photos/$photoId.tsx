@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ArrowLeft, ArrowRight, Cross, Crosshair, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 import type { components } from '@/api/schema';
 import { Spinner } from '@/components/ui/spinner';
 import { useCollectionQuery } from '@/lib/hooks/useCollectionQuery';
-import { PageTitle } from '@/components/ui/page-title';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { UserAvatar } from '@/components/user-avatar';
 
 export const Route = createFileRoute('/_app/walks/$collectionId/photos/$photoId')({
@@ -114,57 +112,56 @@ function PhotoDetailRoute() {
   }
 
   return (
-    <>
-      <PageTitle
-        title={<UserAvatar user={current.user} />}
-        backLink={
-          <Link
-            to="/walks/$collectionId"
-            params={{ collectionId: params.collectionId }}
-            className="inline-flex items-center gap-2"
-          >
-            <X className="h-4 w-4" />
-          </Link>
-        }
-        actions={
-          <div>
-            <div className="flex items-center justify-end">
-              <button
-                type="button"
-                onClick={goPrev}
-                disabled={!prev}
-                className="group disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <ArrowLeft
-                  className={`h-4 w-4 transition-colors ${
-                    !prev ? 'text-gray-400' : 'text-primary group-hover:text-primary-700'
-                  }`}
-                />
-              </button>
-              <button
-                type="button"
-                onClick={goNext}
-                disabled={!next}
-                className="group disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <ArrowRight
-                  className={`h-4 w-4 transition-colors ${
-                    !next ? 'text-gray-400' : 'text-primary group-hover:text-primary-700'
-                  }`}
-                />
-              </button>
-            </div>
-            <span className="text-xs uppercase tracking-[0.2em] opacity-70">{progressLabel}</span>
-          </div>
-        }
-      />
+    <div className="h-[calc(100vh-8rem)] flex flex-col">
+      {/* Compact header */}
+      <div className="flex items-center justify-between px-4 py-2 border-b flex-shrink-0">
+        <Link
+          to="/walks/$collectionId"
+          params={{ collectionId: params.collectionId }}
+          className="inline-flex items-center gap-2 text-foreground hover:text-foreground/80 transition-colors text-sm"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Link>
+        <span className="text-sm text-muted-foreground">{progressLabel}</span>
+        <UserAvatar user={current.user} />
+      </div>
 
-      <div className="space-y-6">
-        <div className="relative flex items-center justify-center overflow-hidden rounded-2xl ">
-          <img src={current.full_url} alt={current.title || 'Photo'} className="max-h-[70vh] w-full object-contain" />
+      {/* Full-screen image */}
+      <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
+        <img src={current.full_url} alt={current.title || 'Photo'} className="max-w-full max-h-full object-contain" />
+      </div>
+
+      {/* Bottom navigation */}
+      <div className="flex items-center justify-center p-4 border-t flex-shrink-0">
+        <div className="flex items-center gap-6">
+          <button
+            type="button"
+            onClick={goPrev}
+            disabled={!prev}
+            className="group disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <ArrowLeft
+              className={`h-6 w-6 transition-colors ${
+                !prev ? 'text-muted-foreground' : 'text-foreground group-hover:text-foreground/80'
+              }`}
+            />
+          </button>
+          <button
+            type="button"
+            onClick={goNext}
+            disabled={!next}
+            className="group disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <ArrowRight
+              className={`h-6 w-6 transition-colors ${
+                !next ? 'text-muted-foreground' : 'text-foreground group-hover:text-foreground/80'
+              }`}
+            />
+          </button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
