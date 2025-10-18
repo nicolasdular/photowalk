@@ -6,7 +6,7 @@ defmodule P.Accounts do
   alias P.Accounts.{Mails.SendMagicLinkEmail}
 
   @token_max_age 3600
-  @allowed_emails ~w(hello@nicolasdular.com julia.edlinger@live.at)
+  @allowed_emails ~w(hello@nicolasdular.com julia.edlinger@live.at melanie.krawina@gmail.com)
   @signature_salt "magic_link_salt"
 
   @spec get_user_by_email(Scope.t(), String.t()) :: User.t() | nil
