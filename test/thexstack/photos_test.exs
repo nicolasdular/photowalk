@@ -5,6 +5,13 @@ defmodule P.PhotosTest do
 
   alias P.Photos
 
+  setup do
+    user = user_fixture()
+    photo = photo_fixture(user: user)
+    scope = scope_fixture(current_user: user)
+    %{user: user, photo: photo, scope: scope}
+  end
+
   describe "create_photo/3" do
     test "creates a photo with a collection_id" do
       user = user_fixture()
@@ -128,6 +135,43 @@ defmodule P.PhotosTest do
       user = user_fixture()
 
       assert {:error, :not_found} = Photos.delete_photo(user, Ecto.UUID.generate())
+    end
+  end
+
+  describe "like_photo/2" do
+    test "likes a photo", %{user: user, scope: scope, photo: photo} do
+      assert :ok = Photos.like_photo(scope, photo.id)
+
+      assert Repo.get_by(P.PhotoLike, user_id: user.id, photo_id: photo.id)
+    end
+
+    test "does not error when liking a photo twice", %{user: user, scope: scope, photo: photo} do
+      assert :ok = Photos.like_photo(scope, photo.id)
+      assert :ok = Photos.like_photo(scope, photo.id)
+
+      assert Repo.get_by(P.PhotoLike, user_id: user.id, photo_id: photo.id)
+    end
+
+    test "returns error when liking a non-existent photo", %{scope: scope} do
+      assert {:error, :not_found} = Photos.like_photo(scope, Ecto.UUID.generate())
+    end
+  end
+
+  describe "unlike_photo/2" do
+    test "unlikes a photo", %{user: user, scope: scope, photo: photo} do
+      assert :ok = Photos.like_photo(scope, photo.id)
+      assert Repo.get_by(P.PhotoLike, user_id: user.id, photo_id: photo.id)
+
+      assert :ok = Photos.unlike_photo(scope, photo.id)
+      refute Repo.get_by(P.PhotoLike, user_id: user.id, photo_id: photo.id)
+    end
+
+    test "does not error when unliking a photo that is not liked", %{scope: scope, photo: photo} do
+      assert :ok = Photos.unlike_photo(scope, photo.id)
+    end
+
+    test "does not error when unliking a non-existent photo", %{scope: scope} do
+      assert :ok = Photos.unlike_photo(scope, Ecto.UUID.generate())
     end
   end
 end

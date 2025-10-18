@@ -168,6 +168,50 @@ defmodule PWeb.PhotoControllerTest do
     end
   end
 
+  describe "POST /api/photos/:id/like" do
+    test "likes and unlikes a photo", %{conn: conn} do
+      user = user_fixture()
+      photo = photo_fixture(user: user)
+
+      like_response =
+        conn
+        |> auth_json_conn(user)
+        |> post(~p"/api/photos/#{photo.id}/like")
+        |> json_response(200)
+
+      assert like_response["success"]
+      assert like_response["message"] == "Photo liked"
+
+      assert P.Repo.get_by(P.PhotoLike, user_id: user.id, photo_id: photo.id)
+
+      unlike_response =
+        conn
+        |> auth_json_conn(user)
+        |> post(~p"/api/photos/#{photo.id}/unlike")
+        |> json_response(200)
+
+      assert unlike_response["success"]
+      assert unlike_response["message"] == "Photo unliked"
+
+      refute P.Repo.get_by(P.PhotoLike, user_id: user.id, photo_id: photo.id)
+    end
+
+    test "unliking an unliked photo still succeeds", %{conn: conn} do
+      user = user_fixture()
+      photo = photo_fixture(user: user)
+
+      response =
+        conn
+        |> auth_json_conn(user)
+        |> post(~p"/api/photos/#{photo.id}/unlike")
+        |> json_response(200)
+
+      assert response["success"]
+      assert response["message"] == "Photo unliked"
+      refute P.Repo.get_by(P.PhotoLike, user_id: user.id, photo_id: photo.id)
+    end
+  end
+
   describe "photo serialization" do
     test "marks photos as not deletable when the user is not the owner" do
       owner = user_fixture()

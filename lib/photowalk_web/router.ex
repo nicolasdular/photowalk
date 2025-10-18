@@ -75,6 +75,8 @@ defmodule PWeb.Router do
 
     get("/user/me", UserController, :me)
     resources("/photos", PhotoController, only: [:index, :create, :delete])
+    post("/photos/:id/like", PhotoController, :like)
+    post("/photos/:id/unlike", PhotoController, :unlike)
 
     resources("/collections", CollectionController, only: [:index, :create, :show, :update]) do
       post("/users", CollectionController, :add_user)

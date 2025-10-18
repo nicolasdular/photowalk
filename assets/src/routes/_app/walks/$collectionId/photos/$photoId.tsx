@@ -7,10 +7,9 @@ import { Spinner } from '@/components/ui/spinner';
 import { useCollectionQuery } from '@/lib/hooks/useCollectionQuery';
 import { PageTitle } from '@/components/ui/page-title';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/user-avatar';
 
-export const Route = createFileRoute(
-  '/_app/walks/$collectionId/photos/$photoId'
-)({
+export const Route = createFileRoute('/_app/walks/$collectionId/photos/$photoId')({
   component: PhotoDetailRoute,
 });
 
@@ -19,16 +18,9 @@ type Photo = components['schemas']['CollectionDetail']['photos'][0];
 function PhotoDetailRoute() {
   const params = Route.useParams();
   const navigate = Route.useNavigate();
-  const {
-    data: collection,
-    isLoading,
-    isError,
-  } = useCollectionQuery(params.collectionId);
+  const { data: collection, isLoading, isError } = useCollectionQuery(params.collectionId);
 
-  const photos = useMemo(
-    () => (collection?.photos as Photo[] | undefined) ?? [],
-    [collection?.photos]
-  );
+  const photos = useMemo(() => (collection?.photos as Photo[] | undefined) ?? [], [collection?.photos]);
 
   const currentIndex = useMemo(
     () => photos.findIndex(photo => String(photo.id) === params.photoId),
@@ -36,14 +28,9 @@ function PhotoDetailRoute() {
   );
   const current = currentIndex >= 0 ? photos[currentIndex] : undefined;
   const prev = currentIndex > 0 ? photos[currentIndex - 1] : undefined;
-  const next =
-    currentIndex >= 0 && currentIndex < photos.length - 1
-      ? photos[currentIndex + 1]
-      : undefined;
+  const next = currentIndex >= 0 && currentIndex < photos.length - 1 ? photos[currentIndex + 1] : undefined;
 
-  const progressLabel = photos.length
-    ? `Photo ${Math.max(currentIndex + 1, 1)}/${photos.length}`
-    : 'Photo';
+  const progressLabel = photos.length ? `Photo ${Math.max(currentIndex + 1, 1)}/${photos.length}` : 'Photo';
 
   const goToPhoto = useCallback(
     (photo?: Photo) => {
@@ -125,16 +112,11 @@ function PhotoDetailRoute() {
       </div>
     );
   }
-  console.log(current.user);
 
   return (
     <>
       <PageTitle
-        title={
-          <Avatar>
-            <AvatarImage src={current.user?.avatar_url} />
-          </Avatar>
-        }
+        title={<UserAvatar user={current.user} />}
         backLink={
           <Link
             to="/walks/$collectionId"
@@ -155,9 +137,7 @@ function PhotoDetailRoute() {
               >
                 <ArrowLeft
                   className={`h-4 w-4 transition-colors ${
-                    !prev
-                      ? 'text-gray-400'
-                      : 'text-primary group-hover:text-primary-700'
+                    !prev ? 'text-gray-400' : 'text-primary group-hover:text-primary-700'
                   }`}
                 />
               </button>
@@ -169,27 +149,19 @@ function PhotoDetailRoute() {
               >
                 <ArrowRight
                   className={`h-4 w-4 transition-colors ${
-                    !next
-                      ? 'text-gray-400'
-                      : 'text-primary group-hover:text-primary-700'
+                    !next ? 'text-gray-400' : 'text-primary group-hover:text-primary-700'
                   }`}
                 />
               </button>
             </div>
-            <span className="text-xs uppercase tracking-[0.2em] opacity-70">
-              {progressLabel}
-            </span>
+            <span className="text-xs uppercase tracking-[0.2em] opacity-70">{progressLabel}</span>
           </div>
         }
       />
 
       <div className="space-y-6">
         <div className="relative flex items-center justify-center overflow-hidden rounded-2xl ">
-          <img
-            src={current.full_url}
-            alt={current.title || 'Photo'}
-            className="max-h-[70vh] w-full object-contain"
-          />
+          <img src={current.full_url} alt={current.title || 'Photo'} className="max-h-[70vh] w-full object-contain" />
         </div>
       </div>
     </>

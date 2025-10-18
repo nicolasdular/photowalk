@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { UserAvatar } from '@/components/user-avatar';
 
 type SignedInLayoutProps = React.PropsWithChildren<{
   onSignOut?: () => void;
@@ -53,13 +54,7 @@ export function SignedInLayout({
 
           <DropdownMenu>
             <DropdownMenuTrigger className="focus:outline-none">
-              <Avatar className="h-9 w-9 cursor-pointer">
-                <AvatarImage
-                  src={currentUser?.avatar_url}
-                  alt={currentUser?.name || 'User'}
-                />
-                <AvatarFallback>{getInitials()}</AvatarFallback>
-              </Avatar>
+              <UserAvatar user={currentUser} />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem>

@@ -4,7 +4,7 @@ defmodule PWeb.PhotoController do
 
   alias OpenApiSpex.Schema
   alias P.Photos
-  alias PWeb.Api.Docs.Response
+  alias PWeb.Api.Docs.{Response, Success}
   alias PWeb.API.Resources.PhotoSummary
 
   action_fallback PWeb.FallbackController
@@ -83,6 +83,50 @@ defmodule PWeb.PhotoController do
   def delete(conn, %{"id" => id}) do
     with {:ok, _photo} <- Photos.delete_photo(current_user(conn), id) do
       send_resp(conn, :no_content, "")
+    end
+  end
+
+  operation :like,
+    summary: "Like a photo",
+    parameters: [
+      id: [
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      ]
+    ],
+    responses: [
+      ok: Response.ok(Success, "Photo liked"),
+      not_found: Response.not_found()
+    ]
+
+  def like(conn, %{"id" => id}) do
+    scope = conn.assigns.current_scope
+
+    with :ok <- Photos.like_photo(scope, id) do
+      json(conn, %{success: true, message: "Photo liked"})
+    end
+  end
+
+  operation :unlike,
+    summary: "Unlike a photo",
+    parameters: [
+      id: [
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      ]
+    ],
+    responses: [
+      ok: Response.ok(Success, "Photo unliked"),
+      not_found: Response.not_found()
+    ]
+
+  def unlike(conn, %{"id" => id}) do
+    scope = conn.assigns.current_scope
+
+    with :ok <- Photos.unlike_photo(scope, id) do
+      json(conn, %{success: true, message: "Photo unliked"})
     end
   end
 end
