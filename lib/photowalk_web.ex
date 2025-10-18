@@ -43,7 +43,7 @@ defmodule PWeb do
       use Gettext, backend: PWeb.Gettext
 
       import Plug.Conn
-      import PWeb.ControllerHelpers, only: [current_user: 1, scope: 1]
+      import PWeb.ControllerHelpers, only: [current_user: 1, scope: 1, present: 3, present: 4]
 
       unquote(verified_routes())
     end

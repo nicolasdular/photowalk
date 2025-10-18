@@ -1,16 +1,15 @@
 defmodule PWeb.API.Resources.CollectionBase do
-  @moduledoc false
-
   alias P.Collection
   alias PWeb.API.Resources.Helpers
 
+  @fields [:id, :title, :description]
+
   def build(%Collection{} = collection) do
-    %{
-      id: collection.id,
-      title: collection.title,
-      description: collection.description,
+    collection
+    |> Map.take(@fields)
+    |> Map.merge(%{
       inserted_at: Helpers.datetime_to_iso!(collection.inserted_at),
       updated_at: Helpers.datetime_to_iso!(collection.updated_at)
-    }
+    })
   end
 end

@@ -9,23 +9,11 @@ defmodule P.User do
     field(:email, :string)
     field(:confirmed_at, :utc_datetime_usec)
 
-    field :avatar_url, :string, virtual: true
-
     has_many :collection_memberships, Member, foreign_key: :user_id
     has_many :sent_collection_invitations, Member, foreign_key: :inviter_id
 
     timestamps()
   end
-
-  def avatar_url(%__MODULE__{email: email}) when is_binary(email) do
-    hash =
-      :crypto.hash(:md5, String.downcase(String.trim(email)))
-      |> Base.encode16(case: :lower)
-
-    "https://www.gravatar.com/avatar/#{hash}"
-  end
-
-  def avatar_url(_), do: nil
 
   def changeset(user, attrs) do
     user

@@ -19,15 +19,9 @@ defmodule PWeb.CollectionController do
     ]
 
   def index(conn, _params) do
-    scope = conn.assigns.current_scope
-    current_user = conn.assigns.current_user
+    collections = Collections.list_collections(scope(conn))
 
-    collections =
-      scope
-      |> Collections.list_collections()
-      |> Enum.map(&CollectionSummary.build(&1, current_user: current_user))
-
-    json(conn, %{data: collections})
+    json(conn, %{data: present(conn, CollectionSummary, collections)})
   end
 
   operation :create,
@@ -52,16 +46,11 @@ defmodule PWeb.CollectionController do
     ]
 
   def create(conn, params) do
-    scope = conn.assigns.current_scope
-    current_user = conn.assigns.current_user
-
-    with {:ok, collection} <- Collections.create_collection(scope, params),
-         {:ok, detailed_collection} <-
-           Collections.get_collection(scope, collection.id, %{preloads: [photos: :user]}) do
+    with {:ok, collection} <- Collections.create_collection(scope(conn), params) do
       conn
       |> put_status(:created)
       |> json(%{
-        data: CollectionDetail.build(detailed_collection, current_user: current_user)
+        data: present(conn, CollectionDetail, collection)
       })
     end
   end
@@ -92,14 +81,9 @@ defmodule PWeb.CollectionController do
     ]
 
   def update(conn, params) do
-    scope = scope(conn)
-    current_user = current_user(conn)
-
-    with {:ok, collection} <- Collections.update_collection(scope, params),
-         {:ok, detailed_collection} <-
-           Collections.get_collection(scope, collection.id, %{preloads: [photos: :user]}) do
+    with {:ok, collection} <- Collections.update_collection(scope(conn), params) do
       json(conn, %{
-        data: CollectionDetail.build(detailed_collection, current_user: current_user)
+        data: present(conn, CollectionDetail, collection)
       })
     end
   end
@@ -114,13 +98,8 @@ defmodule PWeb.CollectionController do
     ]
 
   def show(conn, %{"id" => id}) do
-    current_user = current_user(conn)
-
-    with {:ok, collection} <-
-           Collections.get_collection(scope(conn), id, %{
-             preloads: [photos: [:user, likes: :user]]
-           }) do
-      json(conn, %{data: CollectionDetail.build(collection, current_user: current_user)})
+    with {:ok, collection} <- Collections.get_collection(scope(conn), id) do
+      json(conn, %{data: present(conn, CollectionDetail, collection)})
     end
   end
 
@@ -166,7 +145,7 @@ defmodule PWeb.CollectionController do
          user when not is_nil(user) <- P.Accounts.get_user_by_email(scope(conn), email) do
       conn
       |> put_status(:created)
-      |> json(%{data: UserResource.build(user)})
+      |> json(%{data: present(conn, UserResource, user)})
     else
       nil -> {:error, :user_not_found}
       error -> error
@@ -193,7 +172,7 @@ defmodule PWeb.CollectionController do
 
     with {:ok, collection} <- Collections.get_collection(scope, collection_id),
          users <- Collections.list_users(scope, collection) do
-      json(conn, %{data: Enum.map(users, &UserResource.build/1)})
+      json(conn, %{data: present(conn, UserResource, users)})
     end
   end
 end

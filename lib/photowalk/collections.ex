@@ -4,11 +4,10 @@ defmodule P.Collections do
   alias P.{Collection, Member, Repo, User, Scope}
 
   @spec list_collections(Scope.t()) :: [Collection.t()]
-  def list_collections(%Scope{current_user: %User{id: user_id}}, opts \\ %{}) do
+  def list_collections(%Scope{current_user: %User{id: user_id}}) do
     Collection
     |> join(:inner, [c], m in Member, on: m.collection_id == c.id)
     |> where([c, m], m.user_id == ^user_id)
-    |> maybe_preload(opts[:preloads])
     |> Repo.all()
   end
 
@@ -32,10 +31,9 @@ defmodule P.Collections do
   end
 
   @spec get_collection(Scope.t(), String.t()) :: {:ok, Collection.t()} | {:error, :not_found}
-  def get_collection(scope, id, opts \\ %{preloads: [:photos]}) do
+  def get_collection(scope, id) do
     case Collection
          |> where([c], c.id == ^id)
-         |> maybe_preload(opts[:preloads])
          |> Repo.one() do
       nil ->
         {:error, :not_found}
@@ -101,21 +99,16 @@ defmodule P.Collections do
     end
   end
 
-  def list_users(scope, %Collection{id: collection_id} = collection, opts \\ %{}) do
+  def list_users(scope, %Collection{id: collection_id} = collection) do
     if can_read_collection?(scope, collection) do
       User
       |> join(:inner, [u], m in Member, on: m.user_id == u.id)
       |> where([u, m], m.collection_id == ^collection_id)
-      |> maybe_preload(opts[:preloads])
       |> Repo.all()
     else
       {:error, :forbidden}
     end
   end
-
-  defp maybe_preload(query, nil), do: query
-  defp maybe_preload(query, preloads) when is_list(preloads), do: preload(query, ^preloads)
-  defp maybe_preload(query, preload) when is_atom(preload), do: preload(query, ^preload)
 
   def can_read_collection?(%P.Scope{current_user: nil}, _collection), do: false
 

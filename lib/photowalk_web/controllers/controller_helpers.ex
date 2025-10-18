@@ -10,4 +10,8 @@ defmodule PWeb.ControllerHelpers do
 
   @spec scope(Conn.t()) :: any()
   def scope(%Conn{} = conn), do: conn.assigns[:current_scope]
+
+  def present(conn, module, data, opts \\ []) do
+    PWeb.API.Presenter.present(module, data, Keyword.put(opts, :current_user, current_user(conn)))
+  end
 end

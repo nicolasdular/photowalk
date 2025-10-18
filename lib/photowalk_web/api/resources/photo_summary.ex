@@ -3,6 +3,8 @@ defmodule PWeb.API.Resources.PhotoSummary do
   alias P.Photo
   alias PWeb.API.Resources.Helpers
 
+  use PWeb.API.Resource
+
   @fields [
     :id,
     :title,

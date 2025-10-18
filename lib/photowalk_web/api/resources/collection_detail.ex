@@ -1,8 +1,9 @@
 defmodule PWeb.API.Resources.CollectionDetail do
-  alias Ecto.{Association.NotLoaded}
   alias OpenApiSpex.Schema
   alias P.Collection
   alias PWeb.API.Resources.{CollectionBase, PhotoDetail}
+
+  def preload(_opts), do: [photos: [:user, likes: :user]]
 
   def schema do
     %Schema{
@@ -29,20 +30,11 @@ defmodule PWeb.API.Resources.CollectionDetail do
     current_user = Keyword.get(opts, :current_user)
 
     photos =
-      collection
-      |> fetch_loaded_photos!()
-      |> Enum.map(&PhotoDetail.build(&1, current_user: current_user))
+      collection.photos
+      |> Enum.map(&PhotoDetail.build(&1, opts))
 
     CollectionBase.build(collection)
     |> Map.put(:can_edit, collection.owner_id == current_user.id)
     |> Map.put(:photos, photos)
   end
-
-  defp fetch_loaded_photos!(%Collection{photos: %NotLoaded{}}) do
-    raise ArgumentError,
-          "expected collection.photos to be preloaded when building a CollectionDetail resource"
-  end
-
-  defp fetch_loaded_photos!(%Collection{photos: nil}), do: []
-  defp fetch_loaded_photos!(%Collection{photos: photos}) when is_list(photos), do: photos
 end

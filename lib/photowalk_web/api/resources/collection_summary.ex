@@ -1,4 +1,6 @@
 defmodule PWeb.API.Resources.CollectionSummary do
+  use PWeb.API.Resource
+
   alias OpenApiSpex.Schema
   alias P.{Collection, Photos}
   alias PWeb.API.Resources.{CollectionBase, PhotoSummary}

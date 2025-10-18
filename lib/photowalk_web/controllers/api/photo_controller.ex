@@ -58,12 +58,11 @@ defmodule PWeb.PhotoController do
 
   def create(conn, params) do
     scope = conn.assigns.current_scope
-    user = scope.current_user
 
     with {:ok, photo} <- Photos.create_photo(scope, params["photo"], params) do
       conn
       |> put_status(:created)
-      |> json(%{data: PhotoSummary.build(photo, current_user: user)})
+      |> json(%{data: present(conn, PhotoSummary, photo)})
     end
   end
 
