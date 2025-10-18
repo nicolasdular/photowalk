@@ -1,8 +1,4 @@
 defmodule P.Photo do
-  @moduledoc """
-  Represents a processed photo belonging to a user.
-  """
-
   use P.Schema
   use Waffle.Ecto.Schema
 
@@ -24,6 +20,8 @@ defmodule P.Photo do
 
     belongs_to :user, User
     belongs_to :collection, Collection
+
+    has_many :likes, P.PhotoLike
 
     timestamps()
   end

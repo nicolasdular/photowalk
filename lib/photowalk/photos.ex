@@ -68,6 +68,44 @@ defmodule P.Photos do
     |> Repo.all()
   end
 
+  def like_photo(%Scope{} = scope, photo_id) do
+    # TODO: implement check if user has access to that photo
+
+    with photo when not is_nil(photo) <- Repo.get(Photo, photo_id) do
+      P.PhotoLike.changeset(%P.PhotoLike{}, %{user_id: scope.current_user.id, photo_id: photo.id})
+      |> Repo.insert()
+      |> case do
+        {:ok, _like} ->
+          :ok
+
+        {:error,
+         %Ecto.Changeset{
+           errors: [
+             photo_id: {_, [constraint: :unique, constraint_name: "photo_likes_photo_id_user_id_index"]}
+           ]
+         } = _changeset} ->
+          # User already liked the photo, return ok without error
+          :ok
+
+        {:error, changeset} ->
+          {:error, changeset}
+      end
+    else
+      nil -> {:error, :not_found}
+    end
+  end
+
+  def unlike_photo(%Scope{} = scope, photo_id) do
+    case Repo.get_by(P.PhotoLike, user_id: scope.current_user.id, photo_id: photo_id) do
+      nil ->
+        :ok
+
+      like ->
+        Repo.delete(like)
+        :ok
+    end
+  end
+
   defp validate_collection_access(_scope, nil), do: :ok
 
   defp validate_collection_access(scope, collection_id) do

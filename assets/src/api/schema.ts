@@ -139,6 +139,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/photos/{id}/like": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Like a photo */
+        post: operations["PWeb.PhotoController.like"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/photos/{id}/unlike": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Unlike a photo */
+        post: operations["PWeb.PhotoController.unlike"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/user/me": {
         parameters: {
             query?: never;
@@ -1411,6 +1445,72 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Error message */
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PWeb.PhotoController.like": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Photo liked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Success"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Error message */
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PWeb.PhotoController.unlike": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Photo unliked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Success"];
+                };
             };
             404: {
                 headers: {
